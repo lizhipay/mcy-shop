@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 return [
     'driver' => 'mysql',
-    'host' => 'localhost',
-    'database' => 'install2',
-    'username' => 'install2',
-    'password' => 'D3CeMXK8DE6WcDYB',
+    'host' => '',
+    'database' => '',
+    'username' => '',
+    'password' => '',
     'charset' => 'utf8mb4',
     'collation' => 'utf8mb4_unicode_ci',
-    'prefix' => 'test_',
+    'prefix' => '',
     'pool' => 10,
 ];
