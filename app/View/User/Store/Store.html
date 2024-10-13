@@ -1,0 +1,46 @@
+{{ include ("Common/Header.html") }}
+
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    App Store
+                </h2>
+            </div>
+            <nav class="flex-shrink-0 mt-3 mt-sm-0 ms-sm-3" aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-alt">
+                    <li class="breadcrumb-item">
+                        <a class="link-fx" href="javascript:void(0)">{{ i18n('我的应用')|raw }}</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        {{ i18n(title)|raw }}
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-primary btn-sm open-store-powers">{{icon("icon-dingdan4")|raw}} {{ i18n("我的订阅")|raw }}</button>
+            <a href="/user/plugin" type="button" class="btn btn-outline-primary btn-sm">{{icon("icon-chajianhua")|raw}} {{ i18n("管理插件")|raw }}</a>
+        </div>
+        <div class="block-content pt-0">
+            <table id="store-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/user/controller/store/store.js")|raw }}
+{{ include ("Common/Footer.html") }}

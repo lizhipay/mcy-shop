@@ -1,0 +1,94 @@
+{{include( "Common/Header.html")}}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    My Products
+                </h2>
+            </div>
+            <nav class="flex-shrink-0 mt-3 mt-sm-0 ms-sm-3" aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-alt">
+                    <li class="breadcrumb-item">
+                        <a class="link-fx" href="javascript:void(0)">{{ i18n("我的店铺")|raw }}</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        {{ i18n(title)|raw }}
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+
+<!-- Page Content -->
+<div class="content">
+    <div class="row mb-2 data-count">
+
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-xiaoxiong","icon-42px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("全部")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center item_count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-anquan3","icon-40px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("在售")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center sold_count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-anquan2","icon-42px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("已下架")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center not_sold_count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+    <div class="block block-rounded">
+        <div class="block-table-header block-header-default pt-3 pb-3">
+            <button type="button" class="btn btn-outline-success btn-sm add-shop-item me-2" onclick="window.location.href='/user/shop/supply'">{{ icon("icon-tianjia")|raw }} {{ i18n("添加商品")|raw }}</button>
+            <button type="button" class="btn btn-outline-primary btn-sm control-item me-2">{{ icon("icon-shangxiajia")|raw }} {{i18n("操作选中商品")|raw}}</button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-shop-item">{{ icon("icon-shanchu")|raw }} {{ i18n("移除商品")|raw }}</button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="shop-item-table"></table>
+        </div>
+    </div>
+</div>
+<!-- END Page Content -->
+
+{{ ready("/assets/user/controller/shop/item.js")|raw }} 
+{{include ("Common/Footer.html")}}

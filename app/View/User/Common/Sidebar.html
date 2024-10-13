@@ -1,0 +1,255 @@
+<!-- Sidebar Scrolling -->
+<div class="js-sidebar-scroll pb-4">
+    <!-- Side Navigation -->
+    <div class="content-side">
+        <ul class="nav-main">
+            <li class="nav-main-heading">{{ i18n("我的购物")|raw }}</li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/trade/order") }}" href="/" target="_blank">
+                    {{ icon("icon-gouwuche1" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("我要购物")|raw }}</span>
+                </a>
+            </li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/trade/order") }}" href="/user/trade/order">
+                    {{ icon("icon-baby" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("已买到的宝贝")|raw }}</span>
+                </a>
+            </li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/report/order") }}" href="/user/report/order">
+                    {{ icon("icon-Fxjsjyqx" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("消费维权")|raw }}</span>
+                </a>
+            </li>
+
+
+            <li class="nav-main-heading">{{ i18n("我的钱包")|raw }}</li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/recharge") }}" href="/user/recharge">
+                    {{ icon("icon-jifenchongzhi" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("余额充值")|raw }}</span>
+
+                    <span class="nav-main-link-badge badge rounded-pill bg-success user-balance-amount">{{ user.balance }}</span>
+                </a>
+
+            </li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/transfer") }}" href="/user/transfer">
+                    {{ icon("icon-zhuanzhang" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("匿名转账")|raw }}</span>
+                </a>
+            </li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/withdraw") }}" href="/user/withdraw">
+                    {{ icon("icon-tixian1" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("法币兑换")|raw }}</span>
+
+                    <span class="nav-main-link-badge badge rounded-pill bg-primary user-withdraw-amount">{{ user.withdraw_amount }}</span>
+                </a>
+
+
+            </li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/bill") }}" href="/user/bill">
+                    {{ icon("icon-zhangdan" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("账单记录")|raw }}</span>
+                </a>
+            </li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/bank/card") }}" href="/user/bank/card">
+                    {{ icon("icon-yinhangka1" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("银行卡")|raw }}</span>
+                </a>
+            </li>
+
+            <li class="nav-main-heading">{{ i18n("个人中心")|raw }}</li>
+
+            {% if user.group is null %}
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/merchant/open") }}" href="/user/merchant/open">
+                    {{ icon("icon-woyaokaidian" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("开通商家")|raw }}</span>
+                </a>
+            </li>
+            {% endif %}
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/personal") }}" href="/user/personal">
+                    {{ icon("icon-cdp-gerenxinxi" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("我的资料")|raw }}</span>
+                </a>
+            </li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/inviter") }}" href="/user/inviter">
+                    {{ icon("icon-shangpintuiguang" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("推广返利")|raw }}</span>
+                </a>
+            </li>
+
+            <li class="nav-main-item">
+                <a class="nav-main-link {{ link_active("/user/security") }}" href="/user/security">
+                    {{ icon("icon-anquan3" , "nav-main-link-icon")|raw }} <span
+                            class="nav-main-link-name">{{ i18n("安全中心")|raw }}</span>
+                </a>
+            </li>
+
+
+            {% if user.group.is_merchant == 1 or user.group.is_supplier == 1 %}
+
+                {% if user.group.is_merchant == 1 %}
+                    <li class="nav-main-heading">{{ i18n("我的店铺")|raw }}</li>
+                    <li class="nav-main-item {{ submenu_open(["/user/shop/category" ,  "/user/shop/item" , "/user/shop/supply" , "/user/shop/item/markup" , "/user/shop/order" , "/user/shop/order/summary"]) }}">
+                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true"
+                           aria-expanded="true" href="#">
+                            {{ icon("icon-shangpinguanli1" , "nav-main-link-icon")|raw }}
+                            <span class="nav-main-link-name">{{ i18n("商品管理")|raw }}</span>
+                        </a>
+                        <ul class="nav-main-submenu">
+                            <li class="nav-main-item ">
+                                <a class="nav-main-link {{ link_active("/user/shop/category") }}"
+                                   href="/user/shop/category">
+                                    {{ icon("icon-shangpinleibie" , "nav-main-link-icon")|raw }}
+                                    <span class="nav-main-link-name">{{ i18n("分类管理")|raw }}</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link {{ link_active("/user/shop/item") }}" href="/user/shop/item">
+                                    {{ icon("icon-shangpinguanli" , "nav-main-link-icon")|raw }}
+                                    <span class="nav-main-link-name">{{ i18n("商品管理")|raw }}</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link {{ link_active("/user/shop/order") }}" href="/user/shop/order">
+                                    {{ icon("icon-dingdan1" , "nav-main-link-icon")|raw }}
+                                    <span class="nav-main-link-name">{{ i18n("订单管理")|raw }}</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link {{ link_active("/user/shop/order/summary") }}" href="/user/shop/order/summary">
+                                    {{ icon("icon-shujuhuizong" , "nav-main-link-icon")|raw }}
+                                    <span class="nav-main-link-name">{{ i18n("订单汇总")|raw }}</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link {{ link_active("/user/shop/item/markup") }}"
+                                   href="/user/shop/item/markup">
+                                    {{ icon("icon-jiage" , "nav-main-link-icon")|raw }}
+                                    <span class="nav-main-link-name">{{ i18n("同步模版")|raw }}</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link {{ link_active("/user/shop/supply") }}"
+                                   href="/user/shop/supply">
+                                    {{ icon("icon-huowu" , "nav-main-link-icon")|raw }}
+                                    <span class="nav-main-link-name">{{ i18n("货源市场")|raw }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-main-item">
+                        <a class="nav-main-link {{ link_active("/user/user") }}" href="/user/user">
+                            {{ icon("icon-huiyuanguanli" , "nav-main-link-icon")|raw }} <span
+                                    class="nav-main-link-name">{{ i18n("会员管理")|raw }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-main-item">
+                        <a class="nav-main-link {{ link_active("/user/user/level") }}" href="/user/user/level">
+                            {{ icon("icon-huiyuandengji" , "nav-main-link-icon")|raw }} <span
+                                    class="nav-main-link-name">{{ i18n("会员等级")|raw }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-main-item">
+                        <a class="nav-main-link {{ link_active("/user/config") }}" href="/user/config">
+                            {{ icon("icon-shezhi3" , "nav-main-link-icon")|raw }} <span
+                                    class="nav-main-link-name">{{ i18n("店铺设置")|raw }}</span>
+                        </a>
+                    </li>
+
+                {% endif %}
+
+                {% if user.group.is_supplier == 1 %}
+                    <li class="nav-main-heading">{{ i18n("供货商")|raw }}</li>
+
+                    <li class="nav-main-item">
+                        <a class="nav-main-link {{ link_active("/user/repertory/item") }}" href="/user/repertory/item">
+                            {{ icon("icon-m_whms" , "nav-main-link-icon")|raw }} <span
+                                    class="nav-main-link-name">{{ i18n("货源管理")|raw }}</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-main-item">
+                        <a class="nav-main-link {{ link_active("/user/repertory/item/markup") }}" href="/user/repertory/item/markup">
+                            {{ icon("icon-jiage" , "nav-main-link-icon")|raw }} <span
+                                    class="nav-main-link-name">{{ i18n("同步模版")|raw }}</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-main-item">
+                        <a class="nav-main-link {{ link_active("/user/repertory/report/order") }}" href="/user/repertory/report/order">
+                            {{ icon("icon-tousu" , "nav-main-link-icon")|raw }} <span
+                                    class="nav-main-link-name">{{ i18n("维权订单")|raw }}</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-main-item">
+                        <a class="nav-main-link {{ link_active("/user/repertory/order") }}" href="/user/repertory/order">
+                            {{ icon("icon-dingdan" , "nav-main-link-icon")|raw }} <span
+                                    class="nav-main-link-name">{{ i18n("进货订单")|raw }}</span>
+                        </a>
+                    </li>
+
+                {% endif %}
+
+                {% if user.group.is_merchant == 1 %}
+                    <li class="nav-main-heading">{{ i18n("收款功能")|raw }}</li>
+
+                    <li class="nav-main-item">
+                        <a class="nav-main-link {{ link_active("/user/pay") }}" href="/user/pay">
+                            {{ icon("icon-zhifu" , "nav-main-link-icon")|raw }} <span
+                                    class="nav-main-link-name">{{ i18n("支付接口")|raw }}</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-main-item">
+                        <a class="nav-main-link {{ link_active("/user/pay/order") }}" href="/user/pay/order">
+                            {{ icon("icon-dingdan4" , "nav-main-link-icon")|raw }} <span
+                                    class="nav-main-link-name">{{ i18n("收款记录")|raw }}</span>
+                        </a>
+                    </li>
+
+                {% endif %}
+
+                <li class="nav-main-heading">{{ i18n("我的应用")|raw }}</li>
+
+                <li class="nav-main-item">
+                    <a class="nav-main-link {{ link_active("/user/plugin") }}" href="/user/plugin">
+                        {{ icon("icon-chajianhua" , "nav-main-link-icon")|raw }}
+                        <span class="nav-main-link-name">{{ i18n("插件管理")|raw }}</span>
+                    </a>
+                </li>
+
+                {{ plugin_menus(user.id)|raw }}
+
+            {% endif %}
+
+
+        </ul>
+    </div>
+    <!-- END Side Navigation -->
+</div>
+<!-- END Sidebar Scrolling -->

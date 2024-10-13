@@ -1,0 +1,96 @@
+{{ include ("Common/Header.html") }}
+
+<div class="content">
+
+    <div class="block block-rounded trade-block hide">
+        <ul class="nav nav-tabs nav-tabs-alt" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="my-withdrawal" data-bs-toggle="tab"
+                        data-bs-target="#tab-my-withdrawal" role="tab" aria-controls="tab-my-withdrawal"
+                        aria-selected="false" tabindex="-1">兑换记录
+                </button>
+            </li>
+                        <li class="nav-item" role="presentation">
+                <button class="nav-link" id="my-bill" data-bs-toggle="tab"
+                        data-bs-target="#tab-my-bill" role="tab" aria-controls="tab-my-bill"
+                        aria-selected="true">我的账单
+                </button>
+            </li>
+        </ul>
+        <div class="block-content tab-content pt-0">
+            <div class="tab-pane active show pt-3" id="tab-my-withdrawal" role="tabpanel" aria-labelledby="my-withdrawal" tabindex="0">
+                <button type="button" class="btn btn-outline-primary btn-sm withdrawal-apply">{{ icon("icon-tixian")|raw }} <span class="withdrawal-apply-text">{{ i18n("兑现") }}</span>
+                </button>
+                <table id="withdrawal-table"></table>
+            </div>
+
+            <div class="tab-pane" id="tab-my-bill" role="tabpanel" aria-labelledby="my-bill" tabindex="0">
+                <table id="bill-table" class="pt-0"></table>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="block block-rounded identity-block hide">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">实名认证</h3>
+        </div>
+        <div class="block-content">
+            <form onsubmit="return false;">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 col-xl-5">
+
+                        <div class="cert-status-submit d-hide">
+                            <div class="alert alert-warning alert-dismissible" role="alert">
+                                <h4 class="fw-bold mb-3 text-success">您当前位于【应用商店-盈利中心】。该功能需完成实名认证后方可使用。盈利中心主要用于【应用商店】的合作返佣提现、【应用商店】的消费账单查询及【应用商店】的开发者资金管理。</h4>
+
+                                <h4 class="mt-2 mb-2">所以，为什么要实名？</h4>
+                                <p class="mb-0 ms-2"><b>1.遵守国家法规</b>：根据中国相关法律规定，金融交易和资金提现必须实行实名制管理。这是维护社会秩序和金融安全的必要措施。</p>
+                                <p class="mt-0 mb-0 ms-2"><b>2.打击洗钱行为</b>：国家对洗钱活动实行严格监管。通过实名认证，我们能够有效监控资金流动，防止非法资金交易，确保平台运营合法合规。</p>
+                                <p class="mt-0 ms-2"><b>3.防范电信诈骗</b>：电信诈骗严重危害社会安全。实名认证有助于核实用户身份，防止不法分子利用虚假信息进行诈骗活动，保护您的账户安全。</p>
+                                <p class="mb-0 text-danger">
+                                    请注意，请务必填写真实信息。实名认证每24小时内只能进行一次，我们的实名认证是通过“支付宝人脸”进行的，且我们不会保存您提交的信息。实名认证完成后无法更改，仅适用于中国大陆的用户。
+                                </p>
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="cert-name" placeholder="请输入您的姓名">
+                                <label for="cert-name">姓名</label>
+                            </div>
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="cert-no" placeholder="18位身份证号码">
+                                <label class="form-label" for="cert-no">身份证号码</label>
+                            </div>
+
+                            <div class="mb-4">
+                                <button type="button"
+                                        class="btn btn-lg btn-alt-primary w-100 py-3 fw-semibold cert-button">
+                                    开始进行人脸验证
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <div class="cert-status-scan d-hide">
+                            <div class="d-flex justify-content-center flex-column">
+                                <div class="mb-2 text-center">
+                                    <span class="common-item">{{ icon("icon-zhifubao","icon-18px")|raw }} <span
+                                                class="ms-1" style="color: #1678ff;font-weight: bold;font-size: 16px;">请使用支付宝认证</span></span>
+                                </div>
+
+                                <div class="mb-4 text-center">
+                                    <div class="cert-qrcode"></div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{ ready("/assets/admin/controller/store/trade.js")|raw }}
+{{ include ("Common/Footer.html") }}

@@ -1,0 +1,33 @@
+{{ include ("Common/Header.html") }}
+
+{{ var({ nginxConf : nginxConf , cli : cli })|raw }}
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-content">
+            <div class="row push">
+
+                {% for config in configs %}
+                    <div class="col-6 col-md-3 col-lg-3 col-xl-2 col-xxl-2 col-xxxl-1">
+                        <a class="block block-rounded text-center config-block {{ config.key }}-setting"
+                           href="javascript:void(0)">
+                            <div style="background: url('{{ config.bg_url }}') center/cover !important; "
+                                 class="config-background"></div>
+                            <div class="block-content block-content-full bg-config ratio ratio-4x3">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div>
+                                        {{ icon(config.icon , "icon-44px")|raw }}
+                                        <div class="fw-semibold mt-3 text-white config-title">{{ i18n(config.title)|raw }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ ready("/assets/admin/controller/config/config.js")|raw }}
+{{ include ("Common/Footer.html") }}

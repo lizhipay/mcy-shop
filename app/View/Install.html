@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="/assets/admin/css/codebase.min.css" rel="stylesheet">
+    <link href="/assets/common/js/layer/theme/default/layer.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 0;
+            background-color: #ffffffa8;
+        }
+
+        .list-group{
+            --bs-list-group-bg: #ffffff05;
+        }
+
+        .card-header {
+            background-color: #007bff73;
+            color: white;
+            border-top-left-radius: 0 !important;
+            border-top-right-radius: 0 !important;
+        }
+
+        .form-control{
+            background-color: #ffffff30;
+        }
+
+        .step-container {
+            display: none;
+        }
+
+        .step-container.active {
+            display: block;
+        }
+
+        .step-btn {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .smooth-transition {
+            transition: all 0.5s ease-in-out;
+            opacity: 0;
+        }
+
+        .smooth-transition.active {
+            opacity: 1;
+        }
+
+        .list-group-item{
+            border: 1px solid #d1d1d175;
+        }
+    </style>
+
+    {{ js("/assets/common/js/ready.js")|raw }}
+
+    {{ var({"language" : language , "DEBUG" : app.debug, "version" : app.version})|raw }}
+</head>
+<body style="background: url('/assets/user/images/bg.jpg') fixed no-repeat;background-size: cover;">
+<div class="container my-5">
+    <div id="css-theme"></div>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header pt-4">
+                    <h3 class="card-title text-center">安装程序(v{{ app_version }})</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Step 1 -->
+                    <div class="step-container  smooth-transition active" id="step-1">
+                        <h5 class="mb-4">检查服务器运行环境</h5>
+
+                        <ul class="list-group push">
+                            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                运行架构 {{ cli == true ? '<span class="badge rounded-pill bg-success">CLI</span>' : '<span class="badge rounded-pill bg-primary">PHP-FPM</span>' }}
+                            </li>
+
+                            {% if cli == false %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                    php <span class="badge rounded-pill bg-success">8.1</span>
+                                </li>
+
+                                <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                    <b class="text-danger">shell_exec</b>
+                                    {{ shell_exec ? '<span class="badge rounded-pill bg-success">Enable</span>' : '<span class="badge rounded-pill bg-danger">请在PHP设置中解除禁用此函数</span>' }}
+                                </li>
+                            {% endif %}
+
+                            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                读取权限
+                                {{ readable ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' }}
+                            </li>
+
+                            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                写入权限
+                                {{ writable ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' }}
+                            </li>
+
+                            {% if cli == false %}
+                            {% for key, support in depend %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                    {{ key }}
+                                    {{ support ? '<i class="fa fa-check text-success"></i>' : '<i class="fa fa-times text-danger"></i>' }}
+                                </li>
+                            {% endfor %}
+                            {% endif %}
+
+                        </ul>
+
+                        <div class="step-btn mt-4">
+                            <button class="btn btn-secondary" disabled>上一步</button>
+                            <button class="btn btn-primary next-btn" {{ install == false ? "disabled" : "" }}>{{ install ? "下一步" : "环境检查未通过" }}</button>
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="step-container smooth-transition" id="step-2">
+                        <h5 class="mb-4">数据库配置</h5>
+                        <form class="database-form">
+                            <div class="alert alert-danger alert-dismissible database-error" style="display: none;"
+                                 role="alert">
+                                <h3 class="alert-heading fs-5 fw-bold mb-1">数据库连接时错误</h3>
+                                <p class="mb-0 database-message"></p>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="db-host" name="db_host"
+                                       placeholder="数据库地址" value="localhost">
+                                <label class="form-label" for="db-host">数据库地址</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="db-name" name="db_name"
+                                       placeholder="用户名">
+                                <label class="form-label" for="db-name">数据库名称</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="db-user" name="db_user"
+                                       placeholder="用户名">
+                                <label class="form-label" for="db-user">用户名</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="db-pass" name="db_pass"
+                                       placeholder="用户名">
+                                <label class="form-label" for="db-pass">密码</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="db-prefix" name="db_prefix"
+                                       placeholder="用户名" value="acg_">
+                                <label class="form-label" for="db-prefix">表前缀(推荐默认)</label>
+                            </div>
+
+                        </form>
+                        <div class="step-btn mt-4">
+                            <button class="btn btn-secondary prev-btn">上一步</button>
+                            <button class="btn btn-primary next-btn">下一步</button>
+                        </div>
+                    </div>
+                    {% if cli %}
+                        <!-- Step 3 -->
+                        <div class="step-container smooth-transition" id="step-3">
+                            <h5 class="mb-4">配置HTTP服务器</h5>
+                            <form class="server-form">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="cli-name" name="cli_name"
+                                           placeholder="服务名称" value="mcy-shop">
+                                    <label class="form-label" for="cli-name">服务名称(推荐默认)</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="cli-host" name="cli_host"
+                                           value="0.0.0.0">
+                                    <label class="form-label" for="cli-host">监听地址</label>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="cli-port" name="cli_port" value="911">
+                                    <label class="form-label" for="cli-port">监听端口</label>
+                                </div>
+
+
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="cli-cpu" name="cli_cpu" value="2">
+                                    <label class="form-label" for="cli-cpu">CPU数量</label>
+                                </div>
+                            </form>
+                            <div class="step-btn mt-4">
+                                <button class="btn btn-secondary prev-btn">上一步</button>
+                                <button class="btn btn-primary next-btn">下一步</button>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Step 4 -->
+                    <div class="step-container smooth-transition" id="step-4">
+                        <h5 class="mb-4">创建系统管理员</h5>
+                        <form class="user-form">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="login-nickname" name="login_nickname">
+                                <label class="form-label" for="login-nickname">呢称</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="login-email" name="login_email">
+                                <label class="form-label" for="login-email">邮箱地址</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="login-password" name="login_password">
+                                <label class="form-label" for="login-password">设置密码</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="login-re-password"
+                                       name="login_re_password">
+                                <label class="form-label" for="login-re-password">确认密码</label>
+                            </div>
+
+                        </form>
+                        <div class="step-btn mt-4">
+                            <button class="btn btn-secondary prev-btn">上一步</button>
+                            <button class="btn btn-success finish-btn">完成安装</button>
+                        </div>
+                    </div>
+                    <!-- Step 5 -->
+                    <div class="step-container smooth-transition" id="step-5">
+                        <div class="alert alert-success d-flex align-items-center" role="alert">
+                            <i class="fa fa-fw fa-check me-2"></i>
+                            <p class="mb-0">
+                                恭喜您安装成功，接下来配置公网，让世界任何一个角落都能访问你！
+                            </p>
+                        </div>
+
+                        <ul class="list-group push">
+                            {% if cli %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                    反向代理地址
+                                    <span class="badge rounded-pill bg-warning http-proxy"></span>
+                                </li>
+                            {% else %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                    公网状态
+                                    <span class="badge rounded-pill bg-success">您目前使用的是FPM架构，无需配置公网。</span>
+                                </li>
+                            {% endif %}
+
+
+                            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                邮箱
+                                <span class="badge rounded-pill bg-success user-email"></span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                密码
+                                <span class="badge rounded-pill bg-danger">******</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center fw-semibold">
+                                后台地址
+                                <span class="badge rounded-pill bg-primary">http://您的域名/admin</span>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/common/js/jquery.min.js"></script>
+<script src="/assets/common/js/util.js"></script>
+<script src="/assets/common/js/layer/layer.js"></script>
+
+<script>
+    $(document).ready(function () {
+        let currentStep = 0;
+        const steps = $('.step-container');
+        const $databaseError = $('.database-error');
+        const $databaseMessage = $('.database-message');
+
+
+        $("#cli-cpu").hover(function () {
+            layer.tips(`请根据服务器的 CPU 数量调整相应设置。如果服务器上只部署一个程序，请填写 'auto'，该选项将自动获取服务器的 CPU 数量并最大化其性能。如果部署多个程序，请根据需要填写具体数量，最低为 1。`, '#cli-cpu', {
+                tips: [1, '#000000'],
+                time: 0
+            });
+        }, function () {
+            layer.closeAll('tips');
+        });
+
+        function showStep(step) {
+            steps.removeClass('active').removeClass('smooth-transition');
+            steps.eq(step).addClass('active').addClass('smooth-transition');
+        }
+
+        $('.next-btn').on('click', function () {
+            if (currentStep == 1) {
+                $databaseError.hide();
+
+                const formData = util.arrayToObject($('.database-form').serializeArray());
+                util.post({
+                    url: "/install/database",
+                    data: formData,
+                    done: () => {
+                        currentStep++;
+                        showStep(currentStep);
+                    },
+                    error: res => {
+                        if (res.code == 13) {
+                            $databaseMessage.html(res.msg);
+                            $databaseError.show();
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    },
+                    fail: res => {
+                        layer.msg("服务器数据错误");
+                    }
+                });
+
+                return;
+            } else if (currentStep == 2) {
+                const formData = util.arrayToObject($('.server-form').serializeArray());
+                util.post({
+                    url: "/install/server",
+                    data: formData,
+                    done: () => {
+                        currentStep++;
+                        showStep(currentStep);
+                    },
+                    error: res => {
+                        layer.msg(res.msg);
+                    },
+                    fail: res => {
+                        layer.msg("服务器数据错误");
+                    }
+                });
+                return;
+            }
+
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
+
+        $('.prev-btn').on('click', function () {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        $('.finish-btn').on('click', function () {
+            const dbForm = util.arrayToObject($('.database-form').serializeArray());
+            const userFrom = util.arrayToObject($('.user-form').serializeArray());
+            const serverFrom = util.arrayToObject($('.server-form').serializeArray());
+
+            util.post({
+                url: "/install/finish",
+                data: Object.assign({}, userFrom, dbForm, serverFrom),
+                done: res => {
+                    currentStep++;
+                    showStep(currentStep);
+                    $('.http-proxy').text("http://127.0.0.1:" + serverFrom.cli_port);
+                    $('.user-email').text(userFrom.login_email);
+                },
+                error: res => {
+                    layer.msg(res.msg);
+                },
+                fail: res => {
+                    layer.msg("服务器数据错误");
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{{ include ("Common/Header.html") }}
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <a type="button" href="/admin/store" class="btn btn-outline-success btn-sm wap-mb1">{{ icon("icon-tianjia")|raw }}
+                {{ i18n("安装插件")|raw }}
+            </a>
+
+            <button type="button" class="btn btn-outline-success btn-sm plugin-restarts ms-2 wap-mb1">{{ icon("icon-update")|raw }}
+                {{ i18n("重启插件")|raw }}
+            </button>
+
+            <button type="button" class="btn btn-outline-primary btn-sm plugin-starts wap-mb1">{{ icon("icon-yunxingzhong")|raw }}
+                {{ i18n("启动插件")|raw }}
+            </button>
+
+            <button type="button" class="btn btn-outline-danger btn-sm plugin-stops wap-mb1">{{ icon("icon-tingzhi2")|raw }}
+                {{ i18n("停止插件")|raw }}
+            </button>
+
+            <button type="button" class="btn btn-outline-primary btn-sm plugin-composer wap-mb1">{{ icon("icon-peizhixinxi")|raw }}
+                {{ i18n("Composer")|raw }}
+            </button>
+
+            {% if app.cli %}
+            <button type="button" class="btn btn-outline-danger btn-sm plugin-restart wap-mb1">{{ icon("icon-restart")|raw }}
+                {{ i18n("强制同步插件")|raw }}
+            </button>
+            {% endif %}
+        </div>
+        <div class="block-content pt-0">
+            <table id="plugin-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/admin/controller/plugin/plugin.js")|raw }}
+{{ include ("Common/Footer.html") }}

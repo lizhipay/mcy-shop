@@ -1,0 +1,14 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-content pt-0">
+            <table id="permission-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/admin/controller/manage/permission.js")|raw }}
+{{ include ("Common/Footer.html") }}

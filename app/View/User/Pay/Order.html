@@ -1,0 +1,104 @@
+{{ include( "Common/Header.html") }}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    Collection Record
+                </h2>
+            </div>
+            <nav class="flex-shrink-0 mt-3 mt-sm-0 ms-sm-3" aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-alt">
+                    <li class="breadcrumb-item">
+                        <a class="link-fx" href="javascript:void(0)">{{ i18n("收款功能")|raw }}</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        {{ i18n(title)|raw }}
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+
+<!-- Page Content -->
+<div class="content">
+
+    <div class="row mb-2 data-count">
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-ic-dingdanshuliang","icon-40px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("订单数量")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center order-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-mianxing-disanfangzhifu","icon-40px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("第三方支付")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center trade-amount">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon--yue","icon-40px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("余额支付")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center balance-amount">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <select class="form-select pay-voice-broadcast wap-mb1" style="width: 200px;">
+                <option value="">{{ i18n("语音播报")|raw }}：{{ i18n("关闭")|raw }}</option>
+                <option value="taffy">{{ i18n("语音包")|raw }}：{{ i18n("永雏塔菲")|raw }}</option>
+            </select>
+
+            {{ hook(user_env(user.id) , point("USER_PAY_ORDER_TABLE_BUTTON") , 1)|raw }}
+
+            <div class="form-check form-switch wap-mb1" style="margin-left: 20px;">
+                <input class="form-check-input" type="checkbox" id="monitorOrders">
+                <label class="form-check-label" for="monitorOrders">{{ i18n("动态监视订单")|raw }}</label>
+            </div>
+        </div>
+
+
+
+        <div class="block-content pt-0">
+            <table id="pay-order-table"></table>
+        </div>
+    </div>
+</div>
+<!-- END Page Content -->
+
+{{ ready("/assets/user/controller/pay/order.js")|raw }}
+{{ hook(user_env(user.id) , point("USER_PAY_ORDER_BODY") , 1)|raw }}
+{{ include ("Common/Footer.html") }}

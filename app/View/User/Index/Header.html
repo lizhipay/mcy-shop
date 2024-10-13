@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <title>{{ item.sku ? item.name|striptags ~ " - " : "" }}{{ site.title }}</title>
+    <meta name="description" content="{{ site.description|striptags }}">
+    <meta name="keywords" content="{{ site.keywords|striptags }}">
+
+    {% if item.sku %}
+        <meta property="og:title" content="{{ item.name|striptags }}">
+        <meta property="og:description"
+              content="{{ item.source.introduce|striptags|length > 100 ? item.source.introduce|striptags|slice(0, 100) ~ '...' : item.source.introduce|striptags }}">
+        <meta property="og:image" content="{{ request.url  ~ item.source.picture_thumb_url }}">
+        <meta property="og:url" content="{{ request.url ~ "/item?id=" ~ item.id }}">
+        <meta property="og:type" content="website">
+    {% endif %}
+
+    <link rel="shortcut icon" href="{{ site.logo }}">
+    <!-- Stylesheets -->
+    {{ css( [
+        "/assets/user/css/index.min.css",
+    ] , [
+        "/assets/user/css/oneui.min.css",
+        "/assets/user/css/index.css",
+        "/assets/common/js/layui/css/layui.css",
+        "/assets/common/css/select2.min.css",
+        "/assets/common/css/component.css",
+        "/assets/common/css/toastr.min.css",
+        "/assets/common/js/table/bootstrap-table.css",
+        "/assets/common/js/layer/theme/default/layer.css"
+    ])|raw }}
+
+    {{ js(["/assets/common/js/ready.js"])|raw }}
+
+    {{ var({"language" : language , "DEBUG" : app.debug , "CCY" : ccy_symbol})|raw }}
+    <!-- END Stylesheets -->
+
+    {{ hook(env() , point("INDEX_HEADER") , 1)|raw }}
+</head>
+
+
+<body style="background: url('{{ site.bg_image }}') fixed no-repeat;background-size: cover;">
+<!-- Page Container -->
+<div id="page-container" class="page-header-dark main-content-boxed">
+
+    <!-- Header -->
+    <header id="page-header">
+        <!-- Header Content -->
+        <div class="content-header">
+            <!-- Left Section -->
+            <div class="d-flex align-items-center">
+                <!-- Logo -->
+                <a class="fw-semibold fs-5 tracking-wider text-dual me-3" href="/">
+                    <span class="shop-name"><img src="{{ site.logo }}" class="shop-logo"> <span
+                                class="shop-title d-none d-md-inline-block">{{ site.title }}</span></span>
+                </a>
+                <!-- END Logo -->
+            </div>
+            <!-- END Left Section -->
+
+            <!-- Right Section -->
+            <div class="d-flex align-items-center">
+                <!-- Open Search Section (visible on smaller screens) -->
+                <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
+                <button type="button" class="btn btn-sm btn-alt-secondary d-md-none" data-toggle="layout"
+                        data-action="header_search_on">
+                    <i class="fa fa-fw fa-search"></i>
+                </button>
+                <!-- END Open Search Section -->
+
+                <!-- Search Form (visible on larger screens) -->
+                <form class="d-none d-md-inline-block" id="search-form" action="/">
+                    <div class="input-group input-group-sm">
+                        <input type="text" value="{{ keywords }}" class="form-control form-control-alt"
+                               placeholder="{{ i18n("搜索商品")|raw }}.." name="keywords"/>
+                        <span class="input-group-text bg-body border-0"
+                              onclick="document.getElementById('search-form').submit();" style="cursor: pointer;"><i
+                                    class="fa fa-fw fa-search"></i></span>
+                    </div>
+                </form>
+                <!-- END Search Form -->
+
+                <!-- User Dropdown -->
+                <div class="dropdown d-inline-block ms-2 me-2">
+                    <a href="{{ user ? "javascript:void(0);" : "/login?goto=/" }}"
+                       class="btn btn-sm btn-alt-secondary d-flex align-items-center" {{ user ? 'id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"' : '' }}>
+                        <img class="rounded-circle"
+                             src="{{ user ? user.avatar is not null ? user.avatar : '/favicon.ico' : "/favicon.ico" }}"
+                             alt="Header Avatar"
+                             style="width: 21px;"/>
+
+
+                        <span class="d-none d-sm-inline-block ms-2">{% if user %}<span
+                                    class="bg-primary-light text-white px-1 me-1">{{ user.level.name }}</span>{% endif %}{{ user ? user.username : i18n("登录/注册")|raw }}</span>
+                        {% if user %} <i
+                                class="fa fa-fw fa-angle-down d-none d-sm-inline-block opacity-50 ms-1"></i> {% endif %}
+                    </a>
+                    {% if user %}
+                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-end p-0 border-0"
+                             aria-labelledby="page-header-user-dropdown">
+                            <div class="p-3 text-center bg-body-light border-bottom rounded-top"
+                                 style="cursor: pointer;" onclick="location.href='/user/personal'">
+                                <img class="img-avatar img-avatar48 img-avatar-thumb"
+                                     src="{{ user ? user.avatar is not null ? user.avatar : '/favicon.ico' : "/favicon.ico" }}"
+                                     alt="">
+                                <p class="mt-2 mb-0 fw-medium text-success">{{ user ? user.username : i18n("未登录")|raw }}</p>
+
+
+                            </div>
+
+
+                            <div class="p-2">
+                                <a class="dropdown-item d-flex align-items-center justify-content-between"
+                                   href="/user/recharge" target="_blank">
+                                    <span class="fs-sm fw-medium">{{ icon("icon-qianbao2")|raw }} {{ i18n("我的钱包")|raw }}</span>
+                                    <span class="badge rounded-pill bg-primary ms-2">{{ user.balance }}</span>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center justify-content-between"
+                                   target="_blank" href="/user/trade/order">
+                                    <span class="fs-sm fw-medium">{{ icon("icon-dingdan4")|raw }} {{ i18n("我的订单")|raw }}</span>
+                                </a>
+
+                                <a class="dropdown-item d-flex align-items-center justify-content-between"
+                                   href="/user/security" target="_blank">
+                                    <span class="fs-sm fw-medium">{{ icon("icon-gerenshezhi")|raw }} {{ i18n("个人设置")|raw }}</span>
+                                </a>
+                            </div>
+                            <div role="separator" class="dropdown-divider m-0"></div>
+                            <div class="p-2">
+                                <a class="dropdown-item d-flex align-items-center justify-content-between"
+                                   href="/user/logout">
+                                    <span class="fs-sm fw-medium">{{ icon("icon-logout")|raw }} {{ i18n("注销登录")|raw }}</span>
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <!-- END User Dropdown -->
+
+                {{ view_languages()|raw }}
+
+            </div>
+            <!-- END Right Section -->
+        </div>
+        <!-- END Header Content -->
+
+        <!-- Header Search -->
+        <div id="page-header-search" class="overlay-header bg-body-extra-light">
+            <div class="content-header">
+                <form class="w-100">
+                    <div class="input-group">
+                        <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
+                        <button type="button" class="btn btn-alt-danger" data-toggle="layout"
+                                data-action="header_search_off">
+                            <i class="fa fa-fw fa-times-circle"></i>
+                        </button>
+                        <input type="text" class="form-control" placeholder="{{ i18n("搜索商品")|raw }}.."
+                               id="page-header-search-input" name="page-header-search-input"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- END Header Search -->
+
+        <!-- Header Loader -->
+        <!-- Please check out the Loaders page under Components category to see examples of showing/hiding it -->
+        <div id="page-header-loader" class="overlay-header bg-primary-lighter">
+            <div class="content-header">
+                <div class="w-100 text-center">
+                    <i class="fa fa-fw fa-circle-notch fa-spin text-primary"></i>
+                </div>
+            </div>
+        </div>
+        <!-- END Header Loader -->
+    </header>
+    <!-- END Header -->
+
+    <!-- Main Container -->
+    <main id="main-container">
+        <!-- Navigation -->
+        <div class="bg-nav-primary-darker">
+            <div class="bg-black-10">
+                <div class="content py-3">
+                    <!-- Toggle Main Navigation -->
+                    <div class="d-lg-none">
+                        <!-- Class Toggle, functionality initialized in Helpers.oneToggleClass() -->
+                        <button type="button"
+                                class="btn w-100 btn-alt-secondary d-flex justify-content-between align-items-center"
+                                data-toggle="class-toggle" data-target="#main-navigation" data-class="d-none">
+                            {{ i18n("菜单")|raw }}
+                            <i class="fa fa-bars"></i>
+                        </button>
+                    </div>
+                    <!-- END Toggle Main Navigation -->
+
+                    <!-- Main Navigation -->
+                    <div id="main-navigation" class="d-none d-lg-block mt-2 mt-lg-0">
+                        <ul class="nav-main nav-main-dark nav-main-horizontal nav-main-hover">
+                            <li class="nav-main-item">
+                                <a class="nav-main-link active" href="/">
+                                    <svg class="mcy-icon icon-18px" aria-hidden="true">
+                                        <use xlink:href="#icon-shouye"></use>
+                                    </svg>
+                                    <span class="nav-main-link-name m-lg-1">{{ i18n("主页")|raw }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-heading">{{ i18n("购物") }}</li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
+                                   aria-haspopup="true" aria-expanded="false" href="#">
+                                    <svg class="mcy-icon icon-18px" aria-hidden="true">
+                                        <use xlink:href="#icon-fenlei1"></use>
+                                    </svg>
+                                    <span class="nav-main-link-name m-lg-1">{{ i18n("商品分类")|raw }}</span>
+                                </a>
+                                {{ cat_html(category)|raw }}
+                            </li>
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link" href="/search">
+                                    <svg class="mcy-icon icon-18px" aria-hidden="true">
+                                        <use xlink:href="#icon-dingdan3"></use>
+                                    </svg>
+                                    <span class="nav-main-link-name m-lg-1">{{ i18n("订单查询")|raw }}</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link" href="/shop/cart">
+                                    <svg class="mcy-icon icon-18px" aria-hidden="true">
+                                        <use xlink:href="#icon-gouwuche"></use>
+                                    </svg>
+                                    <span class="nav-main-link-name m-lg-1">{{ i18n("购物车") }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END Main Navigation -->
+                </div>
+            </div>
+        </div>
+        <!-- END Navigation -->

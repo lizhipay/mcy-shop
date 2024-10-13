@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>{{ i18n(title)|raw }} - {{ i18n(site.title) }}</title>
+    <link rel="icon" href="{{ site.logo }}">
+    {{ css( [
+        "/assets/admin/css/admin.min.css",
+    ] , [
+        "/assets/admin/css/codebase.min.css",
+        "/assets/admin/css/admin.css",
+        "/assets/common/js/layui/css/layui.css",
+        "/assets/common/css/select2.min.css",
+        "/assets/common/css/component.css",
+        "/assets/common/css/toastr.min.css",
+        "/assets/common/js/table/bootstrap-table.css",
+        "/assets/common/js/layer/theme/default/layer.css"
+    ])|raw }}
+
+    {{ js("/assets/common/js/ready.js")|raw }}
+
+    {{ var({
+        "language" : language ,
+        "DEBUG" : app.debug,
+        "version" : app.version,
+        "CCY" : ccy_symbol,
+        "HACK_ROUTE_TABLE_COLUMNS" : hook(env(true), point("HACK_ROUTE_TABLE_COLUMNS")),
+        "HACK_SUBMIT_FORM" : hook(env(true), point("HACK_SUBMIT_FORM")),
+        "HACK_SUBMIT_TAB" : hook(env(true), point("HACK_SUBMIT_TAB")),
+    })|raw }}
+</head>
+<body style="background: url('{{ site.bg_image }}') fixed no-repeat;background-size: cover;">
+
+<div class="loading">
+    <div class="dot-loader">
+        <div class="dot dot1"></div>
+        <div class="dot dot2"></div>
+        <div class="dot dot3"></div>
+        <div class="dot dot4"></div>
+    </div>
+</div>
+
+
+<!-- Page Container -->
+<div id="page-container"
+     class="sidebar-o enable-page-overlay side-scroll page-header-modern main-content-boxed page-header-fixed">
+    {{ include ("Common/Sidebar.html") }}
+    {{ include ("Common/Top.html") }}
+
+    <!-- Main Container -->
+    <main id="main-container">
+        <!-- Default Table Style -->
+        <div class="content-heading">{{ icon("icon-wangzhanshezhi","icon-14px")|raw }}  {{ i18n(title) }}</div>
+

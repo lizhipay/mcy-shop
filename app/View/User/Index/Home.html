@@ -1,0 +1,78 @@
+{{ include ("Index/Header.html") }}
+
+{% set items = items() %}
+<!-- Page Content -->
+<div class="content">
+    {% if keywords is empty %}
+        <!-- Hero -->
+        <div class="block block-rounded block-notice">
+            <div style="background: url('{{ site.notice_banner }}') center/cover !important;"
+                 class="notice-background"></div>
+            <div class="block-content block-content-full content-notice ribbon ribbon-primary ribbon-left ribbon-modern">
+                <div class="ribbon-box notice-title">
+                    <svg class="mcy-icon icon-14px" aria-hidden="true">
+                        <use xlink:href="#icon-gonggao2"></use>
+                    </svg>
+                    {{ i18n('公告') }}
+                </div>
+                <div style="margin: 25px 10px 0 10px;">{{ i18n(site.notice)|raw }}</div>
+            </div>
+        </div>
+        <!-- END Hero -->
+    {% endif %}
+
+    <div class="row" id="masonry-grid">
+
+        {% if items is empty %}
+
+            <div class="content content-full mb-3">
+                <div class="py-4 text-center">
+                    <h1 class="h2 fw-bold mt-4 mb-4 text-muted">): {{ i18n('没有找到你想要的商品')|raw }}</h1>
+                </div>
+            </div>
+
+        {% else %}
+
+            {% for m in items %}
+
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-1 item-box">
+                    <a href="/item?id={{ m.id }}">
+                        <div class="block block-rounded item-block">
+                            <div style="background: url('{{ m.thumb_url }}') center/cover !important; "
+                                 class="item-background"></div>
+                            <div class="block-content block-content-full  ribbon">
+                                {% if m.have_wholesale %}
+                                    <div class="support-wholesale">{{ icon("icon-pifa","icon-30px")|raw }}</div>
+                                {% endif %}
+                                <div class="ribbon-item-price">
+                                    {{ ccy() }}{{ m.sku[0].price }}
+                                </div>
+                                <div class="py-3 text-center">
+                                    <div class="mb-3 item-card-icon">
+                                        <img src="{{ m.thumb_url }}">
+                                    </div>
+                                    <div class="fs-3 fw-semibold mb-2"><span
+                                                class="item-text">{{ text_o(m.name)|raw }}</span>
+                                    </div>
+                                    <div class="ribbon-item-stock">
+                                        <div class="item-stock">{{ i18n("库存")|raw }}：<span
+                                                    class="item-number">{{ m.stock }}</span>
+                                        </div>
+                                        <div class="item-sold">{{ i18n("已售")|raw }}：<span
+                                                    class="item-number">{{ m.sold }}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+    </div>
+
+</div>
+<!-- END Page Content -->
+
+{{ include ("Index/Footer.html") }}

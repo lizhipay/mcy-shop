@@ -1,0 +1,22 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <select class="form-select report-voice-broadcast" style="width: 180px;">
+                <option value="">{{ i18n("语音包")|raw }}：{{ i18n("关闭")|raw }}</option>
+                <option value="taffy">{{ i18n("永雏塔菲")|raw }}</option>
+            </select>
+        </div>
+
+        <div class="block-content pt-0">
+            <table id="shop-report-order-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/admin/controller/shop/order.report.js")|raw }}
+{{ include ("Common/Footer.html") }}

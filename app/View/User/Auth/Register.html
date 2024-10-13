@@ -1,0 +1,99 @@
+{{ include ("Auth/Header.html") }}
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="row mx-0 justify-content-center hero-static align-items-center">
+        <div class="col-xl-4" style="width: 540px;">
+            <div class="content content-full overflow-hidden">
+                <!-- Register In Form -->
+                <form id="register-form" method="POST">
+                    <div class="block block-themed block-rounded block-fx-shadow">
+                        <div class="block-header bg-gd-emerald">
+                           <h3 class="block-title">{{ i18n("创建账号")|raw }}</h3>
+                        </div>
+                        <div class="block-content">
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="username" name="username" placeholder="{{ i18n("请输入登录会员名")|raw }}">
+                                <label class="form-label" for="username">{{ i18n("会员名")|raw }}</label>
+                            </div>
+
+                            {% if option.email_register == 1 %}
+
+                                <div class="form-floating mb-4">
+                                    <input type="text" class="form-control" id="email" name="email" placeholder="{{ i18n("请输入邮箱")|raw }}">
+                                    <label class="form-label" for="email">{{ i18n("邮箱")|raw }}</label>
+                                </div>
+
+                                {% if option.email_register_state == 1 %}
+                                    <div class="row mb-4">
+                                        <div class="col-sm-8 col-8">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="email-code"
+                                                       name="email_code" placeholder="{{ i18n("邮箱验证码")|raw }}">
+                                                <label class="form-label" for="email-code">{{ i18n("邮箱验证码")|raw }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 col-4">
+                                            <button type="button" class="w-100 btn btn-outline-primary py-3 send-email-code">
+                                                {{ i18n("发送验证码")|raw }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+
+
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="{{ i18n("请输入密码")|raw }}">
+                                <label class="form-label" for="password">{{ i18n("设置密码")|raw }}</label>
+                            </div>
+
+
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control" id="re-password" name="password_re" placeholder="{{ i18n("请再次输入密码")|raw }}">
+                                <label class="form-label" for="re-password">{{ i18n("确认密码")|raw }}</label>
+                            </div>
+
+
+                            {{ hook(env(), point("USER_AUTH_REGISTER_FORM"))|raw}}
+
+                            {% if option.agreement_status == 1 %}
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="1" id="terms" name="terms">
+                                    <label class="form-check-label" for="terms">{{ i18n("我已阅读并同意")|raw }} <a href="/register/terms?type=0" target="_blank" class="text-warning">{{ i18n("用户协议")|raw }}</a>、<a href="/register/terms?type=1" target="_blank" class="text-warning">{{ i18n("隐私政策")|raw }}</a>、<a href="/register/terms?type=2" target="_blank" class="text-warning">{{ i18n("商品服务协议")|raw }}</a></label>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="mb-4">
+                                <button type="button" class="btn btn-lg btn-outline-success fw-medium register-btn w-100">
+                                    {{ i18n("立即注册")|raw }}
+                                </button>
+                            </div>
+
+                            {{ hook(env(), point("USER_AUTH_REGISTER_FORM_BUTTON"))|raw }}
+                        </div>
+                        <div class="block-content block-content-full bg-body-light text-center d-flex justify-content-between">
+                            <a class="fs-sm fw-medium link-fx text-muted me-2 mb-1 d-inline-block"
+                               href="/login">
+                                <i class="fa fa-arrow-left opacity-50 me-1"></i> {{ i18n("去登录")|raw }}
+                            </a>
+                            <a class="fs-sm fw-medium link-fx text-muted me-2 mb-1 d-inline-block"
+                               href="/">
+                                {{ i18n("回到首页")|raw }}
+                            </a>
+                        </div>
+                    </div>
+                </form>
+                <!-- END Sign In Form -->
+            </div>
+        </div>
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+
+{{ ready("/assets/user/controller/auth/register.js")|raw }}
+{{ hook(env(), point("USER_AUTH_REGISTER_BODY"))|raw }}
+{{ include ("Auth/Footer.html") }}

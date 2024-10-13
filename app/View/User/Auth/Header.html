@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>{{ i18n(title)|raw }} - {{ i18n(site.title)|raw }}</title>
+    <meta name="description" content="{{ site.description }}">
+    <meta name="keywords" content="{{ site.keywords }}"/>
+    <link href="{{ site.logo }}" rel="icon">
+
+    {{ css([
+        "/assets/user/css/oneui.min.css",
+        "/assets/common/js/layer/theme/default/layer.css",
+        "/assets/common/css/toastr.min.css",
+        "/assets/user/css/auth.css"
+    ])|raw }}
+
+    {{ js("/assets/common/js/ready.js")|raw }}
+
+    {{ var({"language": language , "DEBUG" : app.debug})|raw }}
+
+    {{ hook(env(), point("USER_AUTH_HEADER"))|raw }}
+</head>
+
+<body style="background: url('{{ site.bg_image }}') fixed no-repeat;background-size: cover;">
+<div id="page-container">

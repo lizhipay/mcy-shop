@@ -1,0 +1,18 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-danger btn-sm del-bank-card">{{ icon("icon-shanchu")|raw }} {{ i18n("移除银行卡")|raw }}
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="bank-card-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ready("/assets/admin/controller/user/bank.card.js")|raw}}
+{{ include ("Common/Footer.html") }}

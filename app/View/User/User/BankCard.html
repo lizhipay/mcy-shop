@@ -1,0 +1,18 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-bank-card">{{ icon("icon-tianjia")|raw }} {{ i18n("绑定银行卡") }}
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="bank-card-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ready("/assets/user/controller/user/bank.card.js")|raw}}
+{{ include ("Common/Footer.html") }}

@@ -1,0 +1,210 @@
+{{ include ("Index/Header.html") }}
+
+
+<!-- Page Content -->
+<div class="content">
+    <form method="POST" onsubmit="return false;">
+
+        {% if order.status == 3 %}
+
+            <div class="block block-rounded bg-gradient-blue render-pay">
+                <div class="block-header block-header-default" style="display: none;">
+                    <h3 class="block-title pay-title"
+                        style="color: #8e7eff;">{{ icon("icon-fukuan")|raw }} {{ i18n("请在")|raw }}<span
+                                class="hour"></span><span class="minute"></span><span
+                                class="second"></span>{{ i18n("内完成支付")|raw }}
+                    </h3>
+                </div>
+
+                <div class="block-content block-content-full text-center">
+                    <span class="loading">{{ i18n("正在加载，请稍等..")|raw }}</span>
+
+                    <div class="pay-icon" style="display: none;"></div>
+
+                    <div class="render-qrcode" style="display: none;">
+                        <div class="qrcode-content"></div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+
+        <!-- Shopping Cart -->
+        <div class="block block-rounded bg-gradient-blue">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">{{ icon("icon-gouwuche1")|raw }} {{ i18n("商品列表")|raw }}</h3>
+            </div>
+            <div class="block-content block-content-full">
+                <table class="table table-borderless table-hover table-vcenter table-cart">
+                    <thead>
+                    <tr>
+                        <th class="text-center" style="width: 60px;"></th>
+                        <th class="d-none d-md-table-cell">{{ i18n("商品名称")|raw }}</th>
+                        <th class="d-none d-md-table-cell">{{ i18n("数量")|raw }}</th>
+                        <th class="d-none d-sm-table-cell text-end">{{ i18n("价格")|raw }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if order.type == 0 %}
+                        {% for item in order.items %}
+                            <tr>
+                                <td style="width: 60px;">
+                                    <img class="img-fluid" src="{{ item.sku.thumb_url }}" alt=""
+                                         style="border-radius: 10px;">
+                                </td>
+                                <td>
+                                    <span class="h6" style="color: #817ed6;">{{ i18n(item.item.name)|raw }}</span>
+                                    <div class="fs-sm fw-semibold"
+                                         style="color: #c520f0;">{{ i18n(item.sku.name)|raw }}</div>
+                                </td>
+                                <td>
+                                    <div>{{ item.quantity }}</div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="fw-semibold" style="color: #6f6fff;">{{ item.amount }}</div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td style="width: 60px;">
+                                <img class="img-fluid" src="{{ order.product.icon }}" alt=""
+                                     style="border-radius: 10px;">
+                            </td>
+                            <td>
+                                <span class="h6" style="color: #45c920;">{{ order.product.name }}</span>
+                            </td>
+                            <td>
+                                <div>1</div>
+                            </td>
+                            <td class="text-end">
+                                <div class="fw-semibold" style="color: #6f6fff;">{{ order.total_amount }}</div>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% if order.pay_order is not null and order.pay_order.fee > 0 %}
+
+                        <tr>
+                            <td style="width: 60px;">
+                                <img class="img-fluid" src="/assets/common/images/fee.png" style="border-radius: 10px;">
+                            </td>
+                            <td>
+                                <span class="h6" style="color: #45c920;">交易手续费</span>
+                                <div class="fs-sm fw-semibold" style="color: #9091e7;">平台交易时产生的必要手续费</div>
+                            </td>
+                            <td>
+                                <div>-</div>
+                            </td>
+                            <td class="text-end">
+                                <div class="fw-semibold" style="color: #6f6fff;">{{ order.pay_order.fee }}</div>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
+                    {% if order.pay_order is not null and order.pay_order.api_fee > 0 %}
+
+                        <tr>
+                            <td style="width: 60px;">
+                                <img class="img-fluid" src="/assets/common/images/api.png" style="border-radius: 10px;">
+                            </td>
+                            <td>
+                                <span class="h6" style="color: #0f6cf9;">API调用费</span>
+                                <div class="fs-sm fw-semibold" style="color: #f7ba67;">调用稀有API产生此费用</div>
+                            </td>
+                            <td>
+                                <div>-</div>
+                            </td>
+                            <td class="text-end">
+                                <div class="fw-semibold" style="color: #6f6fff;">{{ order.pay_order.api_fee }}</div>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
+                    {{ hook(env() , point("INDEX_CHECKOUT_ITEM") , 1, order)|raw }}
+
+                    <tr class="table-active">
+                        <td class="text-end" colspan="4">
+                            <span class="h4 fw-semibold" style="color: #ff5000;">
+                                {% set checkoutAmount = hook(env() , point("INDEX_CHECKOUT_TOTAL_AMOUNT") , 1, order , order.pay_order is not null ?  order.pay_order.trade_amount + order.pay_order.fee + order.pay_order.api_fee : order.total_amount) %}
+                                {% if checkoutAmount > 0 %}
+                                    {{ ccy() }}{{ checkoutAmount }}
+                                {% else %}
+                                    {{ ccy() }}{{ order.pay_order is not null ?  order.pay_order.trade_amount + order.pay_order.fee + order.pay_order.api_fee : order.total_amount }}
+                                {% endif %}
+                             </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- END Shopping Cart -->
+        {% if order.status == 0 %}
+
+            {% if user is not null %}
+                <!-- Balance Payment -->
+                <div class="block block-rounded bg-gradient-blue">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">{{ icon("icon-qianbao2")|raw }} {{ i18n("余额支付")|raw }} <span
+                                    class="text-success wallet-balance">{{ ccy() }}{{ user.balance }}</span></h3>
+                    </div>
+                    <div class="block-content block-content-full">
+                        <div class="pay-container">
+                            <div class="pay-list">
+                                <div class="pay-item wallet-balance-click"><img
+                                            src="/assets/common/images/balance.png"><span>{{ i18n("我的钱包")|raw }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Balance Payment -->
+            {% endif %}
+
+            <!-- Payment -->
+            <div class="block block-rounded bg-gradient-blue">
+                <div class="block-header block-header-default">
+                    <h3 class="block-title">{{ icon("icon-fukuan")|raw }} {{ i18n("在线支付")|raw }}</h3>
+                </div>
+                <div class="block-content block-content-full">
+                    <div class="pay-container">
+                        <div class="pay-list">
+                            {% for item in pay %}
+                                <div class="pay-item online-pay"
+                                     data-payId="{{ item.id }}">
+                                    <span class="pay-icon"><img src="{{ item.icon }}"></span>
+                                    <span class="pay-name">{{ i18n(item.name)|raw }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END Payment -->
+
+            <!-- Submit Form -->
+            <div class="shop-checkout-pay-btn">
+                <button type="button" class="btn-pay-now" disabled="disabled">{{ icon("icon-qingxuanze")|raw }}
+                    {{ i18n("请选择付款方式")|raw }}
+                </button>
+                <button type="button"
+                        class="btn-cancel-order">{{ icon("icon-quxiao")|raw }} {{ i18n("取消订单")|raw }}</button>
+            </div>
+            <!-- END Submit Form -->
+        {% elseif order.status == 2 %}
+            <div class="block block-rounded bg-gradient-blue">
+                <div class="block-content block-content-full text-center">
+                    <span style="color: #a2b4c6;" class=" fs-4">{{ i18n("订单已取消")|raw }}</span>
+                </div>
+            </div>
+        {% endif %}
+
+    </form>
+</div>
+<!-- END Page Content -->
+
+{{ ready("/assets/user/controller/index/checkout.js")|raw }}
+{{ include ("Index/Footer.html") }}

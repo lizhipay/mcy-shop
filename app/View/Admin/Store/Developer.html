@@ -1,0 +1,85 @@
+{{ include ("Common/Header.html") }}
+
+<div class="content">
+
+    <div class="block block-rounded developer-block hide">
+        <ul class="nav nav-tabs nav-tabs-alt" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="my-plugins" data-bs-toggle="tab"
+                        data-bs-target="#tab-my-plugins" role="tab" aria-controls="tab-my-plugins"
+                        aria-selected="false" tabindex="-1">我的插件
+                </button>
+            </li>
+
+        </ul>
+        <div class="block-content tab-content pt-3">
+            <div class="tab-pane active show" id="tab-my-plugins" role="tabpanel" aria-labelledby="my-plugins"
+                 tabindex="0">
+                <button type="button"
+                        class="btn btn-outline-success btn-sm add-plugin">{{ icon("icon-tianjia")|raw }} {{ i18n("创建插件") }}
+                </button>
+                <table id="developer-table"></table>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="block block-rounded identity-block hide">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">实名认证</h3>
+        </div>
+        <div class="block-content">
+            <form onsubmit="return false;">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 col-xl-5">
+
+                        <div class="cert-status-submit d-hide">
+                            <div class="alert alert-warning alert-dismissible" role="alert">
+                                <h3 class="alert-heading fs-5 fw-bold mb-1">安全说明</h3>
+                                <p class="mb-0">
+                                    请注意，请务必填写真实信息。实名认证每24小时内只能进行一次，我们的实名认证是通过“支付宝人脸”进行的，且我们不会保存您提交的信息。实名认证完成后无法更改，仅适用于中国大陆的开发者。
+                                </p>
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="cert-name" placeholder="请输入您的姓名">
+                                <label for="cert-name">姓名</label>
+                            </div>
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="cert-no" placeholder="18位身份证号码">
+                                <label class="form-label" for="cert-no">身份证号码</label>
+                            </div>
+
+                            <div class="mb-4">
+                                <button type="button"
+                                        class="btn btn-lg btn-alt-primary w-100 py-3 fw-semibold cert-button">
+                                    开始进行人脸验证
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <div class="cert-status-scan d-hide">
+                            <div class="d-flex justify-content-center flex-column">
+                                <div class="mb-2 text-center">
+                                    <span class="common-item">{{ icon("icon-zhifubao","icon-18px")|raw }} <span
+                                                class="ms-1" style="color: #1678ff;font-weight: bold;font-size: 16px;">请使用支付宝认证</span></span>
+                                </div>
+
+                                <div class="mb-4 text-center">
+                                    <div class="cert-qrcode"></div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{ ready("/assets/admin/controller/store/developer.js")|raw }}
+{{ include ("Common/Footer.html") }}

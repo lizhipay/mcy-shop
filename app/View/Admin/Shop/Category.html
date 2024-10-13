@@ -1,0 +1,20 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-shop-category">{{ icon("icon-tianjia")|raw }} {{ i18n("添加分类")|raw }}
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-shop-category">{{ icon("icon-shanchu")|raw }} {{ i18n("移除分类")|raw }}
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="shop-category-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ready("/assets/admin/controller/shop/category.js")|raw}}
+{{ include ("Common/Footer.html") }}

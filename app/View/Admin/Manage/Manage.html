@@ -1,0 +1,16 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-manage">{{icon("icon-tianjia")|raw}} {{ i18n("添加管理员")|raw }}</button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="manage-table"></table>
+        </div>
+    </div>
+</div>
+
+{{ready("/assets/admin/controller/manage/manage.js")|raw}}
+{{ include ("Common/Footer.html") }}

@@ -1,0 +1,43 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="row mb-2 data-count">
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-ic-dingdanshuliang","icon-40px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("用户数量")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center user-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-icon-shourufenjie","icon-40px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("总余额")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center user-total-balance">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="block block-rounded">
+        <div class="block-content pt-0">
+            <table id="user-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/admin/controller/user/user.js")|raw }}
+{{ include ("Common/Footer.html") }}

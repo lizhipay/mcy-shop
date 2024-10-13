@@ -1,0 +1,43 @@
+{{ include ("Common/Header.html") }}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    <div class="header-message">
+                        <p>{{ i18n("赚钱很简单，有两种方法")|raw }}</p>
+                        <ul>
+                            <li>{{ i18n("通过推广链接注册的用户，或者游客，只要产生消费，都会给您返佣")|raw }}</li>
+                            <li><a href="/user/merchant/open" style="color: red;font-weight: bold;text-decoration: underline;">{{ i18n("成为商家")|raw }}</a>，{{ i18n("开设属于自己的店铺，大仓库实时供货，市场自己做主！")|raw }}</li>
+                        </ul>
+                    </div>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-content">
+            <div class="mb-3">
+                <label class="form-label mb-3">{{ i18n("我的推广链接")|raw }}</label>
+                <div class="input-group" style="width: 520px;">
+                    <input type="text" class="form-control invite-url" disabled value="{{ inviteUrl }}">
+                    <button type="button" class="btn btn-primary copy-invite-url">{{ i18n("复制")|raw }}</button>
+                </div>
+            </div>
+
+            <table id="user-inviter-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/user/controller/user/inviter.js")|raw }}
+{{ include ("Common/Footer.html") }}

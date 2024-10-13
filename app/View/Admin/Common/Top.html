@@ -1,0 +1,81 @@
+<header id="page-header">
+    <!-- Header Content -->
+    <div class="content-header">
+        <!-- Left Section -->
+        <div class="space-x-1">
+            <!-- Toggle Sidebar -->
+            <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
+            <button type="button" class="btn btn-sm btn-alt-secondary" data-toggle="layout" data-action="sidebar_toggle"> <i class="fa fa-fw fa-bars"></i></button>
+            <!-- END Toggle Sidebar -->
+
+
+                <a class="btn btn-sm btn-success fw-bold" href="/admin/store">
+                   <i class="fab fa-app-store"></i> {{ i18n('应用商店')|raw }}
+                </a>
+
+
+
+                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle store-node-select hide" id="dropdown-default-outline-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-outline-primary" style="">
+                    <a class="dropdown-item store-node-0" href="javascript:void(0)">阿里云(全球节点)</a>
+                    <a class="dropdown-item store-node-1" href="javascript:void(0)">CloudFlare(海外推荐)</a>
+                    <a class="dropdown-item store-node-2" href="javascript:void(0)">腾讯云</a>
+                </div>
+
+
+
+            <div class="store-user d-inline-block"></div>
+        </div>
+
+
+        <!-- END Left Section -->
+
+        <!-- Right Section -->
+        <div class="space-x-1">
+            <!-- User Dropdown -->
+            <div class="dropdown d-inline-block">
+                <button type="button" class="btn btn-sm btn-alt-secondary" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-user d-sm-none"></i>
+                        <img class="d-none d-sm-inline-block  rounded-circle me-1" src="{{ manage.avatar is not null ? manage.avatar : '/favicon.ico' }}" alt="Header Avatar" style="width: 21px;">
+                        <span class="d-none d-sm-inline-block fw-semibold">{{ manage.nickname }}</span>
+                        <i class="fa fa-angle-down opacity-50 ms-1"></i>
+                    </div>
+                </button>
+                <div class="dropdown-menu dropdown-menu-md dropdown-menu-end p-0"
+                     aria-labelledby="page-header-user-dropdown">
+                    <div class="px-2 py-3 bg-body-light rounded-top">
+                        <h5 class="h6 text-center mb-0">
+                            <img class="img-avatar img-avatar48 img-avatar-thumb" src="{{ manage.avatar is not null ? manage.avatar : '/favicon.ico' }}" alt="">
+                            <p class="mt-2 mb-0 fw-medium text-success">{{ manage.nickname }}</p>
+                        </h5>
+                    </div>
+                    <div class="p-2">
+
+
+                        <a href="/admin/personal/login/log" class="dropdown-item d-flex align-items-center justify-content-between space-x-1" data-avatar="{{ manage.avatar }}">
+                            <span>{{ icon("icon-rizhi")|raw }} {{ i18n("登录日志")|raw }}</span>
+                        </a>
+
+                        <a href="javascript:void(0);" class="dropdown-item d-flex align-items-center justify-content-between space-x-1 password-edit" data-avatar="{{ manage.avatar }}">
+                            <span>{{ icon("icon-anquan3")|raw }} {{ i18n("安全设置")|raw }}</span>
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between space-x-1" href="javascript:location.href='/admin/personal/logout';">
+                            <span>{{ icon("icon-logout")|raw }} {{ i18n("注销登录")|raw }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- END User Dropdown -->
+
+        </div>
+        <!-- END Right Section -->
+    </div>
+    <!-- END Header Content -->
+
+
+    <!-- Header Loader -->
+
+</header>

@@ -1,0 +1,20 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-translate-language">{{ icon("icon-tianjia")|raw }} 添加翻译
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-translate-language">{{ icon("icon-shanchu")|raw }} 移除翻译
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="translate-language-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ready("/assets/admin/controller/config/language.js")|raw}}
+{{ include ("Common/Footer.html") }}

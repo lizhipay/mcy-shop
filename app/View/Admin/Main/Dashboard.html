@@ -1,0 +1,213 @@
+{{ include ("Common/Header.html") }}
+
+    <!-- Page Content -->
+    <div class="content">
+        <div class="row items-push">
+            <div class="col-md-4">
+                <div class="block block-rounded h-100 mb-0">
+                    <div class="block-header block-header-default">
+                        <h4 class="block-title" style="color: #f56b2e;">{{ icon("icon-gonggao2")|raw }} {{ i18n("官方公告") }}</h4>
+                    </div>
+
+                    <div class="block-content store-notice">
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="block block-rounded h-100 mb-0">
+                            <div class="block-header block-header-default">
+                                <select class="form-select select-show-date" style="width: 160px">
+                                    <option value="0">{{ i18n("今日数据")|raw }}</option>
+                                    <option value="1">{{ i18n("昨日数据")|raw }}</option>
+                                    <option value="2">{{ i18n("本周数据")|raw }}</option>
+                                    <option value="3">{{ i18n("本月数据")|raw }}</option>
+                                    <option value="4">{{ i18n("上月数据")|raw }}</option>
+                                    <option value="5">{{ i18n("所有数据")|raw }}</option>
+                                </select>
+                            </div>
+
+                            <div class="block-content">
+                                <div class="row">
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-shipment-amount", "icon-40px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("出货额")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center shipment-amount">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-shipment-count", "icon-40px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("出货数")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center shipment-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-shipment-profit", "icon-40px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("出货盈利")|raw }}({{ i18n("平台")|raw }})</div>
+                                                    <div class="fs-3 fw-semibold text-center shipment-profit">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-recharge-amount", "icon-40px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("充值金额")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center recharge-amount">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-recharge-count", "icon-40px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("充值订单数")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center recharge-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-pay-trade-amount", "icon-38px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("在线支付")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center pay-trade-amount">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-pay-balance-amount", "icon-38px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("余额支付")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center pay-balance-amount">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-pay-count", "icon-38px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("支付订单数")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center pay-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-user-register-count", "icon-38px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("新用户")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center user-register-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-user-active-count", "icon-38px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("活跃用户")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center user-active-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-user-new-merchant-count", "icon-38px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("入驻商家")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center user-new-merchant-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-3">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {{ icon("icon-withdraw-amount", "icon-38px")|raw }}
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("提现金额")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center withdraw-amount">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="block block-rounded h-100 mb-0">
+                            <div class="block-header block-header-default">
+                                <h4 class="block-title" style="color: #eb9b15;">{{ icon("icon-dengdai1")|raw}} {{ i18n("正在付款")|raw }}</h4>
+                            </div>
+
+                            <div class="block-content pt-0">
+                                <table id="shop-progress-order-table"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Page Content -->
+
+
+{{ ready("/assets/admin/controller/main/dashboard.js")|raw }}
+{{ include ("Common/Footer.html") }}

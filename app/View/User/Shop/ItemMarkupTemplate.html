@@ -1,0 +1,45 @@
+{{include( "Common/Header.html")}}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    Synchronize Templates
+                </h2>
+            </div>
+            <nav class="flex-shrink-0 mt-3 mt-sm-0 ms-sm-3" aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-alt">
+                    <li class="breadcrumb-item">
+                        <a class="link-fx" href="javascript:void(0)">{{ i18n("我的店铺")|raw }}</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        {{ i18n(title)|raw }}
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+
+<!-- Page Content -->
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-table-header block-header-default pt-3 pb-3">
+            <button type="button" class="btn btn-outline-success btn-sm add-shop-markup m-r-2">{{ icon("icon-tianjia")|raw }} {{ i18n("添加模板")|raw }}</button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-shop-markup">{{ icon("icon-shanchu")|raw }} {{ i18n("移除模板")|raw }}</button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="shop-markup-table"></table>
+        </div>
+    </div>
+</div>
+<!-- END Page Content -->
+
+{{ ready("/assets/user/controller/shop/item.markup.template.js")|raw }}
+{{include ("Common/Footer.html")}}

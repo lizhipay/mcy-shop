@@ -1,0 +1,18 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-user-level">{{ icon("icon-tianjia")|raw }} {{ i18n("添加等级")|raw }}
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="user-level-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ready("/assets/admin/controller/user/level.js")|raw}}
+{{ include ("Common/Footer.html") }}

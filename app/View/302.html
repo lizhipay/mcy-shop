@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>{{ message }}</title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" id="css-main" href="/assets/admin/css/codebase.min.css">
+</head>
+<body>
+
+<div id="page-container" class="main-content-boxed">
+    <main id="main-container">
+        <div class="hero bg-body-extra-light">
+            <div class="hero-inner">
+                <div class="content content-full">
+                    <div class="py-4 text-center">
+                        <div class="display-4 fw-bold text-info">
+                            <i class="fa fa-lock opacity-50 me-1"></i> {{ message }}
+                        </div>
+                        <h2 class="fs-4 fw-medium text-muted mb-5 mt-5">{{ i18n("我们正在为您的浏览器进行安全重定向，请稍等..")|raw }}</h2>
+                        <a class="btn btn-lg btn-outline-primary" href="{{ url }}">
+                            立即跳转
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    setTimeout(() => {
+        window.location.href = "{{ url }}";
+    }, 1000 * parseFloat("{{ time }}"))
+</script>
+</body>
+</html>

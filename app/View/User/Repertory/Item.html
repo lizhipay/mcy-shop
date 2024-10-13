@@ -1,0 +1,117 @@
+{{include( "Common/Header.html")}}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    Supply Management
+                </h2>
+            </div>
+            <nav class="flex-shrink-0 mt-3 mt-sm-0 ms-sm-3" aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-alt">
+                    <li class="breadcrumb-item">
+                        <a class="link-fx" href="javascript:void(0)">{{ i18n("供货商")|raw }}</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        {{ i18n(title)|raw }}
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+
+<!-- Page Content -->
+<div class="content">
+    <div class="row mb-2 data-count">
+        <!-- Row #1 -->
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-shangpin","icon-42px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("全部")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center item_count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-shangjia","icon-40px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("上架")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center shelves-have-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-shangxiajia","icon-42px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("下架")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center shelves-not-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-dingshi","icon-42px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("审核中")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center under-review-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-tupianweigui","icon-42px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("封禁")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center banned-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- END Row #1 -->
+    </div>
+
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-repertory-item wap-mb1">{{ icon("icon-tianjia")|raw }} {{i18n("添加货源")|raw}}</button>
+            <button type="button" class="btn btn-outline-primary btn-sm item-up wap-mb1">{{ icon("icon-shangjia")|raw }} {{i18n("一键上架")|raw}}</button>
+            <button type="button" class="btn btn-outline-primary btn-sm item-down wap-mb1">{{ icon("icon-shangxiajia")|raw }} {{i18n("一键下架")|raw}}</button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-repertory-item wap-mb1">{{ icon("icon-shanchu")|raw }} {{i18n("移除货源")|raw}}</button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="repertory-item-table"></table>
+        </div>
+    </div>
+</div>
+<!-- END Page Content -->
+
+{{ ready("/assets/user/controller/repertory/item.js" , { "hookItemPopup": hook(env(false) , point("ADMIN_REPERTORY_ITEM_POPUP")) })|raw }}
+{{include ("Common/Footer.html")}}

@@ -1,0 +1,102 @@
+{{ include ("Common/Header.html") }}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ title }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    <div class="header-message" style="max-width: 720px">
+                        <h4 class="mb-2">等级如何升级？</h4>
+                        <p>每个会员等级升级要求不同，但升级要求基本如下：</p>
+                        <ul>
+                            <li><b>消费金额：</b> 累计消费金额达到等级设定的金额。</li>
+                            <li><b>充值金额：</b> 累计充值金额达到等级设定的金额。</li>
+                            <li><b>推广人数：</b> 累计推广人数达到等级设定的数量。</li>
+                            <li><b>盈利金额：</b> 通过推广，累计盈利达到等级设定的金额。</li>
+                        </ul>
+                    </div>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="table-responsive">
+            <table class="table table-borderless table-hover table-vcenter text-center mb-0">
+                <thead class="table-dark text-uppercase fs-sm">
+                <tr>
+                    <th class="py-3" style="width: 180px;"></th>
+                    {% for g in level %}
+                        <th class="py-3 {{ g.id == user.level.id ? "bg-primary" : "" }}"><span class="user-group-name"><img src="{{ g.icon }}"> {{ g.name }}</span></th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="bg-body-light">
+                    <td></td>
+                    {% for g in level %}
+                        <td class="py-4">
+                            <div class="mb-0">{{ g.privilege_introduce|raw }}</div>
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="fw-semibold text-start">累计消费</td>
+                    {% for g in level %}
+                        <td>{{ g.upgrade_requirements.total_consumption_amount > 0 ? g.upgrade_requirements.total_consumption_amount : "-" }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="fw-semibold text-start">累计充值</td>
+                    {% for g in level %}
+                        <td>{{ g.upgrade_requirements.total_recharge_amount > 0 ? g.upgrade_requirements.total_recharge_amount : "-" }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="fw-semibold text-start">累计推广人数</td>
+                    {% for g in level %}
+                        <td>{{ g.upgrade_requirements.total_referral_count > 0 ? g.upgrade_requirements.total_referral_count : "-" }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="fw-semibold text-start">累计盈利</td>
+                    {% for g in level %}
+                        <td>{{ g.upgrade_requirements.total_profit_amount > 0 ? g.upgrade_requirements.total_profit_amount : "-" }}</td>
+                    {% endfor %}
+                </tr>
+                <tr class="bg-body-light">
+                    <td></td>
+                    {% for g in level %}
+                        <td>
+                            {% if g.upgradeable %}
+                                {% if g.upgrade_price > 0 %}
+                                    <button type="button" class="btn rounded-pill btn-primary px-4 upgrade-level" data-id="{{ g.id }}" data-name="{{ g.name }}" data-amount="{{ g.upgrade_price }}">
+                                        付费升级({{ ccy }}{{ g.upgrade_price }})
+                                    </button>
+                                {% else %}
+                                    <button type="button" class="btn rounded-pill btn-dark px-4" disabled>
+                                        不可付费升级
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+
+                        </td>
+                    {% endfor %}
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/user/controller/user/upgrade.level.js")|raw }}
+{{ include ("Common/Footer.html") }}

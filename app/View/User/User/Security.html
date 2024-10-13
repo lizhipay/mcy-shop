@@ -1,0 +1,277 @@
+{{ include ("Common/Header.html") }}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    Security Center
+                </h2>
+            </div>
+            <nav class="flex-shrink-0 mt-3 mt-sm-0 ms-sm-3" aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-alt">
+                    <li class="breadcrumb-item">
+                        <a class="link-fx" href="javascript:void(0)">{{ i18n("个人中心")|raw }}</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        {{ i18n(title)|raw }}
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+<!-- END Hero -->
+<div class="content">
+    <div class="block block-rounded row block-security">
+        <ul class="nav nav-tabs nav-tabs-block flex-md-column col-md-4 col-xxl-1" role="tablist">
+            <li class="nav-item d-md-flex flex-md-column nowrap">
+                <button class="nav-link text-md-start active" id="user-general-tab" data-bs-toggle="tab"
+                        data-bs-target="#user-general-id" role="tab" aria-controls="user-general-id"
+                        aria-selected="true">
+                    {{ icon('icon-gerenshezhi')|raw }}
+                    <span style="color: #80b7f9;">{{ i18n("基本设置")|raw }}</span>
+                    <span class="d-none d-md-block fs-xs fw-medium opacity-75 mt-md-2">{{ i18n("设置您的基本资料")|raw }}</span>
+                </button>
+            </li>
+            {% if option.email_bind_state == 1 %}
+                <li class="nav-item d-md-flex flex-md-column nowrap">
+                    <button class="nav-link text-md-start" id="user-email-tab" data-bs-toggle="tab"
+                            data-bs-target="#user-email-id" role="tab" aria-controls="user-email-id"
+                            aria-selected="false">
+                        {{ icon('icon-mailbox_settings_yellow')|raw }}
+                        <span style="color: #a146eb;">{{ i18n("邮箱设置")|raw }}</span>
+                        <span class="d-none d-md-block fs-xs fw-medium opacity-75 mt-md-2">
+                        {{ i18n("绑定或更改你的邮箱")|raw }}
+                      </span>
+                    </button>
+                </li>
+            {% endif %}
+            <li class="nav-item d-md-flex flex-md-column nowrap">
+                <button class="nav-link text-md-start" id="user-passwd-tab" data-bs-toggle="tab"
+                        data-bs-target="#user-passwd-id" role="tab" aria-controls="user-passwd-id"
+                        aria-selected="false">
+                    {{ icon('icon-mimashezhi-xiugaimima')|raw }}
+                    <span style="color: #704dff;">{{ i18n("修改密码")|raw }}</span>
+                    <span class="d-none d-md-block fs-xs fw-medium opacity-75 mt-md-2">
+                        {{ i18n("修改你的登录密码")|raw }}
+                      </span>
+                </button>
+            </li>
+            <li class="nav-item d-md-flex flex-md-column nowrap">
+                <button class="nav-link text-md-start" id="user-identity-tab" data-bs-toggle="tab"
+                        data-bs-target="#user-identity-id" role="tab" aria-controls="user-identity-id"
+                        aria-selected="false">
+                    {{ icon('icon-lanVrenzheng')|raw }}
+                    <span style="color: #4ca394;">{{ i18n("实名认证")|raw }}</span>
+                    <span class="d-none d-md-block fs-xs fw-medium opacity-75 mt-md-2">
+                        {{ i18n("完善你的身份信息")|raw }}
+                      </span>
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content col-md-8 col-xxl-10">
+            <div class="block-content tab-pane active" id="user-general-id" role="tabpanel"
+                 aria-labelledby="user-general-tab" tabindex="0">
+                <form class="general-form">
+                    <div class="row push">
+                        <div class="col-lg-8 col-xl-5">
+                            <div class="mb-4">
+                                <label class="form-label">{{ i18n("头像")|raw }}</label>
+                                <div class="mb-4">
+                                    <input type="file" class="avatar-file" style="display: none;">
+                                    <input type="text" class="avatar-input" name="avatar" style="display: none;"
+                                           value="{{ user.avatar }}">
+                                    <img onclick="document.getElementsByClassName('avatar-file')[0].click()"
+                                         class="image-avatar" src="{{ user.avatar }}">
+                                </div>
+                            </div>
+
+                            {{ hook(env(), point("USER_SECURITY_GENERAL_FORM"))|raw }}
+
+                            <div class="mb-4">
+                                <button type="button" class="btn btn-alt-primary general-save-btn">
+                                    {{ i18n("保存资料")|raw }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% if option.email_bind_state == 1 %}
+                <div class="block-content tab-pane" id="user-email-id" role="tabpanel" aria-labelledby="user-email-tab"
+                     tabindex="0">
+                    <form class="email-form">
+                        <div class="row push">
+                            <div class="col-lg-8 col-xl-3">
+                                {% if user.email != "" %}
+                                    <div class="form-floating mb-4">
+                                        <input type="text" class="form-control" disabled id="current-email"
+                                               value="{{ user.email }}">
+                                        <label class="form-label" for="current-email">{{ i18n("当前邮箱")|raw }}</label>
+                                    </div>
+
+
+                                    <div class="row mb-4">
+                                        <div class="col-sm-8 col-8">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="current-email-code"
+                                                       name="current_email_code" placeholder="{{ i18n("邮箱验证码")|raw }}">
+                                                <label class="form-label" for="current-email-code">{{ i18n("邮箱验证码")|raw }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4 col-4">
+                                            <button type="button" class="w-100 btn btn-outline-primary py-3 send-current-email-code">
+                                                {{ i18n("获取验证码")|raw }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+
+                                {% endif %}
+
+                                <div class="form-floating mb-4">
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="{{ i18n("新邮箱")|raw }}">
+                                    <label class="form-label" for="email">{{ i18n("新邮箱")|raw }}</label>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-sm-8 col-8">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="new-email-code"
+                                                   name="new_email_code" placeholder="{{ i18n("新邮箱验证码")|raw }}">
+                                            <label class="form-label" for="new-email-code">{{ i18n("新邮箱验证码")|raw }}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 col-4">
+                                        <button type="button" class="w-100 btn btn-outline-primary py-3 send-new-email-code">
+                                            {{ i18n("获取验证码")|raw }}
+                                        </button>
+                                    </div>
+                                </div>
+
+
+                                <div class="mb-4">
+                                    <button type="button" class="btn py-3 w-100 btn-alt-primary email-save-btn">
+                                        {{ i18n("确认修改")|raw }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+            <div class="block-content tab-pane" id="user-passwd-id" role="tabpanel" aria-labelledby="user-passwd-tab"
+                 tabindex="0">
+                <form class="passwd-form">
+                    <div class="row push">
+
+                        <div class="mb-4 alert alert-primary alert-dismissible" role="alert">
+                            <h3 class="alert-heading h4 my-2">{{ i18n("安全提示")|raw }}</h3>
+                            <p class="mb-0">
+                                {{ i18n("登录密码应为字母、数字、特殊符号(~!@#$%^&*()_.)，两种及以上组合，8-26位字符串。")|raw }}
+                            </p>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
+                        <div class="col-lg-8 col-xl-3">
+
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control" id="current-password" name="current_password" placeholder="{{ i18n("旧密码")|raw }}">
+                                <label class="form-label" for="current-password">{{ i18n("旧密码")|raw }}</label>
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control" id="new-password" name="new_password" placeholder="{{ i18n("请输入新密码")|raw }}">
+                                <label class="form-label" for="new-password">{{ i18n("新密码")|raw }}</label>
+                            </div>
+
+
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control" id="re-password" name="re_new_password" placeholder="{{ i18n("请再次输入新密码")|raw }}">
+                                <label class="form-label" for="re-password">{{ i18n("确认新密码")|raw }}</label>
+                            </div>
+
+
+                            <div class="mb-4">
+                                <button type="button" class="btn w-100 py-3 btn-alt-primary passwd-save-btn">
+                                    {{ i18n("确认修改")|raw }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="block-content tab-pane" id="user-identity-id" role="tabpanel"
+                 aria-labelledby="user-identity-tab"
+                 tabindex="0">
+                <form class="identity-form">
+                    <div class="row push">
+                        <div class="col-lg-8 col-xl-3 col-md-12">
+                            {% if userIdentity is null %}
+
+                                <div class="form-floating mb-4">
+                                    <select class="form-select" id="card-type" name="type" aria-label="{{ i18n("证件类型")|raw }}">
+                                        <option value="0">{{ i18n("中国居民身份证")|raw }}</option>
+                                        <option value="1">{{ i18n("香港永久居民身份证")|raw }}</option>
+                                        <option value="2">{{ i18n("澳门永久性居民身份证")|raw }}</option>
+                                        <option value="3">{{ i18n("国际护照（包含中国大陆/台湾/国际）")|raw }}</option>
+                                    </select>
+                                    <label class="form-label" for="card-type">{{ i18n("证件类型")|raw }}</label>
+                                </div>
+
+                                <div class="form-floating mb-4">
+                                    <input type="text" class="form-control" id="real-name" name="name" placeholder="{{ i18n("请输入姓名")|raw }}">
+                                    <label class="form-label" for="real-name">{{ i18n("姓名")|raw }} {{ icon("icon-bitian")|raw }}</label>
+                                </div>
+
+                                <div class="form-floating mb-4">
+                                    <input type="text" class="form-control" id="id-card" name="id_card" placeholder="{{ i18n("请输入姓名")|raw }}">
+                                    <label class="form-label" for="id-card">{{ i18n("证件号码")|raw }} {{ icon("icon-bitian")|raw }}</label>
+                                </div>
+
+                                <div class="mb-4">
+                                    <button type="button" class="btn py-3 w-100 btn-alt-primary identity-save-btn">
+                                        {{ i18n("立即认证")|raw }}
+                                    </button>
+                                </div>
+
+                            {% elseif (userIdentity.status == 0) %}
+                                <div class="alert alert-warning alert-dismissible" role="alert">
+                                    <h3 class="alert-heading h4 my-2">{{ icon("icon-tishi")|raw }} {{ i18n("正在审核中")|raw }}</h3>
+                                    <p class="mb-0">
+                                        {{ i18n("您的实名认证正在审核中，预计在1-3个工作日内完成审核，请耐心等待。")|raw }}
+                                    </p>
+                                </div>
+                            {% elseif (userIdentity.status == 1) %}
+                                <div class="alert alert-success alert-dismissible" role="alert">
+                                    <h3 class="alert-heading h4 my-2">{{ icon("icon-chenggong")|raw }} {{ i18n("实名认证成功")|raw }}</h3>
+                                    <p class="mb-0">
+                                        {{ i18n("您的实名认证已经通过审核。")|raw }}
+                                    </p>
+                                </div>
+                            {% elseif (userIdentity.status == 2) %}
+                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                    <h3 class="alert-heading h4 my-2">{{ icon("icon-cuowu")|raw }} {{ i18n("实名失败")|raw }}</h3>
+                                    <p class="mb-0">
+                                        {{ i18n("您的实名认证失败，请")|raw }}<a class="resubmit-identity" href="javascript:void(0);">{{ i18n("点击这里")|raw }}</a>{{ i18n("重新提交实名信息。")|raw }}
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/user/controller/user/security.js")|raw }}
+{{ include ("Common/Footer.html") }}

@@ -1,0 +1,83 @@
+{{ include ("Auth/Header.html") }}
+
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="row mx-0 justify-content-center hero-static align-items-center">
+        <div class="col-xl-4" style="width: 540px;">
+            <div class="content content-full overflow-hidden">
+                <!-- Register In Form -->
+                <form id="reset-form" method="POST">
+                    <div class="block block-themed block-rounded block-fx-shadow">
+                        <div class="block-header bg-gd-primary">
+                            <h3 class="block-title">{{ i18n("重置密码")|raw }}</h3>
+                        </div>
+                        <div class="block-content">
+
+
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="email" name="email"
+                                       placeholder="{{ i18n("请输入邮箱")|raw }}">
+                                <label class="form-label" for="email">{{ i18n("邮箱")|raw }}</label>
+                            </div>
+
+
+                            <div class="row mb-4">
+                                <div class="col-sm-8 col-8">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="email-code"
+                                               name="email_code" placeholder="{{ i18n("邮箱验证码")|raw }}">
+                                        <label class="form-label" for="email-code">{{ i18n("邮箱验证码")|raw }}</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-4">
+                                    <button type="button"
+                                            class="w-100 btn btn-outline-primary py-3 send-email-code">
+                                        {{ i18n("发送验证码")|raw }}
+                                    </button>
+                                </div>
+                            </div>
+
+
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="password" name="password"
+                                       placeholder="{{ i18n("请输入新密码")|raw }}">
+                                <label class="form-label" for="password">{{ i18n("新密码")|raw }}</label>
+                            </div>
+
+                            {{ hook( env(), point("USER_AUTH_RESET_FORM"))|raw }}
+
+                            <div class="mb-4">
+                                <button type="button"
+                                        class="btn btn-lg btn-outline-success fw-medium reset-btn w-100">
+                                    {{ i18n("确认重置")|raw }}
+                                </button>
+                            </div>
+
+
+                            {{ hook(env(), point("USER_AUTH_RESET_FORM_BUTTON"))|raw }}
+                        </div>
+
+                        <div class="block-content block-content-full bg-body-light text-center d-flex justify-content-between">
+                            <a class="fs-sm fw-medium link-fx text-muted me-2 mb-1 d-inline-block"
+                               href="/login">
+                                <i class="fa fa-arrow-left opacity-50 me-1"></i> {{ i18n("去登录")|raw }}
+                            </a>
+                            <a class="fs-sm fw-medium link-fx text-muted me-2 mb-1 d-inline-block"
+                               href="/register">
+                                <i class="fa fa-plus opacity-50 me-1"></i> {{ i18n("注册新账号")|raw }}
+                            </a>
+                        </div>
+                    </div>
+                </form>
+                <!-- END Sign In Form -->
+            </div>
+        </div>
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+
+{{ ready("/assets/user/controller/auth/reset.js")|raw }}
+{{ hook( env(), point("USER_AUTH_RESET_BODY"))|raw }}
+{{ include ("Auth/Footer.html") }}

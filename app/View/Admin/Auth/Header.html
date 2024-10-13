@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>{{ i18n(title)|raw }} - {{ site.title }}</title>
+    <link rel="icon" href="{{ site.logo }}">
+    {{ css(["/assets/admin/css/codebase.min.css", "/assets/common/css/toastr.min.css",  "/assets/common/js/layer/theme/default/layer.css"])|raw }}
+
+    {{ js("/assets/common/js/ready.js")|raw }}
+
+    {{ var({"language" : language , "DEBUG" : app.debug})|raw }}
+
+    {{ hook(env(true) ,  point("ADMIN_AUTH_HEADER")) }}
+</head>
+<body style="background: url('{{ site.bg_image }}') fixed no-repeat;background-size: cover;">

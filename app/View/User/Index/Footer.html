@@ -1,0 +1,70 @@
+</main>
+<!-- END Main Container -->
+
+<!-- Footer -->
+<footer id="page-footer" class="bg-body-extra-light">
+    <div class="content py-3">
+        <div class="row fs-sm">
+            <div class="col-sm-6 order-sm-2 py-1 text-center text-sm-end">
+                {% if site.icp != "" %}
+                    <a class="text-gray-dark" href="https://beian.miit.gov.cn/">{{ site.icp }}</a>
+                {% else %}
+                    Crafted with <i class="fa fa-heart text-danger"></i> by <span class="fw-semibold text-success">lizhipay</span>
+                {% endif %}
+            </div>
+            <div class="col-sm-6 order-sm-1 py-1 text-center text-sm-start">
+                <a class="fw-semibold" href="/" target="_blank">{{ i18n(site.title)|raw }}</a>
+                &copy;
+                <span data-toggle="year-copy"></span>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- END Footer -->
+</div>
+<!-- END Page Container -->
+
+{{ js([
+    "/assets/common/js/base.js",
+    "/assets/user/js/index.js"
+] , [
+    "/assets/common/js/jquery.min.js",
+    "/assets/common/js/toastr.min.js",
+    "/assets/common/js/language.js",
+    "/assets/common/js/util/dict.js",
+    "/assets/common/js/util.js",
+    "/assets/common/js/layer/layer.js",
+    "/assets/common/js/jquery.pjax.min.js",
+    "/assets/common/js/format.js",
+    "/assets/common/js/message.js",
+    "/assets/common/js/component.js",
+    "/assets/common/js/layui/layui.js",
+    "/assets/common/js/jquery.treegrid.min.js",
+    "/assets/common/js/jquery.qrcode.min.js",
+    "/assets/common/js/table/bootstrap-table.min.js",
+    "/assets/common/js/table/bootstrap-table-treegrid.min.js",
+    "/assets/common/js/component/form.js",
+    "/assets/common/js/component/search.js",
+    "/assets/common/js/component/xm-select.js",
+    "/assets/common/js/component/tree.select.js",
+    "/assets/common/js/component/authtree.js",
+    "/assets/common/js/component/table.js",
+    "/assets/common/js/component/select2.min.js",
+    "/assets/common/js/cache.js",
+    "/assets/common/js/editor/editor.js",
+    "/assets/common/js/editor/code/code.js",
+    "/assets/common/js/component/decimal.js",
+    "/assets/common/js/broadcast.js",
+    "/assets/common/js/service/treasure.js",
+    "/assets/user/js/oneui.app.min.js",
+    "/assets/user/js/widget.js",
+    "/assets/user/js/visitor.js",
+    "/assets/user/js/pay.js",
+    "/assets/user/js/util/dict.js",
+    "/assets/user/controller/index/global.js",
+    "/assets/common/fonts/base/iconfont.js",
+])|raw }}
+
+{{ hook(env() , point("INDEX_FOOTER") , 1)|raw }}
+</body>
+</html>

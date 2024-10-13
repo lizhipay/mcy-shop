@@ -1,0 +1,68 @@
+{{ include ("Common/Header.html") }}
+
+<div class="content">
+    <div class="row mb-2 data-count">
+
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-xiaoxiong","icon-42px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("全部")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center item_count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-anquan3","icon-40px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("在售")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center sold_count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+
+        <div class="col-md-6 col-xl-2 sense-boundary">
+            <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                    <div>
+                        {{ icon("icon-anquan2","icon-42px")|raw }}
+                    </div>
+                    <div class="text-end">
+                        <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("已下架")|raw }}</div>
+                        <div class="fs-3 fw-semibold text-center not_sold_count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <a href="/admin/repertory/item"><button type="button" class="btn btn-outline-success btn-sm add-shop-item">{{ icon("icon-tianjia")|raw }} {{ i18n("从仓库导入商品")|raw }}
+                </button></a>
+            <button type="button" class="btn btn-outline-primary btn-sm control-item">{{ icon("icon-shangxiajia")|raw }} {{i18n("操作选中商品")|raw}}</button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-shop-item">{{ icon("icon-shanchu")|raw }} {{ i18n("移除商品")|raw }}
+            </button>
+
+        </div>
+        <div class="block-content pt-0">
+            <table id="shop-item-table"></table>
+        </div>
+    </div>
+</div>
+
+{{ready("/assets/admin/controller/shop/item.js")|raw}}
+{{ include ("Common/Footer.html") }}

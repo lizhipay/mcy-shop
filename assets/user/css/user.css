@@ -1,0 +1,424 @@
+.nav-menu-img-icon {
+    width: 14.95px;
+    height: 14.95px;
+    margin-right: .625rem;
+    border-radius: 5px;
+}
+
+.block-table-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: normal !important;
+    align-items: center;
+    padding: .625rem 1.25rem;
+    transition: opacity .25s ease-out
+}
+
+.m-r-2 {
+    margin-right: 10px;
+}
+
+.block.block-rounded {
+    border-radius: .875rem 1rem;
+}
+
+.block-table-header {
+    border-top-right-radius: 0.875rem 1rem;
+    border-top-left-radius: 0.875rem 1rem;
+}
+
+a.link-fx {
+    color: var(--bs-link-color);
+    text-decoration: none;
+}
+
+.bg-config {
+    border-radius: 25px !important;
+}
+
+.bg-config .config-title {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-size: 1.15rem;
+}
+
+.config-background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 25px !important;
+    filter: blur(4px);
+}
+
+.config-block {
+    background: linear-gradient(to right, #e8e8ffa6, #defdffe6) !important;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px !important;
+    border-radius: 25px !important;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.4s ease;
+    position: relative;
+}
+
+@media (min-width: 1600px) {
+    .col-xxxl-1 {
+        flex: 0 0 auto;
+        width: 11.11111111111111%
+    }
+}
+
+.sms-test-btn, .smtp-test-btn {
+    width: 100%;
+    padding: 10px 0;
+    background-color: #f2f2f2;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sms-test-btn:hover, .smtp-test-btn:hover {
+    background-color: #e6e6e6;
+}
+
+.header-message {
+    color: #333;
+    background-color: #f9f9f99c;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 600px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-message p {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.header-message ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.header-message li {
+    background-color: #ffffff40;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    padding-left: 20px;
+}
+
+.header-message li:before {
+    content: counter(item) ".";
+    counter-increment: item;
+    position: absolute;
+    left: -20px;
+    top: 10px;
+    background-color: #007bff;
+    color: #fff;
+    height: 20px;
+    width: 20px;
+    text-align: center;
+    line-height: 20px;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+.list-group {
+    --bs-list-group-bg: rgba(255, 255, 255, 0.38) !important;
+}
+
+/* Initialize counter */
+.header-message {
+    counter-reset: item;
+}
+
+
+/**
+充值界面
+ */
+
+/* 基础样式 */
+.recharge-view {
+    background-color: #f5f5f5d9;
+    padding: 40px;
+    max-width: 1000px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 25px;
+}
+
+.recharge-view .layout-box {
+    background-color: #ffffff75;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.recharge-view .title {
+    color: #333;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.recharge-view .recharge-content {
+    color: #666;
+    font-size: 16px;
+}
+
+/* 特定内容的样式 */
+.recharge-view .recharge-content.balance {
+    color: #2b8eff;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.recharge-view .pay-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start; /* 确保列表项靠左对齐 */
+    margin: 0 -10px;
+}
+
+.recharge-view .pay-item {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin: 6px 10px 6px 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+.recharge-view .pay-item img {
+    width: 26px;
+    height: 26px;
+    margin-right: 6px;
+}
+
+.recharge-view .pay-item:hover, .recharge-view .pay-item:focus {
+    border-color: #007bff;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+    background-color: #eef4fe;
+}
+
+.recharge-view .pay-current {
+    background-color: #e8f0fe;
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.recharge-view .btn-recharge {
+    width: 120px;
+    padding: 8px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.recharge-view .btn-recharge:hover {
+    background-color: #0056b3;
+}
+
+.recharge-view input {
+    width: 280px;
+    padding: 10px 0;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    background: transparent;
+    box-sizing: border-box;
+    font-size: 16px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.recharge-view input:focus {
+    border-bottom-color: #007bff; /* 聚焦时改变下划线颜色 */
+}
+
+/* 媒体查询，用于响应式调整 */
+@media (max-width: 762px) {
+    .recharge-view {
+        padding: 10px;
+    }
+
+    .recharge-view .layout-box {
+        padding: 30px;
+    }
+
+    .recharge-view .recharge-amount {
+        width: 100%;
+    }
+}
+
+/*
+个人资料页面
+ */
+
+.image-avatar {
+    height: 100px;
+    width: 100px;
+    border-radius: 100%;
+    border: 1px solid #fba9da8c;
+    box-shadow: 1px 1px 10px 1px #ed9b9bb3;
+    cursor: pointer;
+}
+
+
+/**
+开通商家页面
+ */
+
+.user-group-name {
+    display: inline-flex;
+    align-items: center;
+    /*    background-color: #f4f4f8; !* 背景色 *!*/
+    border-radius: 5px; /* 边框圆角 */
+    padding: 5px 10px; /* 内边距 */
+    font-family: 'Arial', sans-serif; /* 字体 */
+    font-size: 24px; /* 字号 */
+    color: #ffffff; /* 文字颜色 */
+    /*  box-shadow: 0 2px 5px rgba(0,0,0,0.1); !* 盒子阴影 *!*/
+}
+
+.user-group-name img {
+    width: 32px; /* 图标大小 */
+    height: 32px;
+    margin-right: 8px; /* 图标和文本之间的距离 */
+    border-radius: 50%;
+}
+
+
+/**
+弹窗支付
+ */
+
+.pay-container .layout-box {
+    margin-bottom: 16px;
+}
+
+.pay-container .layout-box .title {
+    margin-bottom: 8px;
+}
+
+.pay-container .pay-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start; /* 确保列表项靠左对齐 */
+    margin: 0 -10px;
+}
+
+.pay-container .pay-list .pay-item {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin: 6px 10px 6px 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+.pay-container .pay-list .pay-item img {
+    width: 26px;
+    height: 26px;
+    margin-right: 6px;
+}
+
+.pay-container .pay-list .pay-item:hover, .pay-container .pay-list .pay-item:focus {
+    border-color: #007bff;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+    background-color: #eef4fe;
+}
+
+.pay-container .pay-list .pay-current {
+    background-color: #e8f0fe;
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.pay-container button {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.pay-container button[disabled="disabled"] {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pay-container button[disabled="disabled"]:hover {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pay-container button:hover {
+    background-color: #0056b3;
+}
+
+
+@media (min-width: 762px) {
+    .block-security {
+        min-height: calc(100vh - 270px);
+    }
+}
+
+
+.shop-name {
+    display: inline-flex; /* 使用flex布局让图标和名称在同一行显示 */
+    align-items: center; /* 垂直居中对齐 */
+    padding: 5px 8px; /* 添加一些内边距让它看起来不那么拥挤 */
+    border-radius: 8px; /* 给元素添加圆角边框 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加一些阴影效果让它立体一些 */
+    transition: all 0.3s ease; /* 添加一个过渡效果让鼠标悬停时有一个小动画 */
+    cursor: pointer;
+}
+
+.shop-logo {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.shop-name .shop-title {
+    font-size: 16px;
+    font-weight: bolder;
+    white-space: nowrap;
+}
+
+.nav-tabs-block .nav-link {
+    font-size: .975rem !important;
+}
+
+.nav.nav-tabs.nav-tabs-block {
+    padding-right: 0 !important;
+}

@@ -1,0 +1,20 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-bank">{{ icon("icon-tianjia")|raw }} {{ i18n("新增银行")|raw }}
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-bank">{{ icon("icon-shanchu")|raw }} {{ i18n("移除银行")|raw }}
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="bank-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ready("/assets/admin/controller/user/bank.js")|raw}}
+{{ include ("Common/Footer.html") }}

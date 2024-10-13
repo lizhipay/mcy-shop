@@ -1,0 +1,66 @@
+{
+    "name": "hyperf/engine",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "php",
+        "hyperf",
+        "engine",
+        "swoole"
+    ],
+    "description": "Coroutine engine provided by swoole.",
+    "autoload": {
+        "psr-4": {
+            "Hyperf\\Engine\\": "src/"
+        },
+        "files": [
+            "src/Functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HyperfTest\\": "tests"
+        }
+    },
+    "require": {
+        "php": ">=8.0",
+        "hyperf/engine-contract": "~1.10.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "hyperf/guzzle": "^3.0",
+        "hyperf/http-message": "^3.0",
+        "mockery/mockery": "^1.5",
+        "phpstan/phpstan": "^1.0",
+        "phpunit/phpunit": "^9.4",
+        "swoole/ide-helper": "5.*"
+    },
+    "suggest": {
+        "ext-sockets": "*",
+        "ext-swoole": ">=5.0",
+        "psr/http-message": "Required to use WebSocket Frame.",
+        "hyperf/http-message": "Required to use ResponseEmitter."
+    },
+    "conflict": {
+        "ext-swoole": "<5.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.11-dev"
+        },
+        "hyperf": {
+            "config": "Hyperf\\Engine\\ConfigProvider"
+        }
+    },
+    "scripts": {
+        "test": "phpunit -c phpunit.xml --colors=always",
+        "analyse": "phpstan analyse --memory-limit 1024M -l 0 ./src",
+        "cs-fix": "php-cs-fixer fix $1"
+    }
+}

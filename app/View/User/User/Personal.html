@@ -1,0 +1,133 @@
+{{ include ("Common/Header.html") }}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    {{ i18n("您的资料")|raw }}
+                </h2>
+            </div>
+            <nav class="flex-shrink-0 mt-3 mt-sm-0 ms-sm-3" aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-alt">
+                    <li class="breadcrumb-item">
+                        <a class="link-fx" href="javascript:void(0)">{{ i18n("个人中心")|raw }}</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        {{ i18n(title)|raw }}
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+<!-- END Hero -->
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-content">
+
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 col-xl-4 py-4">
+                    <!-- Header -->
+                    <div class="text-center mb-5">
+                        <p class="mb-2">
+                            <img src="{{ user.avatar }}" class="img-avatar">
+                        </p>
+                        <h1 class="h4 mb-1 text-primary">
+                            {{ user.username }}
+                        </h1>
+                    </div>
+                    <!-- END Header -->
+
+                    <!-- Services -->
+                    <ul class="list-group push">
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("当前等级")|raw }}
+                            <span class="fs-sm fw-semibold d-inline-block py-1 px-3"> <p class="mb-2">
+                                    <span class="table-item table-item-cate"
+                                          style="background-color: #dcfcff !important;"><img src="{{ user.level.icon }}"
+                                                                                             class="table-item-icon"><span
+                                                class="table-item-name">{{ i18n(user.level.name)|raw }}</span></span>
+                                    </p> <p><a class="text-primary"
+                                               href="/user/level">{{ i18n("查看所有等级")|raw }}</a></p></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("等级权益")|raw }}
+                            <span class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill">{{ user.level.privilege_content|raw }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("邮箱")|raw }}
+                            <span class="fs-sm d-inline-block py-1 px-3 rounded-pill">{{ user.email }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("API-ID")|raw }}
+                            <span class="fs-sm d-inline-block py-1 px-3 rounded-pill bg-primary text-white">{{ user.id }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("API密钥")|raw }}
+                            <span class="fs-sm d-inline-block py-1 px-3 rounded-pill bg-primary text-white">{{ user.app_key }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("积分")|raw }}
+                            <span class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success">{{ user.integral }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("商家权限")|raw }}
+                            <span class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill">{{ (user.group and user.group.is_merchant == 1 ? '<i class="fa fa-check fa-fw text-success"></i>' : '<a class="text-primary" href="/user/merchant/open">'~ i18n('去升级') ~'</a>')|raw }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("供货权限")|raw }}
+                            <span class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill">{{ (user.group and user.group.is_supplier == 1 ? '<i class="fa fa-check fa-fw text-success"></i>' : '<a class="text-primary" href="/user/merchant/open">'~ i18n('去升级') ~'</a>')|raw }}</span>
+                        </li>
+
+                        {% if  user.group and user.group.is_supplier == 1 %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                                {{ i18n("供货码")|raw }}
+                                <span class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill bg-success-light text-success">{{ user.api_code }}</span>
+                            </li>
+                        {% endif %}
+
+
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("累计消费")|raw }}<span
+                                    class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill text-gray-dark">{{ ccy() ~ lifetime.total_consumption_amount }}</span>
+                        </li>
+
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("累计充值")|raw }}<span
+                                    class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill text-gray-dark">{{ ccy() ~ lifetime.total_recharge_amount }}</span>
+                        </li>
+
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("累计推广人数")|raw }}<span
+                                    class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill text-gray-dark">{{ lifetime.total_referral_count }}</span>
+                        </li>
+
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("累计获利")|raw }}<span
+                                    class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill text-gray-dark">{{ ccy() ~ lifetime.total_profit_amount }}</span>
+                        </li>
+
+                        <li class="list-group-item d-flex justify-content-between align-items-center fw-medium">
+                            {{ i18n("累计提现")|raw }}<span
+                                    class="fs-sm fw-semibold d-inline-block py-1 px-3 rounded-pill text-gray-dark">{{ ccy() ~ lifetime.total_withdraw_amount }}</span>
+                        </li>
+                    </ul>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/user/controller/user/recharge.js")|raw }}
+{{ include ("Common/Footer.html") }}

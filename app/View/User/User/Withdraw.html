@@ -1,0 +1,51 @@
+{{ include ("Common/Header.html") }}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+
+                <div class="recharge-view">
+                    <div class="layout-box">
+                        <div class="title">{{ i18n("可提现金额")|raw }}</div>
+                        <div class="recharge-content balance user-withdraw-amount">{{ ccy() ~ user.withdraw_amount }}</div>
+                    </div>
+
+                    <div class="layout-box">
+                        <div class="title">{{ i18n("银行卡")|raw }}</div>
+                        <div class="recharge-content">
+                            <select class="bank-select">
+                                {% for c in card %}
+                                    <option value="{{ c.id }}" data-icon="{{ c.bankIcon }}">{{ i18n(c.bankName)|raw }}({{ c.cardNo }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layout-box">
+                        <div class="title">{{ i18n("提现金额")|raw }}</div>
+                        <div class="recharge-content amount"><input type="text" class="withdraw-amount user-withdraw-amount"
+                                                                    value="{{ user.withdraw_amount }}"></div>
+                    </div>
+
+                    <div class="layout-box">
+                        <button class="btn-recharge">{{ i18n("立即提现")|raw }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-content pt-0">
+            <table id="user-withdraw-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ ready("/assets/user/controller/user/withdraw.js")|raw }}
+{{ include ("Common/Footer.html") }}

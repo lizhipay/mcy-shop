@@ -1,0 +1,230 @@
+.bg-config {
+    border-radius: 25px !important;
+}
+
+.bg-config .config-title {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-size: 1.15rem;
+}
+
+.config-background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 25px !important;
+    filter: blur(4px);
+}
+
+.config-block {
+    background: linear-gradient(to right, #e8e8ffa6, #defdffe6) !important;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px !important;
+    border-radius: 25px !important;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.4s ease;
+    position: relative;
+}
+
+@media (min-width: 1600px) {
+    .col-xxxl-1 {
+        flex: 0 0 auto;
+        width: 11.11111111111111%
+    }
+}
+
+.sms-test-btn, .smtp-test-btn {
+    width: 100%;
+    padding: 10px 0;
+    background-color: #f2f2f2;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sms-test-btn:hover, .smtp-test-btn:hover {
+    background-color: #e6e6e6;
+}
+
+/**
+打款信息
+ */
+.withdraw-info {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 600px;
+}
+
+.withdraw-info .w-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(224, 224, 224, 0.38);
+}
+
+.withdraw-info .w-item:last-child {
+    border-bottom: none;
+}
+
+.withdraw-info .w-title {
+    flex: 1;
+}
+
+.withdraw-info .w-text {
+    flex: 2;
+    text-align: left; /* 使文本居左 */
+}
+
+.withdraw-info .w-copy {
+    margin-left: 10px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.withdraw-info .w-copy:hover {
+    background-color: #0056b3;
+}
+
+.withdraw-info .w-item img {
+    max-width: 100px; /* 控制图片大小 */
+    border-radius: 4px;
+}
+
+.withdraw-info .w-copy.invisible {
+    visibility: hidden; /* 隐藏按钮 */
+}
+
+.shop-name {
+    display: inline-flex; /* 使用flex布局让图标和名称在同一行显示 */
+    align-items: center; /* 垂直居中对齐 */
+    padding: 5px 8px; /* 添加一些内边距让它看起来不那么拥挤 */
+    border-radius: 8px; /* 给元素添加圆角边框 */
+
+    transition: all 0.3s ease; /* 添加一个过渡效果让鼠标悬停时有一个小动画 */
+    cursor: pointer;
+}
+
+
+.shop-name .shop-logo {
+    width: 22px; /* 图标的大小，根据需要调整 */
+    height: 22px; /* 图标的大小，根据需要调整 */
+    border-radius: 50%; /* 使图标变成圆形 */
+    margin-right: 6px; /* 在图标和名称之间添加一些间隔 */
+}
+
+.shop-name .shop-title {
+    font-size: 16px; /* 名称的字体大小，根据需要调整 */
+
+    font-weight: bolder;
+    white-space: nowrap;
+}
+
+.separator {
+    display: block;
+    height: 0;
+    border-bottom: 1px solid #EFF2F5;
+}
+
+.latest-check {
+    cursor: pointer;
+}
+
+
+
+.nav-menu-img-icon {
+    width: 19px;
+    height: 19px;
+    margin-right: .625rem;
+    border-radius: 5px;
+}
+
+/**
+弹窗支付
+ */
+
+.pay-container .layout-box {
+    margin-bottom: 16px;
+}
+
+.pay-container .layout-box .title {
+    margin-bottom: 8px;
+}
+
+.pay-container .pay-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start; /* 确保列表项靠左对齐 */
+    margin: 0 -10px;
+}
+
+.pay-container .pay-list .pay-item {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin: 6px 10px 6px 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+.pay-container .pay-list .pay-item img {
+    width: 26px;
+    height: 26px;
+    margin-right: 6px;
+}
+
+.pay-container .pay-list .pay-item:hover, .pay-container .pay-list .pay-item:focus {
+    border-color: #007bff;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+    background-color: #eef4fe;
+}
+
+.pay-container .pay-list .pay-current {
+    background-color: #e8f0fe;
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.pay-container button {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.pay-container button[disabled="disabled"] {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pay-container button[disabled="disabled"]:hover {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pay-container button:hover {
+    background-color: #0056b3;
+}

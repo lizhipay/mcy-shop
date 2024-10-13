@@ -1,0 +1,70 @@
+{{ include ("Auth/Header.html") }}
+<!-- Main Container -->
+<main id="main-container">
+    <!-- Page Content -->
+    <div class="row mx-0 justify-content-center hero-static align-items-center">
+        <div class="col-xl-4" style="width: 540px;">
+            <div class="content content-full overflow-hidden">
+                <!-- Sign In Form -->
+                <form id="login-form" method="POST">
+                    <div class="block block-themed block-rounded block-fx-shadow">
+                        <div class="block-header bg-gd-dusk">
+                            <a href="/" class="text-white"><h3 class="block-title">{{ i18n(site.title)|raw }}</h3></a>
+                        </div>
+                        <div class="block-content">
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="username" name="username"
+                                       placeholder="{{ i18n("请输入会员名或邮箱")|raw }}">
+                                <label class="form-label" for="username">{{ i18n("会员名/邮箱")|raw }}</label>
+                            </div>
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="{{ i18n("密码")|raw }}">
+                                <label class="form-label" for="password">{{ i18n("密码")|raw }}</label>
+                            </div>
+
+                            {{ hook(env(), point("USER_AUTH_LOGIN_FORM"))|raw }}
+
+                            <div class="row">
+                                <div class="col-sm-6 d-sm-flex align-items-center push">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="1" id="remember"
+                                               dirname="remember"
+                                               name="remember">
+                                        <label class="form-check-label" for="remember">{{ i18n("记住我!")|raw }}</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 text-sm-end push">
+                                    <button type="button" class="btn btn-lg btn-alt-primary fw-medium login-btn">
+                                        {{ i18n("登入")|raw }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{ hook(env(), point("USER_AUTH_LOGIN_FORM_BUTTON"))|raw }}
+                        </div>
+                        <div class="block-content block-content-full bg-body-light text-center d-flex justify-content-between">
+                            <a class="fs-sm fw-medium link-fx text-muted me-2 mb-1 d-inline-block"
+                               href="/register">
+                                <i class="fa fa-plus opacity-50 me-1"></i> {{ i18n("注册账号")|raw }}
+                            </a>
+                            {% if option.email_reset_state == 1 %}
+                                <a class="fs-sm fw-medium link-fx text-muted me-2 mb-1 d-inline-block"
+                                   href="/reset">
+                                    {{ i18n("忘记密码?")|raw }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+                <!-- END Sign In Form -->
+            </div>
+        </div>
+    </div>
+    <!-- END Page Content -->
+</main>
+<!-- END Main Container -->
+
+{{ ready("/assets/user/controller/auth/login.js")|raw }}
+{{ hook(env(), point("USER_AUTH_LOGIN_BODY"))|raw }}
+{{ include ("Auth/Footer.html") }}

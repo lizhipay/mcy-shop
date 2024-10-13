@@ -1,0 +1,20 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-pay">{{icon("icon-tianjia")|raw}} {{ i18n("新增支付接口")|raw }}
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-pay">{{icon("icon-shanchu")|raw}} {{ i18n("移除接口")|raw }}
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="pay-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ready("/assets/admin/controller/pay/pay.js")|raw}}
+{{ include ("Common/Footer.html") }}

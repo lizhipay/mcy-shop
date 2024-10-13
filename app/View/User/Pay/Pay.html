@@ -1,0 +1,43 @@
+{{ include( "Common/Header.html") }}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    <div class="header-message">
+                        <p>{{ i18n("为了便捷地设置您的收款渠道，您可采纳以下两种方法完成收款操作。")|raw }}</p>
+                        <ul>
+                            <li>{{ i18n("采用个人支付接口，客户的付款将直接进入您的账户。但在此之前，请确保您的平台余额足够，因为采购商品时将直接使用您的余额支付，如余额不满足进货所需金额，则会自动隐藏个人支付接口。")|raw }}</li>
+                            <li>{{ i18n("使用平台提供的支付接口，每笔交易扣除商品成本后，剩余款项将存入您的平台余额，您可随时申请提现。")|raw }}</li>
+                        </ul>
+                    </div>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+
+<!-- Page Content -->
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default pt-3 pb-3">
+            <button type="button" class="btn btn-outline-success btn-sm borrow-pay wap-mb1">{{ icon("icon-web__kuaisuduijie")|raw }} {{ i18n("使用平台接口")|raw }}</button>
+            <button type="button" class="btn btn-outline-success btn-sm add-pay wap-mb1">{{ icon("icon-tianjia")|raw }} {{ i18n("使用个人支付接口")|raw }}</button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-pay wap-mb1">{{ icon("icon-shanchu")|raw }} {{ i18n("移除接口")|raw }}
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="pay-table"></table>
+        </div>
+    </div>
+</div>
+<!-- END Page Content -->
+
+{{ ready("/assets/user/controller/pay/pay.js")|raw }}
+{{ include ("Common/Footer.html") }}

@@ -1,0 +1,1099 @@
+
+.category-btn {
+    background-color: #7a8cf39e;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 0 12px 8px 0;
+    border-radius: 15px;
+    /*  0 0 10px 5px rgba(199, 199, 199, .1);*/
+    -moz-box-shadow: 0 0 10px 5px rgba(199, 199, 199, .1);
+    box-shadow: 0 0 10px 5px rgba(199, 199, 199, .1);
+    border: 3px solid transparent;
+    font-weight: bolder;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    font-size: 16px;
+    color: white;
+    transition: transform 0.4s ease;
+}
+
+.nav-main-link .nav-main-link-name {
+    font-weight: bold;
+}
+
+.category-btn-icon {
+    height: 35px;
+    border-radius: 6px;
+}
+
+.category-icon {
+    height: 16px;
+    width: 16px;
+    border-radius: 6px;
+    margin-right: 3px;
+}
+
+
+.item-card-icon {
+    height: 60px;
+    width: 60px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+    overflow: hidden; /* 隐藏溢出容器的部分 */
+    display: flex; /* 使用Flexbox来居中图片 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    margin: 0 auto;
+    border-radius: 20px;
+}
+
+.item-card-icon img {
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover; /* 裁剪图片以保持宽高比，覆盖容器 */
+    object-position: center; /* 图片居中 */
+}
+
+.category-btn-text {
+    padding-left: 5px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+
+.item-box {
+    transition: transform 0.5s ease-in-out; /* 应用于位置变化 */
+    animation: fadeIn 0.5s ease-out; /* 使用fadeIn动画，持续时间1秒，缓动函数ease-out */
+}
+
+
+.item-block {
+    background: linear-gradient(to right, #e8e8ffa6, #defdffe6) !important;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px !important;
+    border-radius: 25px !important;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.4s ease;
+    position: relative;
+}
+
+.item-background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 25px !important;
+    filter: blur(4px);
+}
+
+.item-background::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .1);
+    border-radius: 25px;
+}
+
+.ribbon-item-price {
+    color: #fff;
+    background-color: #18b346ab;
+    position: absolute;
+    top: 1.75rem;
+    right: 0;
+    padding: 0 .75rem;
+    height: 2.25rem;
+    line-height: 2.25rem;
+    z-index: 5;
+    font-weight: 700;
+    border-top-left-radius: .375rem;
+    border-bottom-left-radius: .375rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.support-wholesale {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.ribbon-item-box::before {
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    content: "";
+}
+
+.ribbon-item-stock {
+    background-color: #00b8ff52;
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    padding: 0 .75rem;
+    height: 1.75rem;
+    line-height: 1.75rem;
+    z-index: 5;
+    font-weight: bolder;
+    font-size: 12px;
+    text-align: center;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    display: flex;
+    justify-content: space-between; /* 左右对齐 */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.ribbon-item-stock .item-stock {
+    color: white;
+    margin-left: 10px;
+}
+
+.ribbon-item-stock .item-sold {
+    color: white;
+    margin-right: 10px;
+}
+
+
+.item-block .item-text {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.ribbon-item-stock .item-stock .item-number {
+    color: #60eeb7 !important;
+}
+
+.ribbon-item-stock .item-sold .item-number {
+    color: #b4ee60 !important;
+}
+
+.block-notice {
+    position: relative;
+    border-radius: 25px !important;
+}
+
+.block-notice .content-notice {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    position: relative;
+}
+
+.block-notice .content-notice p {
+    margin: 0;
+}
+
+.notice-background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 25px !important;
+    filter: blur(4px);
+}
+
+.notice-background::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .1);
+    border-radius: 25px;
+}
+
+.block-notice .content-notice .notice-title {
+    border-top-left-radius: 25px !important;
+}
+
+.item-image-main {
+    background: linear-gradient(to right, rgb(156 119 255 / 33%), rgb(244 255 249));
+    padding: 2px !important;
+    height: 236px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 10px;
+}
+
+.item-image-main .img-link {
+    display: revert !important;
+}
+
+.item-image-show {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 10px;
+}
+
+.item-image-list {
+    margin-top: 5px;
+    text-align: center;
+    background: linear-gradient(to right, rgb(106 151 181 / 7%), rgb(233 213 252 / 27%));
+    border-radius: 10px;
+    padding: 5px 0px;
+    display: flex; /* 使用 flex 布局使图片横向排列 */
+    overflow-x: hidden; /* 隐藏水平滚动条但允许滚动 */
+    overflow-y: hidden;
+    white-space: nowrap; /* 防止图片换行 */
+    position: relative; /* 定位，以便于控制滚动 */
+}
+
+.item-image-list .item-image-sku-mini.image-active {
+    border: 1px solid #ff87c4;
+}
+
+.item-image-list .item-image-sku-mini:hover {
+    transform: scale(1.1);
+}
+
+.item-image-list .item-image-sku-mini:first-child {
+    margin-left: 2px;
+}
+
+.item-image-list .item-image-sku-mini {
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    display: inline-block;
+    transition: transform 0.1s ease;
+    transform: scale(1);
+    flex: 0 0 auto;
+    margin-right: 5px;
+}
+
+.item-image-list img {
+    height: 64px;
+    width: 64px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 4px;
+}
+
+@media (min-width: 992px) {
+    .category-btn:not(article) {
+        border: none;
+        transition: all 0.4s;
+    }
+
+    .category-btn:not(article):hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 8px rgba(73, 90, 47, .6);
+    }
+
+    .category-submenu {
+        width: 100vh !important;
+    }
+
+    .item-block:not(article) {
+        transition: all 0.4s;
+    }
+
+    .item-block:not(article):hover {
+        transform: translateY(-4px);
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .category-btn:active {
+        transform: scale(1.01);
+    }
+
+    .item-block:active {
+        transform: scale(1.01);
+    }
+
+    .nav-main-horizontal.nav-main-hover .nav-main-item:hover > .nav-main-submenu {
+        padding-left: 2rem !important;
+    }
+}
+
+
+/**
+商品页面
+ */
+
+.item-title-content {
+    background: #ebeef2;
+    background: linear-gradient(to right, rgb(106 151 181 / 7%), rgb(233 213 252 / 27%));
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.item-controls {
+    margin-top: 5px;
+    /*   background: #ebeef2;*/
+    /*background: linear-gradient(to right, rgb(106 151 181 / 7%), rgb(233 213 252 / 27%));*/
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.sku-wrapper {
+    display: flex; /* 启用Flexbox */
+    flex-wrap: wrap; /* 允许子元素换行 */
+}
+
+.sku-item {
+    flex: 0 1 auto;
+    display: inline-block;
+    margin-right: 5px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: #ffffffa6;
+    border: 1px solid transparent;
+    cursor: pointer;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    background: linear-gradient(to right, rgb(211, 204, 227), rgb(233, 228, 240));
+    align-items: center;
+    display: flex;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    transition: transform 0.5s ease-in-out; /* 应用于位置变化 */
+    animation: fadeIn 0.5s ease-out; /* 使用fadeIn动画，持续时间1秒，缓动函数ease-out */
+}
+
+.sku-current {
+    border: 1px solid #87cbd485;
+    background: linear-gradient(to right, rgb(185 241 215), rgb(243 255 246)) !important;
+}
+
+.sku-wrapper .sku-item .sku-icon {
+    display: flex;
+    align-items: center; /* 确保图片在.sku-icon内垂直居中 */
+    justify-content: center; /* 如果你还想要图片水平居中 */
+    margin-right: 5px;
+}
+
+.sku-wrapper .sku-item .sku-icon img {
+    height: 24px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    border-radius: 4px;
+}
+
+.sku-cate-td {
+    vertical-align: middle;
+    padding: 0 0 0 10px !important;
+}
+
+.sku-cate-td .cate-name {
+    font-size: 16px;
+    color: #7f7f7f;
+    font-weight: revert;
+}
+
+.table .sku-attr-value {
+    word-break: break-word; /* 对于较长的单词进行断行 */
+    overflow-wrap: break-word; /* 确保内容被适当地包裹 */
+}
+
+.item-controls .form-check {
+    min-height: inherit !important;
+    margin-bottom: inherit !important;
+    font-size: 16px;
+}
+
+@media (max-width: 767.98px) {
+    .sku-item:active {
+        transform: scale(1.01);
+    }
+
+    .introduce-content img {
+        height: auto !important;
+    }
+
+    .introduce-content video {
+        height: auto !important;
+    }
+
+    .introduce-content iframe {
+        height: auto !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .sku-item:not(article) {
+        transition: all 0.4s;
+    }
+
+    .sku-item:not(article):hover {
+        transform: translateY(-4px);
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    }
+}
+
+.introduce-content img {
+    max-width: 100%;
+}
+
+.introduce-content video {
+    max-width: 100%;
+}
+
+.introduce-content iframe {
+    max-width: 100%;
+}
+
+.shop-checkout-btn {
+    display: flex; /* 按钮并排显示 */
+}
+
+.checkout-btn {
+    flex: 0 1 auto; /* 确保按钮平均分配空间 */
+    border: none; /* 移除边框 */
+    color: white; /* 文字颜色设置为白色 */
+    padding: 10px 20px; /* 按钮内边距 */
+    cursor: pointer; /* 鼠标悬停时显示指针 */
+    outline: none; /* 移除焦点时的边框 */
+    box-shadow: rgba(255, 203, 0, 0.2) 0px 9px 13px 0px;
+    width: 160px;
+}
+
+
+.btn-buy-now {
+    background: linear-gradient(90deg, rgb(255, 119, 0), rgb(255, 73, 0)); /* 左按钮背景渐变 */
+    border-right: none; /* 移除右边框以避免中间出现间隔 */
+}
+
+.btn-add-cart {
+    background: linear-gradient(90deg, rgb(255, 203, 0), rgb(255, 148, 2)); /* 右按钮背景渐变 */
+}
+
+.btn-no-stock {
+    background: linear-gradient(90deg, #d9dfe8, #999);
+    border-radius: 34px;
+}
+
+/* 为了更好的视觉效果，可能需要调整按钮的圆角 */
+.shop-checkout-btn .btn-buy-now {
+    border-top-left-radius: 34px; /* 左上角圆角 */
+    border-bottom-left-radius: 34px; /* 左下角圆角 */
+}
+
+.shop-checkout-btn .btn-add-cart, .shop-checkout-btn .btn-add-stock {
+    border-top-right-radius: 34px; /* 右上角圆角 */
+    border-bottom-right-radius: 34px; /* 右下角圆角 */
+}
+
+.bg-gradient-blue {
+    background: linear-gradient(to right, rgb(106 151 181 / 7%), rgb(233 213 252 / 27%));
+}
+
+.bg-lime-green {
+    background: #44ca6d;
+}
+
+.bg-light-gray {
+    background: #d2d2d2;
+}
+
+
+/**
+checkout 页面
+ */
+/*
+.pay-wrapper {
+    display: flex; !* 启用Flexbox *!
+    flex-wrap: wrap; !* 允许子元素换行 *!
+}
+
+.pay-item {
+    flex: 0 1 auto;
+    margin-right: 10px;
+    padding: 8px 16px;
+    border-radius: 15px;
+    background-color: #ffffffa6;
+    border: none;
+    cursor: pointer;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+    background: linear-gradient(to right, rgb(177 255 219), rgb(246 246 255));
+    align-items: center;
+    display: flex;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    transition: transform 0.5s ease-in-out; !* 应用于位置变化 *!
+    animation: fadeIn 0.5s ease-out; !* 使用fadeIn动画，持续时间1秒，缓动函数ease-out *!
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    color: #61af61;
+}
+
+.pay-current {
+    border: none;
+    background: linear-gradient(to right, rgb(0 113 192), rgb(255 120 227)) !important;
+    color: white;
+    box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+}
+
+.pay-wrapper .pay-item .pay-icon {
+    display: flex;
+    align-items: center; !* 确保图片在.sku-icon内垂直居中 *!
+    justify-content: center; !* 如果你还想要图片水平居中 *!
+    margin-right: 5px;
+}
+
+.pay-wrapper .pay-item .pay-icon img {
+    height: 24px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    border-radius: 4px;
+}*/
+
+.shop-checkout-pay-btn {
+    display: flex;
+    justify-content: center; /* 将子元素居中对齐 */
+    align-items: center; /* 垂直居中 */
+    gap: 20px; /* 设置按钮之间的间距，可以根据需要调整 */
+    margin-bottom: 40px;
+}
+
+.btn-pay-now, .btn-cancel-order {
+    padding: 10px 20px; /* 按钮内边距，可以根据需要调整 */
+    border: 1px solid transparent; /* 去除边框，或根据需要调整 */
+    background-color: #007bff; /* 设置支付按钮的背景颜色，可以根据需要调整 */
+    color: white; /* 文字颜色 */
+    cursor: pointer; /* 鼠标悬停时显示手指指针 */
+    border-radius: 20px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
+}
+
+.btn-cancel-order {
+    background-color: #cbcdcf; /* 设置取消按钮的背景颜色，可以根据需要调整 */
+}
+
+
+.render-qrcode {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px auto;
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.2), 0 0 20px 5px rgb(253, 224, 244);
+}
+
+.render-pay .pay-icon {
+    display: flex; /* 启用Flexbox布局 */
+    align-items: center; /* 垂直居中所有子元素 */
+    justify-content: center; /* 水平居中所有子元素（如果需要） */
+    margin: 20px auto 30px auto;
+    font-weight: bold;
+    font-size: 26px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), /* 添加阴影效果 */ -2px -2px 4px rgba(255, 255, 255, 0.5); /* 可选：添加更多层次的阴影以增强立体感 */
+}
+
+.render-pay .pay-icon svg {
+    vertical-align: middle;
+    width: 1.1em;
+    height: 1.1em;
+}
+
+.pay-icon-alipay {
+    color: #1578ff;
+}
+
+.pay-icon-wxpay {
+    color: #26b240;
+}
+
+.pay-icon-qqpay {
+    color: #0099fe;
+}
+
+.pay-title span {
+    margin-left: 1px;
+    margin-right: 1px;;
+}
+
+.hour {
+    color: #c8a531;
+}
+
+.minute {
+    color: #28a745; /* 绿色背景 */
+}
+
+.second {
+    color: #dc3545; /* 红色背景 */
+}
+
+.time-title {
+    color: #5d75a0;
+}
+
+@media (max-width: 767.98px) {
+    .pay-item:active {
+        transform: scale(1.01);
+    }
+}
+
+@media (min-width: 992px) {
+    .pay-item:not(article) {
+        transition: all 0.4s;
+    }
+
+    .pay-item:not(article):hover {
+        transform: translateY(-4px);
+    }
+}
+
+/**
+订单查询
+ */
+
+.flex-container {
+    display: flex;
+    align-items: center;
+}
+
+.item-info .item-logo {
+    margin-right: 10px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+    width: 50px; /* 容器宽度 */
+    height: 50px; /* 容器高度 */
+    overflow: hidden; /* 隐藏溢出容器的部分 */
+    display: flex; /* 使用Flexbox来居中图片 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    border-radius: 10px;
+}
+
+.item-info .item-logo img {
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover; /* 裁剪图片以保持宽高比，覆盖容器 */
+    object-position: center; /* 图片居中 */
+}
+
+.item-info .item-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%; /* 确保有足够的高度进行对齐 */
+}
+
+.item-info .item-content .item-name {
+    font-weight: bold;
+    font-size: 18px;
+    color: #5077c0;
+    margin-bottom: 4px;
+}
+
+.item-info .item-content .item-sku-name {
+    color: #2ab875;
+}
+
+
+.order-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.order-header {
+    background-color: #6c96f9;
+    color: #ffffff;
+    padding: 12px;
+}
+
+.order-header h2 {
+    margin: 0;
+}
+
+.order-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.order-info span {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.order-pay-type pay {
+    color: #0dc8ff;
+}
+
+
+.order-pay-type img {
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: -0.095rem;
+}
+
+.order-pay-type .pay-name {
+    font-weight: bold;
+    color: #5f8bf3;
+}
+
+@media (max-width: 768px) {
+    .order-body {
+        flex-direction: column;
+    }
+}
+
+.search-order-btn {
+    cursor: pointer;
+}
+
+
+/**
+购物车
+ */
+.table-cart tbody tr:not(:last-child) {
+    border-bottom: 20px solid transparent;
+}
+
+.quantity-change {
+    display: flex;
+    align-items: stretch; /* 确保按钮和输入框高度一致 */
+    border: 1px solid #e9ddf7; /* 整体边框 */
+    width: 88px;
+    border-radius: 10px;
+}
+
+.quantity-change button,
+.quantity-change input[type="text"] {
+    display: block;
+    flex: 0 0 auto; /* 确保按钮和输入框平分空间 */
+    text-align: center;
+    line-height: 30px; /* 调整行高以垂直居中文本 */
+    font-size: 14px;
+}
+
+.quantity-change .change-left {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.quantity-change .change-right {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.quantity-change button {
+    background-color: #fff5fd63;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    width: 24px;
+}
+
+/* 移除输入框的外观，使其看起来与按钮融为一体 */
+.quantity-change input[type="text"] {
+    border: none;
+    outline: none;
+    margin: 0; /* 移除默认的外边距 */
+    width: 38px;
+    color: #31a2d6;
+}
+
+/* 添加分隔线来区分按钮和输入框 */
+.quantity-change button:first-child,
+.quantity-change input[type="text"] {
+    border-right: 1px solid #e9ddf7;
+}
+
+.quantity-change button:last-child {
+    border-left: 1px solid #e9ddf7;
+}
+
+/* 鼠标悬停效果 */
+.quantity-change button:hover {
+    background-color: #e0e0e0;
+}
+
+.cart-widgets {
+    /* 基础样式 */
+    padding: 10px;
+    position: relative; /* 为了定位修改按钮 */
+    border: 2px solid transparent; /* 设置一个透明边框以防止内容跳动 */
+}
+
+.cart-widget-edit {
+    /* 修改按钮的初始样式 */
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    padding: 2px 5px;
+    background-color: #f40;
+    border: none;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    font-size: 12px;
+    color: white;
+    visibility: hidden; /* 初始隐藏 */
+    margin: 10px; /* 根据容器的padding值调整，确保显示在虚线内 */
+    cursor: pointer;
+}
+
+.cart-widgets:hover {
+    /* 鼠标悬停时的虚线边框 */
+    border: 2px dashed #ccc;
+}
+
+.cart-widgets:hover .cart-widget-edit {
+    /* 鼠标悬停时显示修改按钮 */
+    visibility: visible; /* 显示修改按钮 */
+}
+
+.cart-widget:not(:last-child) {
+    /* 商品信息的基础样式 */
+    margin-bottom: 8px; /* 商品信息之间的间距 */
+}
+
+.block-cart-btn {
+    display: flex; /* 使用 Flexbox 布局 */
+    justify-content: space-between; /* 两个按钮分别对齐到容器的两侧 */
+    width: 100%; /* 容器宽度设置为 100%，确保充满父容器 */
+}
+
+.btn-cart-bill, .btn-cart-clear {
+    border: 1px solid transparent; /* 设置透明边框 */
+    color: white; /* 设置文字颜色 */
+    text-align: center; /* 文字居中 */
+    padding: 8px 16px; /* 设置内边距 */
+    font-size: 14px; /* 设置字体大小 */
+    transition: background-color 0.3s, color 0.3s; /* 添加过渡动画 */
+    cursor: pointer; /* 设置鼠标指针为手型 */
+    width: auto; /* 宽度自动，根据内容调整 */
+    border-radius: 5px;
+}
+
+.btn-cart-bill {
+    background-color: #007bff; /* 结账按钮的背景颜色 */
+    margin-left: auto; /* 推到右边 */
+
+}
+
+.btn-cart-clear {
+    background-color: #dc3545; /* 清空购物车按钮的背景颜色 */
+    margin-right: auto; /* 推到左边 */
+}
+
+.btn-cart-bill:hover, .btn-cart-clear:hover {
+    opacity: 0.8; /* 鼠标悬停时的透明度变化，添加视觉反馈 */
+}
+
+.sku-quantity-wrapper {
+    display: flex;
+    align-items: center; /* 确保内容在垂直方向上居中对齐 */
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.sku-quantity-wrapper .quantity-input {
+    width: 100px;
+    border-radius: 4px 0 0 4px; /* 只对输入框的左侧和上下设置圆角 */
+    display: block;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #334155;
+    background-color: #fff;
+    background-clip: padding-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid #dfe3ea;
+    border-right: none; /* 移除输入框右侧的边框，使其和库存数量看起来更连贯 */
+}
+
+@media (max-width: 767.98px) {
+    .sku-quantity-wrapper .quantity-input {
+        width: 50px;
+    }
+}
+
+.sku-stock {
+    padding: .53rem .75rem; /* 添加一些内边距 */
+    border: 1px solid #ccc; /* 设置边框颜色保持一致性 */
+    border-radius: 0 4px 4px 0; /* 只对库存数量的右侧和上下设置圆角 */
+    font-size: 0.9rem; /* 调整字体大小以匹配输入框 */
+    font-weight: 400;
+    color: white;
+    border-left: none;
+}
+
+.sku-wholesale {
+    padding: .53rem .75rem; /* 添加一些内边距 */
+    border: 1px solid #ccc; /* 设置边框颜色保持一致性 */
+    font-size: 0.9rem; /* 调整字体大小以匹配输入框 */
+    font-weight: 400;
+    color: white;
+    border-left: none;
+    border-right: none;
+    background: #ee6969;
+    cursor: pointer;
+}
+
+/**
+支付功能
+ */
+
+.pay-container .layout-box {
+    margin-bottom: 16px;
+    margin-top: 10px;
+}
+
+.pay-container .layout-box .title {
+    margin-bottom: 8px;
+    color: #9e9c9c;
+}
+
+.pay-container .pay-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start; /* 确保列表项靠左对齐 */
+    margin: 0 -10px;
+}
+
+.pay-container .pay-list .pay-item {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin: 6px 10px 6px 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+.pay-container .pay-list .pay-item img {
+    width: 26px;
+    height: 26px;
+    margin-right: 6px;
+}
+
+.pay-container .pay-list .pay-item:hover, .pay-container .pay-list .pay-item:focus {
+    border-color: #aca8ff;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+    background-color: #eef4fe;
+}
+
+.pay-container .pay-list .pay-current {
+    background-color: #e8f0fe;
+    border-color: #aca8ff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.pay-container button {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.pay-container button:hover {
+    background-color: #0056b3;
+}
+
+.btn-pay-now[disabled="disabled"] {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+
+.shop-name {
+    display: inline-flex; /* 使用flex布局让图标和名称在同一行显示 */
+    align-items: center; /* 垂直居中对齐 */
+    padding: 5px 8px; /* 添加一些内边距让它看起来不那么拥挤 */
+    border-radius: 8px; /* 给元素添加圆角边框 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加一些阴影效果让它立体一些 */
+    transition: all 0.3s ease; /* 添加一个过渡效果让鼠标悬停时有一个小动画 */
+    cursor: pointer;
+}
+
+
+.shop-name .shop-logo {
+    width: 26px; /* 图标的大小，根据需要调整 */
+    height: 26px; /* 图标的大小，根据需要调整 */
+    border-radius: 50%; /* 使图标变成圆形 */
+    margin-right: 6px; /* 在图标和名称之间添加一些间隔 */
+}
+
+.shop-name .shop-title {
+    font-size: 20px; /* 名称的字体大小，根据需要调整 */
+
+    font-weight: bolder;
+    white-space: nowrap;
+}
+
+.block-notice img {
+    max-width: 100%;
+}
+
+.block-notice video {
+    max-width: 100%;
+}
+
+.block-notice iframe {
+    max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+    .block-notice img, .block-notice video, .block-notice iframe {
+        height: auto !important;
+    }
+}
+
+
+.language-select-theme {
+    width: auto !important;
+}
+
+.language-select-theme .select2-dropdown .select2-results__options:not(.select2-results__options--nested) {
+    max-height: initial !important;
+    overflow: hidden;
+}
+
+.language-select-theme.select2-container--open {
+    width: 150px !important;
+}
+
+.language-select-theme.select2-container--focus .select2-selection, .select2-container--bootstrap-5.select2-container--open .select2-selection {
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.language-select-theme .select2-selection {
+    background-color: #283547 !important;
+    border: none !important;
+    color: #fff !important;
+}
+
+.language-select-theme .select2-selection--single {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+
+.language-select-theme .select2-selection__rendered .table-item-name {
+    color: #ffffff !important;
+}
+
+

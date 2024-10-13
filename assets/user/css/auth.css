@@ -1,0 +1,8 @@
+#login-form .block-title, #register-form .block-title, #reset-form .block-title {
+    flex: 1 1 auto;
+    min-height: 1.75rem;
+    margin: 0;
+    line-height: 1.75;
+    font-size: 1.5rem !important;
+}
+

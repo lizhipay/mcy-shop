@@ -1,0 +1,20 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-repertory-category">{{ icon("icon-tianjia")|raw }} 添加分类
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm del-repertory-category">{{ icon("icon-shanchu")|raw }} 移除分类
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="repertory-category-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ready("/assets/admin/controller/repertory/category.js")|raw}}
+{{ include ("Common/Footer.html") }}

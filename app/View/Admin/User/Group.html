@@ -1,0 +1,18 @@
+{{ include ("Common/Header.html") }}
+
+
+<div class="content">
+    <div class="block block-rounded">
+        <div class="block-header block-header-default">
+            <button type="button" class="btn btn-outline-success btn-sm add-user-group">{{ icon("icon-tianjia")|raw }} {{ i18n("添加权限组")|raw }}
+            </button>
+        </div>
+        <div class="block-content pt-0">
+            <table id="user-group-table"></table>
+        </div>
+    </div>
+</div>
+
+
+{{ready("/assets/admin/controller/user/group.js")|raw}}
+{{ include ("Common/Footer.html") }}

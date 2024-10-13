@@ -1,0 +1,107 @@
+{{ include("Index/Header.html") }}
+
+
+<!-- Page Content -->
+<div class="content">
+    <!-- Shopping Cart -->
+    <div class="block block-rounded bg-gradient-blue">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">{{ icon("icon-gouwuche1")|raw }} {{ i18n("购物车")|raw }}</h3>
+        </div>
+        <div class="block-content block-content-full">
+            {% if items|length > 0 %}
+                <table class="table table-borderless  table-hover table-vcenter table-cart">
+                    <thead>
+                    <tr>
+                        <th class="text-center" style="width: 60px;"></th>
+                        <th class="text-center" style="width: 60px;"></th>
+                        <th class="d-none d-md-table-cell">{{ i18n("商品信息")|raw }}</th>
+                        <th class="d-none d-md-table-cell"
+                            style="width: 300px;padding-left: 26px;">{{ i18n("备注信息")|raw }}</th>
+                        <th class="d-none d-sm-table-cell text-center" style="width: 60px;">{{ i18n("单价")|raw }}</th>
+                        <th class="d-none d-md-table-cell text-center" style="width: 100px;">{{ i18n("数量")|raw }}</th>
+                        <th class="d-none d-sm-table-cell text-end" style="width: 80px;">{{ i18n("金额")|raw }}</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td class="text-center">
+                                <a class="text-muted cart-item-del" href="javascript:void(0)" data-id="{{ item.id }}"><i
+                                            class="fa fa-times"></i></a>
+                            </td>
+                            <td style="width: 60px;">
+                                <img class="img-fluid" src="{{ item.sku.thumb_url }}" alt=""
+                                     style="border-radius: 10px;">
+                            </td>
+                            <td>
+                                <span class="h6" style="color: #817ed6;">{{ i18n(item.item.name)|raw }}</span>
+                                <div class="fs-sm fw-semibold"
+                                     style="color: #c520f0;">{{ i18n(item.sku.name)|raw }}</div>
+                            </td>
+                            <td class="d-none d-sm-table-cell">
+                                <div class="cart-widgets">
+                                    {% if item.item.widget is empty %}
+                                        <div class="cart-widget">
+                                            无
+                                        </div>
+                                    {% else %}
+                                        <div class="cart-widget-edit" data-id="{{ item.id }}">{{ i18n("修改")|raw }}</div>
+                                        {% for widget in item.item.widget %}
+                                            <div class="cart-widget">
+                                                <span>{{ widget.title }}: </span>
+                                                <span>{{ item.option[widget.name] is defined ? widget_name(widget , item.option[widget.name]) : "-" }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="text-center d-none d-sm-table-cell">
+                                <div class="cart-price-{{ item.id }}">{{ ccy() }}{{ item.price }}</div>
+                            </td>
+                            <td class="text-center d-none d-sm-table-cell">
+                                <div class="quantity-change" data-id="{{ item.id }}">
+                                    <button type="button" class="change-left">-</button>
+                                    <span><input type="text" class="change-quantity" value="{{ item.quantity }}"></span>
+                                    <button type="button" class="change-right">+</button>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <div class="fw-semibold cart-amount-{{ item.id }}" style="color: #6f6fff;">
+                                    {{ ccy() }}{{ item.amount }}</div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    <tr class="table-active">
+                        <td class="text-end" colspan="7">
+                            <span class="h4 fw-semibold cart-total-amount"
+                                  style="color: #ff5000;">{{ ccy() }}{{ totalAmount }}</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="text-center"
+                     style="margin: 20px;">{{ i18n("哦豁，您的购物车空着呢！快挑选些心爱的宝贝吧，让它充满幸福！")|raw }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <!-- END Shopping Cart -->
+
+    {% if items|length > 0 %}
+        <!-- Submit Form -->
+        <div class="block-cart-btn">
+            <button type="button"
+                    class="btn-cart-clear">{{ icon("icon-shanchu1")|raw }} {{ i18n("清空购物车")|raw }}</button>
+            <button type="button"
+                    class="btn-cart-bill">{{ icon("icon-fukuan")|raw }} {{ i18n("现在结账")|raw }}</button>
+        </div>
+        <!-- END Submit Form -->
+    {% endif %}
+</div>
+<!-- END Page Content -->
+
+{{ ready("/assets/user/controller/index/cart.js")|raw }}
+{{ include("Index/Footer.html") }}

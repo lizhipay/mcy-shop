@@ -1,0 +1,161 @@
+{{ include('Index/Header.html') }}
+{{ multi_hook([usr(), item.supplier_id] , point("INDEX_ITEM_HEAD") , 1, item)|raw }}
+
+<script>setVar("item", {{ item|json_encode|raw }});</script>
+<!-- Page Content -->
+<div class="content">
+
+
+    <div class="row">
+
+        <div class="col-xl-12 order-xl-0">
+            <!-- Product -->
+            <div class="block block-rounded">
+                <div class="block-content">
+                    <!-- Vitals -->
+                    <div class="row items-push">
+                        <div class="col-md-5">
+                            <!-- Images -->
+                            <div class="row g-sm js-gallery img-fluid-100">
+                                <div class="col-12 mb-1 item-image-main animate-height-change">
+                                    <a class="img-link img-link-zoom-in img-lightbox">
+                                        <img class="img-fluid item-image-show" src="{{ sku_main_img(item.sku) }}">
+                                    </a>
+                                </div>
+                                <div class="col-12 mb-3 item-image-list">
+
+                                    {% for sku in item.sku %}
+                                        {% if sku.picture_url %}
+                                            <a data-skuId="{{ sku.id }}"
+                                               class="sku-image-btn{{ sku.id }} item-image-sku-mini {{ loop.first ? "image-active" : "" }}">
+                                                <img src="{{ sku.thumb_url }}" data-src="{{ sku.picture_url }}">
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                            <!-- END Images -->
+                        </div>
+                        <div class="col-md-7 product-info-area">
+                            <!-- Info -->
+                            <div class="d-flex justify-content-between align-items-center item-title-content">
+                                <div>
+                                    <div class="fs-4 fw-semibold">{{ i18n(item.name)|raw }}</div>
+                                    <div class="fs-sm text-muted">{{ i18n("已售")|raw }} {{ item.sold }}+</div>
+                                    <div class="fs-sm item-amount" style="color: #ff5000;">{{ ccy() }}<span
+                                                style="color: #ff5000;font-size: 26px;">{{ item.sku[0].price }}</span> {{ i18n("起")|raw }}
+                                    </div>
+                                </div>
+                            </div>
+                            <form class="item-controls" onsubmit="return false;">
+                                <table class="table">
+                                    <tbody>
+                                    <tr>
+                                        <td width="80" class="sku-cate-td"><span
+                                                    class="cate-name">{{ i18n("宝贝类型")|raw }}:</span></td>
+                                        <td>
+                                            <div class="sku-wrapper">
+                                                <input type="hidden" value="{{ item.sku[0].id }}" name="sku_id">
+                                                {% for sku in item.sku %}
+                                                    <div class="sku-item-btn{{ sku.id }} sku-item   {{ loop.first ? "sku-current" : "" }}"
+                                                         data-price="{{ sku.price }}"
+                                                         data-stock="{{ i18n(sku.stock)|raw }}"
+                                                         data-skuId="{{ sku.id }}"
+                                                         data-stock-available="{{ sku.stock_available }}">
+                                                        <span class="sku-icon"><img src="{{ sku.thumb_url }}"></span>
+                                                        <span class="sku-name">{{ i18n(sku.name)|raw }}</span>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {#                       <tr>
+                                        <td class="sku-cate-td"><span class="cate-name">{{ i18n("联系方式")|raw }}:</span></td>
+                                        <td><input type="text" class="form-control" name="contact"
+                                                   placeholder="{{ i18n("请输入联系方式")|raw }}"></td>
+                                    </tr> #}
+
+                                    {{ multi_hook([usr(), item.supplier_id], point("INDEX_ITEM_TRADE_FORM") , 1, item)|raw }}
+
+                                    <tr class="sku-quantity">
+                                        <td class="sku-cate-td"><span
+                                                    class="cate-name">{{ i18n("购买数量")|raw }}:</span></td>
+                                        <td class="sku-quantity-wrapper">
+                                            <input type="number" class="quantity-input" name="quantity"
+                                                   value="{{ item.sku[0].quantity_restriction.min }}">
+                                            {% if item.sku[0].have_wholesale %}
+                                                <span class="sku-wholesale">支持批发</span>
+                                            {% endif %}
+                                            <span class="sku-stock {{ convert_class(item.sku[0].stock_available , ["bg-lime-green" , "bg-light-gray"]) }}">{{ i18n(item.sku[0].stock)|raw }}</span>
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                                <div class="shop-checkout-btn have-stock {{ convert_class(item.sku[0].stock_available) }}">
+                                    <button type="button"
+                                            class="checkout-btn btn-buy-now">{{ icon("icon-goumai")|raw }} {{ i18n("立即购买")|raw }}</button>
+                                    <button type="button"
+                                            class="checkout-btn btn-add-cart">{{ icon("icon-gouwuche1")|raw }} {{ i18n("加入购物车")|raw }}</button>
+                                </div>
+
+                                <div class="shop-checkout-btn no-stock {{ convert_class(item.sku[0].stock_available == false) }}">
+                                    <button type="button"
+                                            class="checkout-btn btn-no-stock">{{ icon("icon-goumai")|raw }} {{ i18n("暂时无货")|raw }}</button>
+                                    {{ multi_hook([usr(), item.supplier_id] , point("INDEX_ITEM_TRADE_BUTTON_AFTER") , 1, item)|raw }}
+                                </div>
+
+                            </form>
+                            <!-- END Info -->
+                        </div>
+                    </div>
+                    <!-- END Vitals -->
+
+                    <!-- Extra Info Tabs -->
+                    <div class="block block-rounded no-bg">
+                        <ul class="nav nav-tabs nav-tabs-alt align-items-center" role="tablist">
+                            <li class="nav-item">
+                                <button type="button" class="nav-link active" id="ecom-product-info-tab"
+                                        data-bs-toggle="tab" data-bs-target="#ecom-product-info" role="tab"
+                                        aria-controls="ecom-product-reviews"
+                                        aria-selected="true">{{ i18n("宝贝详情")|raw }}
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="block-content tab-content">
+                            <!-- Info -->
+                            <div class="tab-pane pull-x active" id="ecom-product-info" role="tabpanel"
+                                 aria-labelledby="ecom-product-info-tab" tabindex="0">
+                                {% if item.attr|length > 0 %}
+                                    <table class="table table-striped">
+                                        <tbody>
+                                        {% for attr in item.attr %}
+                                            <tr>
+                                                <td width="25%">{{ attr.name }}</td>
+                                                <td class="sku-attr-value">{{ attr.value }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endif %}
+                                <div class="introduce-content">
+                                    {{ i18n(item.source.introduce)|raw }}
+                                </div>
+                            </div>
+                            <!-- END Info -->
+
+
+                        </div>
+                    </div>
+                    <!-- END Extra Info Tabs -->
+                </div>
+            </div>
+            <!-- END Product -->
+        </div>
+    </div>
+</div>
+<!-- END Page Content -->
+{{ ready("/assets/user/controller/index/item.js")|raw }}
+{{ multi_hook([usr(), item.supplier_id] , point("INDEX_ITEM_BODY") , 1, item)|raw }}
+{{ include('Index/Footer.html') }}

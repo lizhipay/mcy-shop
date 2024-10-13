@@ -1,0 +1,69 @@
+{{ include ("Common/Header.html") }}
+
+<!-- Hero -->
+<div class="bg-body-light">
+    <div class="content content-full">
+        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center py-2">
+            <div class="flex-grow-1">
+                <h1 class="h3 fw-bold mb-2">
+                    {{ i18n(title)|raw }}
+                </h1>
+                <h2 class="fs-base lh-base fw-medium text-muted mb-0">
+                    <div class="header-message" style="max-width: 720px">
+                        <p>{{ i18n("为何选择成为商家？")|raw }}</p>
+                        <ul>
+                            {{ i18n("<li><b>独立店铺网站：</b> 拥有完全自主管理的店铺网站，用户可根据需要自定义网站的所有内容，展示独特的品牌形象。</li>
+                            <li><b>大仓库货源直供：</b> 商家店铺无需烦恼货源问题，通过平台大仓库，享受数以万计的商品实时供货。商家只需专注于选择销售产品和设定合适的价格策略。</li>
+                            <li><b>自主定价权：</b> 商家可以自由设定商品的零售价格，从而全面掌控市场动态。</li>
+                            <li><b>会员及等级体系：</b> 设立独立的会员和等级体系，显著提升用户的忠诚度和粘性。</li>
+                            <li><b>供货至平台仓库：</b> 可将自营商品供应至平台的大型仓库，实现跨店铺乃至全网的销售，扩大销售范围和市场影响力。</li>")|raw }}
+                        </ul>
+                    </div>
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Hero -->
+
+
+<div class="content">
+        <div class="row">
+            {% for g in group_list %}
+            <div class="col-md-6 col-xl-3">
+                <!-- VIP Plan -->
+                <a class="block block-rounded block-link-shadow block-themed block-fx-shadow text-center" href="javascript:void(0)">
+                    <div class="block-header">
+                        <h3 class="block-title"><span class="user-group-name"><img src="{{ g.icon }}"> {{ i18n(g.name)|raw }}</span></h3>
+                    </div>
+                    <div class="block-content bg-body-light">
+                        <div class="py-2">
+                            <p class="h1 fw-bold mb-2 text-primary">{{ (g.price == 0 ? i18n("免费开通") : ccy() ~ g.price)|raw }}</p>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                        <div class="fs-sm py-2">
+                            <p>
+                                <strong>{{ i18n("商家权限")|raw }}</strong> {{ g.isMerchant ? '<i class="fa fa-check fa-fw text-success"></i>' : '<i class="fa fa-times fa-fw text-danger"></i>' }}
+                            </p>
+                            <p>
+                                <strong>{{ i18n("供货权限")|raw }}</strong> {{ g.isSupplier ? '<i class="fa fa-check fa-fw text-success"></i>' : '<i class="fa fa-times fa-fw text-danger"></i>' }}
+                            </p>
+                            <p>
+                                <strong>{{ i18n("自营税率")|raw }}</strong> {{ (g.taxRatio == 0 ? i18n("免税") : g.taxRatio ~ "%")|raw }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="block-content block-content-full bg-body-light">
+                        <span class="btn rounded-0 btn-primary px-4 open-merchant" data-id="{{ g.id }}" data-group="{{ g.name }}" data-amount="{{ g.price }}">{{ (user.group_id <= 0 ? i18n("开通") : i18n("重新开通"))|raw }}</span>
+                    </div>
+                </a>
+                <!-- END VIP Plan -->
+            </div>
+            {% endfor %}
+        </div>
+</div>
+
+
+{{ready("/assets/user/controller/user/open.merchant.js")|raw}}
+{{ include ("Common/Footer.html") }}
