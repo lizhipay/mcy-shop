@@ -15424,7 +15424,7 @@ p {
     display: flex;
     align-items: center;
     min-height: 9rem;
-    background-color: #ebeff7ad;
+    background-color: #ebebf14f;
 }
 
 .sidebar-dark .content-side.content-side-user {
@@ -16916,7 +16916,9 @@ a.block.block-link-shadow:active {
     display: inline-block !important;
     width: 64px;
     height: 64px;
-    border-radius: 50%
+    border-radius: 50%;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    cursor: pointer;
 }
 
 .img-avatar.img-avatar16 {

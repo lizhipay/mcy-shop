@@ -46,3 +46,8 @@ Console::instance()->add(command: "composer.require", callable: [\App\Command\Co
 Console::instance()->add(command: "composer.remove", callable: [\App\Command\Composer::class, "remove"], name: "删除Composer依赖包", desc: "参数1：包名");
 
 
+//迁移管理
+Console::instance()->add(command: "migration.v3.user", callable: [\App\Command\Migration::class, "v3_user"], name: "导入异次元V3.0用户数据", desc: "参数1：根目录下.sql的文件名，如：v3.sql");
+
+
+

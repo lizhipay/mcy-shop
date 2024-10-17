@@ -3,17 +3,12 @@ declare (strict_types=1);
 
 namespace App\Validator\Install;
 
-use App\Model\User;
-use Kernel\Annotation\Regex;
 use Kernel\Annotation\Required;
-use Kernel\Exception\JSONException;
-use Kernel\Util\Context;
 
 class Database
 {
 
     #[Required("数据库地址不能为空")]
-    #[Regex("/^(localhost|(\d{1,3}\.){3}\d{1,3})(:\d+)?$/", "数据库地址格式错误")]
     public function dbHost(): bool
     {
         return true;

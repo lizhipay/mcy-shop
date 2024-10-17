@@ -184,9 +184,9 @@
                         change: (obj, value) => {
                             if (value == 0) {
                                 obj.hide("markup_template_id");
-                                obj.show("markup.drift_base_amount");
-                                obj.show("markup.drift_model");
-                                obj.show("markup.drift_value");
+                            //    obj.show("markup.drift_base_amount");
+                             //   obj.show("markup.drift_model");
+                             //   obj.show("markup.drift_value");
                                 obj.show("markup.sync_name");
                                 obj.show("markup.sync_introduce");
                                 obj.show("markup.sync_picture");
@@ -233,8 +233,51 @@
                     {
                         title: "同步价格",
                         name: "markup.sync_amount",
-                        type: "switch",
-                        placeholder: "同步|不同步"
+                        type: "radio",
+                        placeholder: "同步|不同步",
+                        dict: [
+                            {id: 0, name: "不同步"},
+                            {id: 1, name: "同步仓库并加价"},
+                            {id: 2, name: "同步仓库"}
+                        ],
+                        required: true,
+                        tips: "不同步：完全由本地自定义价格\n同步仓库并加价：根据仓库的商品价格实时控制盈亏\n同步仓库：仓库是什么价格，本地商品就是什么价格".replaceAll("\n" , "<br>"),
+                        change: (from, val) => {
+                            val = parseInt(val);
+                            switch (val) {
+                                case 0:
+                                    from.hide('markup.keep_decimals');
+                                    from.hide('markup.drift_base_amount');
+                                    from.hide('markup.drift_model');
+                                    from.hide('markup.drift_value');
+                                    break;
+                                case 1:
+                                    from.show('markup.keep_decimals');
+                                    from.show('markup.drift_base_amount');
+                                    from.show('markup.drift_model');
+                                    from.show('markup.drift_value');
+                                    break;
+                                case 2:
+                                    from.hide('markup.keep_decimals');
+                                    from.hide('markup.drift_base_amount');
+                                    from.hide('markup.drift_model');
+                                    from.hide('markup.drift_value');
+                                    break;
+                            }
+                        },
+                        complete: (obj, value) => {
+                            obj.triggerOtherPopupChange("markup.sync_amount", value);
+                        }
+                    },
+                    {
+                        title: "保留小数",
+                        name: "markup.keep_decimals",
+                        type: "input",
+                        default: "2",
+                        required: true,
+                        hide: true,
+                        placeholder: "请输入要保留的小数位数",
+                        tips: "价格小数，最大支持6位小数"
                     },
                     {
                         title: "价格基数",
@@ -243,6 +286,7 @@
                         tips: "基数就是你随便设定一个商品的成本价，比如你想象一个商品的成本价是10元，那么你就把基数设定为10元。<br><br>为什么要有这个设定呢？因为每个商品都有不同的类型和价格，设定一个基数可以帮助我们计算出你想给某个商品增加的价格。通过基数，我们可以简单地推算出商品的最终价格。",
                         placeholder: "请设定基数",
                         default: 10,
+                        hide: true,
                         regex: {
                             value: "^(0\\.\\d+|[1-9]\\d*(\\.\\d+)?)$", message: "基数必须大于0"
                         }
@@ -251,6 +295,7 @@
                         title: "加价模式",
                         name: "markup.drift_model",
                         type: "radio",
+                        hide: true,
                         tips: format.success("比例加价") + " 通过基数实现百分比加价，比如你设置基数为10，那么比例设置 0.5，那么10元的商品最终售卖的价格就是：15【算法：(10*0.5)+10】<br>" + format.warning("固定金额加价") + " 通过基数+固定金额算法，得到的比例进行加价，假如基数是10，加价1.2元，那么算法得出加价比例为：1.2/10=0.12，如果一个商品为18元，你加价了1.2元，最终售卖价格则是：20.16【算法：(18*0.12)+18】",
                         dict: "markup_type"
                     },
@@ -261,6 +306,7 @@
                         tips: "百分比 或 金额，根据加价模式自行填写，百分比需要用小数表示",
                         placeholder: "请设置浮动值",
                         default: 0,
+                        hide: true,
                         regex: {
                             value: "^(0\\.\\d+|[0-9]\\d*(\\.\\d+)?)$", message: "浮动值必须是数字 "
                         }
@@ -318,7 +364,6 @@
                     overflow: "inherit"
                 }
             },
-            height: "auto",
             width: "1280px",
             done: () => {
                 table.refresh();

@@ -12,6 +12,7 @@ class Markup
     public bool $syncPicture = true;
     public bool $syncSkuName = true;
     public bool $syncSkuPicture = true;
+    public string $keepDecimals = "2";
 
     public function setPercentage(string $percentage): void
     {
@@ -46,5 +47,14 @@ class Markup
     public function setSyncSkuPicture(bool $syncSkuPicture): void
     {
         $this->syncSkuPicture = $syncSkuPicture;
+    }
+
+    /**
+     * @param string $keepDecimals
+     * @return void
+     */
+    public function setKeepDecimals(string $keepDecimals): void
+    {
+        $this->keepDecimals = $keepDecimals;
     }
 }

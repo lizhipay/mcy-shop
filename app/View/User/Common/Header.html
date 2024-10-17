@@ -87,7 +87,7 @@
                 <!-- END Toggle Mini Sidebar -->
 
                 {% if user.group.is_merchant == 1 or user.group.is_supplier == 1 %}
-                <a class="btn btn-sm btn-success fw-bold" href="/user/store">
+                <a class="btn btn-sm btn-success fw-bold store-button" href="/user/store">
                     <i class="fab fa-app-store"></i> {{ i18n("应用商店")|raw }}
                 </a>
                 {% endif %}

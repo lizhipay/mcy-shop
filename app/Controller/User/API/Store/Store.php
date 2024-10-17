@@ -17,7 +17,7 @@ use Kernel\Context\Interface\Response;
 use Kernel\Exception\JSONException;
 use Kernel\Exception\RuntimeException;
 use Kernel\Plugin\Plugin;
-use Kernel\Plugin\Usr;
+use Kernel\Util\UserAgent;
 use Kernel\Waf\Filter;
 
 #[Interceptor(class: [PostDecrypt::class, Waf::class, User::class, Group::class], type: Interceptor::API)]
@@ -140,7 +140,7 @@ class Store extends Base
         $payId = $this->request->post("pay_id", Filter::INTEGER);
         $balance = $this->request->post("balance", Filter::BOOLEAN);
         $subscriptionId = (int)$this->request->post("subscription_id");
-        $purchase = $this->store->purchase($type, $itemId, $subscription, $subscriptionId, $payId, $balance, $this->request->url() . "/user/store", $this->getStoreAuth());
+        $purchase = $this->store->purchase($type, $itemId, $subscription, $subscriptionId, $payId, $balance, $this->request->url() . "/user/store", 0, "", $this->getStoreAuth(), UserAgent::isMobile($this->request->header("UserAgent")) ? 1 : 0);
         return $this->json(data: $purchase);
     }
 
@@ -158,10 +158,9 @@ class Store extends Base
     {
         $amount = (string)$this->request->post("amount");
         $payId = $this->request->post("pay_id", Filter::INTEGER);
-        $recharge = $this->store->recharge($amount, $payId, $this->request->url() . "/user/store", $this->getStoreAuth());
+        $recharge = $this->store->recharge($amount, $payId, $this->request->url() . "/user/store", $this->getStoreAuth(), UserAgent::isMobile($this->request->header("UserAgent")) ? 1 : 0);
         return $this->json(data: $recharge);
     }
-
 
     /**
      * @return Response

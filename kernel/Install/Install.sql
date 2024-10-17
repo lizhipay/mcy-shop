@@ -159,6 +159,7 @@ CREATE TABLE `${prefix}item_markup_template`  (
                                                   `sync_picture` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '同步商品图片',
                                                   `sync_sku_name` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '同步SKU名称',
                                                   `sync_sku_picture` tinyint(4) UNSIGNED NOT NULL DEFAULT 0 COMMENT '同步SKU图片',
+                                                  `keep_decimals` tinyint(4) UNSIGNED NOT NULL DEFAULT 2 COMMENT '保留小数位数',
                                                   `create_time` datetime NOT NULL COMMENT '创建时间',
                                                   PRIMARY KEY (`id`) USING BTREE,
                                                   INDEX `user_id`(`user_id`) USING BTREE,
@@ -166,7 +167,7 @@ CREATE TABLE `${prefix}item_markup_template`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 
-INSERT INTO `${prefix}item_markup_template` VALUES (1, NULL, 'DEMO', 1, 1.000000, 10.000000, 1, 1, 1, 1, 1, 1, '2024-05-28 23:30:48');
+INSERT INTO `${prefix}item_markup_template` VALUES (1, NULL, '直接同步仓库', 1, 0.000000, 10.000000, 2, 1, 1, 1, 1, 1, 2, '2024-05-28 23:30:48');
 
 
 DROP TABLE IF EXISTS `${prefix}item_sku`;
@@ -931,7 +932,9 @@ INSERT INTO `${prefix}permission` VALUES (249, '盈利中心', 1, '/admin/store/
 INSERT INTO `${prefix}permission` VALUES (250, '兑现记录', 249, '/admin/store/withdrawal/get@POST', 2, 0, NULL);
 INSERT INTO `${prefix}permission` VALUES (251, '申请兑现', 249, '/admin/store/withdrawal/apply@POST', 2, 0, NULL);
 INSERT INTO `${prefix}permission` VALUES (252, '账单记录', 249, '/admin/store/bill/get@POST', 2, 0, NULL);
-
+INSERT INTO `${prefix}permission` VALUES (253, '子站插件免费', 86, '/admin/store/power/sub/free@POST', 2, 0, NULL);
+INSERT INTO `${prefix}permission` VALUES (254, '获取子站列表', 86, '/admin/store/power/sub/list@POST', 2, 0, NULL);
+INSERT INTO `${prefix}permission` VALUES (255, '设置子站插件授权', 86, '/admin/store/power/sub/auth@POST', 2, 0, NULL);
 
 DROP TABLE IF EXISTS `${prefix}plugin_config`;
 CREATE TABLE `${prefix}plugin_config`  (
@@ -1041,9 +1044,6 @@ CREATE TABLE `${prefix}repertory_item_markup_template`  (
                                                             INDEX `user_id`(`user_id`) USING BTREE,
                                                             CONSTRAINT `repertory_item_markup_template_user_cascade` FOREIGN KEY (`user_id`) REFERENCES `${prefix}user` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
-
-
 
 DROP TABLE IF EXISTS `${prefix}repertory_item_sku`;
 CREATE TABLE `${prefix}repertory_item_sku`  (
@@ -1565,6 +1565,9 @@ INSERT INTO `${prefix}role_permission` VALUES (243, 1, 249);
 INSERT INTO `${prefix}role_permission` VALUES (244, 1, 250);
 INSERT INTO `${prefix}role_permission` VALUES (245, 1, 251);
 INSERT INTO `${prefix}role_permission` VALUES (246, 1, 252);
+INSERT INTO `${prefix}role_permission` VALUES (247, 1, 253);
+INSERT INTO `${prefix}role_permission` VALUES (248, 1, 254);
+INSERT INTO `${prefix}role_permission` VALUES (249, 1, 255);
 
 
 DROP TABLE IF EXISTS `${prefix}site`;

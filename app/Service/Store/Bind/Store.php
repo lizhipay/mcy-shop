@@ -154,10 +154,11 @@ class Store implements \App\Service\Store\Store
      * @param int $isGift
      * @param string $giftUsername
      * @param Authentication $authentication
+     * @param int $device
      * @return array
      * @throws ServiceException
      */
-    public function purchase(int $type, int $itemId, int $subscription, int $subscriptionId, int $payId, bool $balance, string $syncUrl, int $isGift, string $giftUsername, Authentication $authentication): array
+    public function purchase(int $type, int $itemId, int $subscription, int $subscriptionId, int $payId, bool $balance, string $syncUrl, int $isGift, string $giftUsername, Authentication $authentication, int $device = 0): array
     {
         $http = $this->http->request("/store/purchase", [
             "type" => $type,
@@ -168,7 +169,8 @@ class Store implements \App\Service\Store\Store
             "sync_url" => $syncUrl,
             "subscription_id" => $subscriptionId,
             "is_gift" => $isGift,
-            "gift_username" => $giftUsername
+            "gift_username" => $giftUsername,
+            "device" => $device
         ], $authentication);
 
         if ($http->code != 200) {
@@ -183,15 +185,17 @@ class Store implements \App\Service\Store\Store
      * @param int $payId
      * @param string $syncUrl
      * @param Authentication $authentication
+     * @param int $device
      * @return array
      * @throws ServiceException
      */
-    public function recharge(string $amount, int $payId, string $syncUrl, Authentication $authentication): array
+    public function recharge(string $amount, int $payId, string $syncUrl, Authentication $authentication, int $device = 0): array
     {
         $http = $this->http->request("/store/recharge", [
             "amount" => $amount,
             "pay_id" => $payId,
-            "sync_url" => $syncUrl
+            "sync_url" => $syncUrl,
+            "device" => $device
         ], $authentication);
 
         if ($http->code != 200) {
@@ -293,6 +297,68 @@ class Store implements \App\Service\Store\Store
         try {
             $http = $this->http->request(url: "/store/power/renewal/auto", data: [
                 "type" => $type,
+                "item_id" => $itemId,
+            ], authentication: $authentication);
+            if ($http->code != 200) {
+                return false;
+            }
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param array $users
+     * @param Authentication $authentication
+     * @return array
+     * @throws ServiceException
+     */
+    public function getSubPowers(array $users, Authentication $authentication): array
+    {
+        $http = $this->http->request(url: "/store/power/sub/powers", data: [
+            "users" => $users,
+        ], authentication: $authentication);
+        if ($http->code != 200) {
+            throw new ServiceException($http->message ?? "获取子站授权插件失败");
+        }
+        return $http->data;
+    }
+
+    /**
+     * @param int $userId
+     * @param string $expireTime
+     * @param int $status
+     * @param Authentication $authentication
+     * @return bool
+     */
+    public function setSubPower(int $userId, string $expireTime, int $status, Authentication $authentication): bool
+    {
+        try {
+            $http = $this->http->request(url: "/store/power/sub/power/set", data: [
+                "user_id" => $userId,
+                "expire_time" => $expireTime,
+                "status" => $status
+            ], authentication: $authentication);
+            if ($http->code != 200) {
+                return false;
+            }
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+
+    /**
+     * @param int $itemId
+     * @param Authentication $authentication
+     * @return bool
+     */
+    public function openSubFree(int $itemId, Authentication $authentication): bool
+    {
+        try {
+            $http = $this->http->request(url: "/store/power/sub/free", data: [
                 "item_id" => $itemId,
             ], authentication: $authentication);
             if ($http->code != 200) {

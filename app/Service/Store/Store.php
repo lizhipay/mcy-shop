@@ -62,9 +62,10 @@ interface Store
      * @param int $isGift
      * @param string $giftUsername
      * @param Authentication $authentication
+     * @param int $device
      * @return array
      */
-    public function purchase(int $type, int $itemId, int $subscription, int $subscriptionId, int $payId, bool $balance, string $syncUrl, int $isGift, string $giftUsername, Authentication $authentication): array;
+    public function purchase(int $type, int $itemId, int $subscription, int $subscriptionId, int $payId, bool $balance, string $syncUrl, int $isGift, string $giftUsername, Authentication $authentication, int $device = 0): array;
 
 
     /**
@@ -72,9 +73,10 @@ interface Store
      * @param int $payId
      * @param string $syncUrl
      * @param Authentication $authentication
+     * @param int $device
      * @return array
      */
-    public function recharge(string $amount, int $payId, string $syncUrl, Authentication $authentication): array;
+    public function recharge(string $amount, int $payId, string $syncUrl, Authentication $authentication, int $device = 0): array;
 
     /**
      * @param Authentication $authentication
@@ -106,6 +108,29 @@ interface Store
      * @return bool
      */
     public function openPowerAutoRenewal(int $type, int $itemId, Authentication $authentication): bool;
+
+    /**
+     * @param int $itemId
+     * @param Authentication $authentication
+     * @return bool
+     */
+    public function openSubFree(int $itemId, Authentication $authentication): bool;
+
+    /**
+     * @param array $users
+     * @param Authentication $authentication
+     * @return array
+     */
+    public function getSubPowers(array $users, Authentication $authentication): array;
+
+    /**
+     * @param int $userId
+     * @param string $expireTime
+     * @param int $status
+     * @param Authentication $authentication
+     * @return bool
+     */
+    public function setSubPower(int $userId, string $expireTime, int $status, Authentication $authentication): bool;
 
     /**
      * @param int $itemId

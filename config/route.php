@@ -216,6 +216,9 @@ Route::add("/admin/store/power/detail", [\App\Controller\Admin\API\Store\Store::
 Route::add("/admin/store/power/renewal", [\App\Controller\Admin\API\Store\Store::class, "powerRenewal"], "POST");
 Route::add("/admin/store/power/renewal/bind", [\App\Controller\Admin\API\Store\Store::class, "powerBind"], "POST");
 Route::add("/admin/store/power/renewal/auto", [\App\Controller\Admin\API\Store\Store::class, "openPowerAutoRenewal"], "POST");
+Route::add("/admin/store/power/sub/free", [\App\Controller\Admin\API\Store\Store::class, "openSubFree"], "POST");
+Route::add("/admin/store/power/sub/list", [\App\Controller\Admin\API\Store\Store::class, "subPowers"], "POST");
+Route::add("/admin/store/power/sub/auth", [\App\Controller\Admin\API\Store\Store::class, "setSubPower"], "POST");
 Route::add("/admin/store/group", [\App\Controller\Admin\API\Store\Store::class, "group"], "POST");
 Route::add("/admin/store/install", [\App\Controller\Admin\API\Store\Store::class, "install"], "POST");
 Route::add("/admin/store/uninstall", [\App\Controller\Admin\API\Store\Store::class, "uninstall"], "POST");

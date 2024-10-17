@@ -332,9 +332,9 @@
 
                                 dom.html(`<div class="block block-rounded">
         <div class="block-header block-header-default">
-            <button type="button" class="btn btn-outline-primary btn-sm wallet-recharge">${util.icon("icon-zhifu")}<space></space>${i18n("钱包充值")}</button>
-            <button type="button" class="btn btn-outline-success btn-sm renewal-subscription">${util.icon("icon-update")}<space></space>${i18n("一键续费")}</button>
-            <button type="button" class="btn btn-outline-info btn-sm bind-subscription">${util.icon("icon-mimashezhi-xiugaimima")}<space></space>${i18n("授权更换至本机")}</button>
+            <button type="button" class="btn btn-outline-primary btn-sm wallet-recharge wap-mb1">${util.icon("icon-zhifu")}<space></space>${i18n("钱包充值")}</button>
+            <button type="button" class="btn btn-outline-success btn-sm renewal-subscription wap-mb1">${util.icon("icon-update")}<space></space>${i18n("一键续费")}</button>
+            <button type="button" class="btn btn-outline-info btn-sm bind-subscription wap-mb1">${util.icon("icon-mimashezhi-xiugaimima")}<space></space>${i18n("授权更换至本机")}</button>
         </div>
         <div class="block-content pt-0">
             <table id="store-subscription-table"></table>
@@ -394,7 +394,14 @@
                                     },
                                     {field: 'create_time', class: "nowrap", title: '开始时间'},
                                     {field: 'server_ip', class: "nowrap", title: '授权IP'},
-                                    {field: 'hwid', class: "nowrap", title: '授权设备'},
+                                    {
+                                        field: 'hwid', class: "nowrap", title: '授权设备', formatter: (val, item) => {
+                                            if (item.is_local_machine) {
+                                                return format.success("本机");
+                                            }
+                                            return val;
+                                        }
+                                    },
                                     {
                                         field: 'message', title: '', formatter: (message, item) => {
                                             if (message) {
@@ -624,10 +631,6 @@
                                     break;
                                 }
                             }
-                        });
-
-                        item.group.forEach(group => {
-                            amount += format.badge(group.name + "免费", "acg-badge-h-green");
                         });
 
                         return amount;

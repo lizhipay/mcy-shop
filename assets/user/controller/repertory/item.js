@@ -115,7 +115,7 @@
                 name: util.icon("icon-fahuo") + "<space></space>发货插件",
                 form: [
                     {
-                        title: "选择插件",
+                        title: "发货插件",
                         name: "plugin",
                         type: "select",
                         dict: "ship",
@@ -295,9 +295,9 @@
                         change: (obj, value) => {
                             if (value == 1) {
                                 obj.hide("markup_template_id");
-                                obj.show("markup.drift_base_amount");
-                                obj.show("markup.drift_model");
-                                obj.show("markup.drift_value");
+                                //    obj.show("markup.drift_base_amount");
+                                //     obj.show("markup.drift_model");
+                                //   obj.show("markup.drift_value");
                                 obj.show("markup.sync_name");
                                 obj.show("markup.sync_introduce");
                                 obj.show("markup.sync_picture");
@@ -307,8 +307,9 @@
                                 obj.show("price_module");
                                 obj.show("info_module");
                                 obj.show("markup.sync_remote_download");
-                                obj.show("markup.keep_decimals");
-                                obj.show("markup.exchange_rate");
+                                //    obj.show("markup.keep_decimals");
+                                //     obj.show("markup.exchange_rate");
+                                obj.setRadio("markup.sync_amount", 0, true);
                             } else {
                                 obj.show("markup_template_id");
                                 obj.hide("markup.drift_base_amount");
@@ -350,8 +351,44 @@
                     {
                         title: "同步价格",
                         name: "markup.sync_amount",
-                        type: "switch",
-                        placeholder: "同步|不同步"
+                        type: "radio",
+                        placeholder: "同步|不同步",
+                        dict: [
+                            {id: 0, name: "不同步"},
+                            {id: 1, name: "同步并加价"},
+                            {id: 2, name: "同步上游"}
+                        ],
+                        required: true,
+                        tips: "不同步：完全由本地自定义价格\n同步并加价：根据上游的商品价格实时控制盈亏\n同步上游：上游是什么价格，本地商品就是什么价格".replaceAll("\n" , "<br>"),
+                        change: (from, val) => {
+                            val = parseInt(val);
+                            switch (val) {
+                                case 0:
+                                    from.hide('markup.exchange_rate');
+                                    from.hide('markup.keep_decimals');
+                                    from.hide('markup.drift_base_amount');
+                                    from.hide('markup.drift_model');
+                                    from.hide('markup.drift_value');
+                                    break;
+                                case 1:
+                                    from.show('markup.exchange_rate');
+                                    from.show('markup.keep_decimals');
+                                    from.show('markup.drift_base_amount');
+                                    from.show('markup.drift_model');
+                                    from.show('markup.drift_value');
+                                    break;
+                                case 2:
+                                    from.hide('markup.exchange_rate');
+                                    from.hide('markup.keep_decimals');
+                                    from.hide('markup.drift_base_amount');
+                                    from.hide('markup.drift_model');
+                                    from.hide('markup.drift_value');
+                                    break;
+                            }
+                        },
+                        complete: (obj, value) => {
+                            obj.triggerOtherPopupChange("markup.sync_amount", value);
+                        }
                     },
                     {
                         title: "货币汇率",
@@ -359,6 +396,7 @@
                         type: "number",
                         default: "0",
                         required: true,
+                        hide: true,
                         tips: "如果对方货币是人民币，填0即可，如果是非人民币，则填写对方货币转人民币的汇率\n\n具体的计算方式：<b class='text-danger'>对方货币</b>÷<b class='text-success'>货币汇率</b>=<b class='text-primary'>人民币</b>\n\n<b class='text-warning'>注意：如果对方是人民币，填'0'即可，无需关心汇率问题</b>".replaceAll("\n", "<br>")
                     },
                     {
@@ -367,7 +405,9 @@
                         type: "input",
                         default: "2",
                         required: true,
-                        tips: "最大支持6位小数"
+                        hide: true,
+                        placeholder: "请输入要保留的小数位数",
+                        tips: "价格小数，最大支持6位小数"
                     },
                     {
                         title: "价格基数",
@@ -377,6 +417,7 @@
                         placeholder: "请设定基数",
                         default: 10,
                         required: true,
+                        hide: true,
                         regex: {
                             value: "^(0\\.\\d+|[1-9]\\d*(\\.\\d+)?)$", message: "基数必须大于0"
                         }
@@ -385,6 +426,7 @@
                         title: "加价模式",
                         name: "markup.drift_model",
                         type: "radio",
+                        hide: true,
                         tips: format.success("比例加价") + " 通过基数实现百分比加价，比如你设置基数为10，那么比例设置 0.5，那么10元的商品最终售卖的价格就是：15【算法：(10*0.5)+10】<br>" + format.warning("固定金额加价") + " 通过基数+固定金额算法，得到的比例进行加价，假如基数是10，加价1.2元，那么算法得出加价比例为：1.2/10=0.12，如果一个商品为18元，你加价了1.2元，最终售卖价格则是：20.16【算法：(18*0.12)+18】",
                         dict: "markup_type"
                     },
@@ -392,6 +434,7 @@
                         title: "浮动值",
                         name: "markup.drift_value",
                         type: "input",
+                        hide: true,
                         tips: "百分比 或 金额，根据加价模式自行填写，百分比需要用小数表示",
                         placeholder: "请设置浮动值",
                         default: 0,
@@ -462,7 +505,6 @@
                     overflow: "inherit"
                 }
             },
-            height: "auto",
             width: "1000px",
             done: () => {
                 table.refresh();

@@ -108,6 +108,91 @@
     }
 
 
+    const topUp = () => {
+        component.popup({
+            submit: false,
+            confirmText: "充值",
+            autoPosition: true,
+            width: "520px",
+            tab: [
+                {
+                    name: util.icon("icon--yue") + " 应用商店-钱包充值",
+                    form: [
+                        {
+                            title: false,
+                            name: "custom",
+                            type: "custom",
+                            complete: (form, dom) => {
+                                dom.html(`<div class="pay-container">               
+<div class="layout-box">
+                    <div class="title">充值金额</div>
+                    <div class="pay-list balance-pay"><input type="text" class="store-recharge-amount" placeholder="最低10元起充" value="100"></div>
+                </div>
+
+<div class="layout-box">
+                    <div class="title">在线支付</div>
+                    <div class="pay-list online-pay"></div>
+                </div>
+                <div class="layout-box">
+                    <button type="button" class="btn-pay">立即充值</button>
+                </div>
+</div>`);
+                                const $onlinePay = dom.find(".online-pay");
+                                const $balancePay = dom.find(".balance-pay");
+                                const $btnPay = dom.find(".btn-pay");
+                                util.post({
+                                    url: "/admin/store/pay/list", done: res => {
+                                        let payId = res.data[0].id;
+
+                                        res.data.forEach((item, index) => {
+                                            $onlinePay.append(`<div data-payId="${item.id}" class="pay-item ${index == 0 ? "pay-current" : ""} online-pay-click"><img src="${item.icon}"><span>${item.name}</span></div>`);
+                                        });
+
+                                        function checkCombination() {
+                                            if (payId > 0) {
+                                                const payAmount = (new Decimal(amount)).sub(res.balance).getAmount(2);
+                                                $btnPay.html(`${payAmount > 0 ? "在线支付" : "确认付款"}（￥${payAmount > 0 ? payAmount : amount}）`).attr("disabled", false);
+                                            } else if (!isBalance && payId == 0) {
+                                                $btnPay.html("请选择付款方式").attr("disabled", true);
+                                            } else if (isBalance && payId == 0) {
+                                                const enough = parseFloat(res.balance) >= parseFloat(amount);
+                                                $btnPay.html(enough ? `确认付款（￥${amount}）` : "余额不足").attr("disabled", !enough);
+                                            } else {
+                                                $btnPay.html(`在线支付（￥${amount}）`).attr("disabled", false);
+                                            }
+                                        }
+
+
+                                        $onlinePay.find('.online-pay-click').click(function () {
+                                            payId = $(this).attr("data-payId");
+                                            $onlinePay.find(".online-pay-click").removeClass("pay-current");
+                                            $(this).addClass("pay-current");
+                                        });
+
+                                        $btnPay.click(function () {
+                                            const amount = $balancePay.find(".store-recharge-amount").val();
+                                            if (amount < 10) {
+                                                layer.msg("最低10元起充");
+                                            }
+
+                                            util.post("/admin/store/recharge", {pay_id: payId, amount: amount}, res => {
+                                                window.location.href = res.data.pay_url;
+                                            });
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    ]
+                }
+            ],
+            maxmin: false,
+            shadeClose: true,
+            assign: {}
+        });
+    }
+
+
     function handleUpdate(isUpdate) {
         component.popup({
             submit: isUpdate ? () => {
@@ -314,9 +399,9 @@
 
                 /* <img class="d-sm-inline-block  rounded-circle me-1" src="${res.data.avatar}" style="width: 21px;">*/
 
-                $storeUser.append(`<a href="/admin/store/trade" class="btn btn-sm btn-outline-dark me-1 d-none d-sm-inline-block"><div class="d-flex align-items-center">
+                $storeUser.append(`<button class="btn btn-sm btn-outline-dark me-1 d-none d-sm-inline-block store-username"><div class="d-flex align-items-center">
                         <span class="fw-semibold">${res.data.username}(<span class="text-warning store-user-balance">￥${res.data.balance}</span>)</span>
-                    </div></a>`);
+                    </div></button>`);
 
                 if (res.data.group) {
                     $storeUser.append(`<a class="btn btn-sm btn-primary me-1 store-group d-sm-inline-block" style="cursor:pointer;"><div class="d-flex align-items-center">
@@ -345,12 +430,20 @@
                 }
 
 
-            },
-            error: () => {
-            },
-            fail: () => {
+                $(`.store-username`).click(() => {
+                    topUp();
+                });
 
-            }
+                if (res?.data?.expire_product > 0) {
+                    layer.tips(`<span style="color: #e6be2f;">您有${res?.data?.expire_product}个产品将在三天内过期，请尽快进行续费，以确保业务的持续正常运作。</span>`, $(`.store-button`), {
+                        tips: 3,
+                        time: 5000,
+                        tipsMore: true
+                    });
+                }
+            },
+            error: () => false,
+            fail: () => false
         });
     }
 

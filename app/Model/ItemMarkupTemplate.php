@@ -20,6 +20,7 @@ use Kernel\Database\Model;
  * @property int $sync_picture
  * @property int $sync_sku_name
  * @property int $sync_sku_picture
+ * @property string $keep_decimals
  */
 class ItemMarkupTemplate extends Model
 {

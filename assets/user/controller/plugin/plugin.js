@@ -272,9 +272,7 @@
                             width: "620px",
                         });
                     },
-                    show: item => {
-                        return item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\Pay") && item?.handleSubmit;
-                    }
+                    show: item =>  item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\Pay") && item?.handleSubmit && item?.state?.run == 1
                 },
                 {
                     icon: 'icon-huoyuan',
@@ -482,9 +480,7 @@
                             width: "820px",
                         });
                     },
-                    show: item => {
-                        return item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\ForeignShip") && item?.handleSubmit;
-                    }
+                    show: item => item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\ForeignShip") && item?.handleSubmit && item?.state?.run == 1
                 },
                 {
                     icon: 'icon-rizhi',

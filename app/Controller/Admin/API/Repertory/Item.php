@@ -129,8 +129,15 @@ class Item extends Base
         $save->enableCreateTime();
 
         $skuTempId = $map['sku_temp_id'] ?? "";
-        unset($map['sku_temp_id']);
+        $local = $map['local'] ?? null;
+        $directSale = $map['direct_sale'] ?? null;
+        $directCategoryId = $map['direct_category_id'] ?? 0;
 
+        unset($map['direct_sale'], $map['direct_category_id'], $map['local'], $map['sku_temp_id']);
+
+        if ($directSale == 1 && $directCategoryId == 0) {
+            throw new JSONException("请选择直营店的商品分类");
+        }
 
         if (!isset($map['id'])) {
             $count = RepertoryItemSku::query()->where("temp_id", $skuTempId)->count();
@@ -141,6 +148,7 @@ class Item extends Base
         }
 
         $save->setMap(map: $map, forbidden: ["user_id"]);
+
         try {
             if (isset($map['id'])) {
                 //刷新缓存
@@ -155,6 +163,33 @@ class Item extends Base
                 RepertoryItemSku::query()->where("temp_id", $skuTempId)->whereNull("user_id")->update([
                     "repertory_item_id" => $saved->id
                 ]);
+            }
+
+            if ($local == 1) {
+                $saved->unique_id = null;
+                $saved->version = null;
+                $saved->save();
+                RepertoryItemSku::query()->where("repertory_item_id", $saved->id)->update([
+                    "unique_id" => null,
+                    "version" => null
+                ]);
+            }
+
+
+            //导入直营店
+            if ($directSale == 1 && !isset($map['id'])) {
+                $this->item->loadRepertoryItem((int)$directCategoryId, (int)$saved->id, [
+                    "sync_amount" => 2,
+                    "keep_decimals" => 2,
+                    "drift_base_amount" => 1,
+                    "drift_model" => 1,
+                    "drift_value" => 0,
+                    "sync_name" => 1,
+                    "sync_introduce" => 1,
+                    "sync_picture" => 1,
+                    "sync_sku_name" => 1,
+                    "sync_sku_picture" => 1
+                ], available: true);
             }
         } catch (\Exception $exception) {
             throw new JSONException("保存失败，错误：" . $exception->getMessage());

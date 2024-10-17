@@ -44,12 +44,12 @@ interface Item
     /**
      * @param int $categoryId
      * @param int $itemId
-     * @param int $markupId
+     * @param int|array $markupId
      * @param User|null $user
+     * @param bool $available
      * @return void
      */
-    public function loadRepertoryItem(int $categoryId, int $itemId, int $markupId, ?User $user = null): void;
-
+    public function loadRepertoryItem(int $categoryId, int $itemId, int|array $markupId, ?User $user = null, bool $available = false): void;
 
     /**
      * @param \App\Model\Item $item
@@ -98,5 +98,5 @@ interface Item
      * @param ?RepertoryItemSku $itemSku
      * @return QuantityRestriction
      */
-    public function getQuantityRestriction(?int $userId,  ?RepertoryItemSku $itemSku): QuantityRestriction;
+    public function getQuantityRestriction(?int $userId, ?RepertoryItemSku $itemSku): QuantityRestriction;
 }

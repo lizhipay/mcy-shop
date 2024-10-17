@@ -25,8 +25,43 @@
                         {
                             title: "同步价格",
                             name: "sync_amount",
-                            type: "switch",
-                            placeholder: "同步|不同步"
+                            type: "radio",
+                            dict: [
+                                {id: 0, name: "不同步"},
+                                {id: 1, name: "同步并加价"},
+                                {id: 2, name: "同步上游"}
+                            ],
+                            required: true,
+                            tips: "不同步：完全由本地自定义价格\n同步并加价：根据上游的商品价格实时控制盈亏\n同步上游：上游是什么价格，本地商品就是什么价格".replaceAll("\n" , "<br>"),
+                            change: (from, val) => {
+                                val = parseInt(val);
+                                switch (val) {
+                                    case 0:
+                                        from.hide('exchange_rate');
+                                        from.hide('keep_decimals');
+                                        from.hide('drift_base_amount');
+                                        from.hide('drift_model');
+                                        from.hide('drift_value');
+                                        break;
+                                    case 1:
+                                        from.show('exchange_rate');
+                                        from.show('keep_decimals');
+                                        from.show('drift_base_amount');
+                                        from.show('drift_model');
+                                        from.show('drift_value');
+                                        break;
+                                    case 2:
+                                        from.hide('exchange_rate');
+                                        from.hide('keep_decimals');
+                                        from.hide('drift_base_amount');
+                                        from.hide('drift_model');
+                                        from.hide('drift_value');
+                                        break;
+                                }
+                            },
+                            complete: (from, val) => {
+                                from.form["sync_amount"].change(from, val);
+                            }
                         },
                         {
                             title: "货币汇率",
@@ -42,7 +77,8 @@
                             type: "input",
                             default: "2",
                             required: true,
-                            tips: "最大支持6位小数"
+                            placeholder: "请输入要保留的小数位数",
+                            tips: "价格小数，最大支持6位小数"
                         },
                         {
                             title: "价格基数",
@@ -123,6 +159,7 @@
                 }
             ],
             assign: assign,
+            autoPosition: true,
             done: () => {
                 table.refresh();
             }
@@ -136,10 +173,45 @@
     table.setColumns([
         {checkbox: true},
         {field: 'name', title: '模板名称'},
-        {field: 'sync_amount', title: '同步价格', type: 'switch', text: "同步|不同步", reload: true},
-        {field: 'drift_model', title: '加价模式', dict: "markup_type", width: 170},
-        {field: 'drift_value', title: '加价比例/金额', type: 'text', width: 120, reload: true},
-        {field: 'drift_base_amount', title: '基数', type: 'text', width: 120, reload: true},
+        {
+            field: 'sync_amount', title: '同步价格', dict: [
+                {id: 0, name: "🚫不同步"},
+                {id: 1, name: "💲加价同步"},
+                {id: 2, name: "♻️同步上游"}
+            ], text: "同步|不同步", reload: true, align: `center`
+        },
+        {
+            field: 'drift_model', title: '加价模式', width: 170, formatter: (val, item) => {
+                if (item.sync_amount != 1) {
+                    return '-';
+                }
+                return _Dict.result('markup_type', val);
+            }
+        },
+        {
+            field: 'drift_value', title: '绝对比例', width: 120, formatter: (val, item) => {
+                if (item.sync_amount != 1) {
+                    return '-';
+                }
+                return item.drift_model == 1 ?  (new Decimal(val)).div(item.drift_base_amount).mul(100).getAmount() + "%" : (new Decimal(val)).mul(100).getAmount() + "%";
+            }
+        },
+        {
+            field: 'drift_base_amount', title: '基数', width: 120, formatter: (val, item) => {
+                if (item.sync_amount != 1) {
+                    return '-';
+                }
+                return val;
+            }
+        },
+        {
+            field: 'keep_decimals', title: '保留小数', formatter: (val, item) => {
+                if (item.sync_amount != 1) {
+                    return '-';
+                }
+                return val;
+            }
+        },
         {field: 'sync_name', title: '商品名称', type: 'switch', text: "同步|不同步", reload: true},
         {field: 'sync_introduce', title: '商品介绍', type: 'switch', text: "同步|不同步", reload: true},
         {field: 'sync_picture', title: '商品封面', type: 'switch', text: "同步|不同步", reload: true},

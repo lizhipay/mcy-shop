@@ -227,7 +227,7 @@
                                             }
 
                                             if (item[s.id] > 0) {
-                                                let amount = item[s.id];
+                                                let amount = item[s.id], price = amount;
                                                 if (isGift) {
                                                     amount = (new Decimal(amount)).mul(giftDiscount).getAmount(2);
                                                 }
@@ -239,7 +239,7 @@
 
                                                 const dayAmount = (new Decimal(amount)).div(subscriptionTimes[index]).getAmount(2);
 
-                                                payList += `<div class="subscription-item ${add == 0 ? 'subscription-current' : ''}" data-subscription="${index}" data-amount="${amount}"><span style="color: #496b93ab;"><span style="color: #D38200;font-size: 18px;font-weight: bold;">￥${amount}</span>/${s.name}</span>${!isGift ? `<span style="color: #BDB8B8;font-size: 13px;text-decoration:line-through;">原价:${item[s.id] * 2}</span>` : `<span style="color: #2eb20f;font-size: 13px;">折扣:${(new Decimal(giftDiscount).mul(10).getAmount(1))}折</span>`}<span style="color: #D38200;font-size:12px;">${index == 4 ? '终身可用' : `低至${dayAmount}元/天`}</span></div>`;
+                                                payList += `<div class="subscription-item ${add == 0 ? 'subscription-current' : ''}" data-subscription="${index}" data-amount="${amount}"><span style="color: #496b93ab;"><span style="color: #D38200;font-size: 18px;font-weight: bold;">￥${amount}</span>/${s.name}</span>${!isGift ? `<span style="color: #BDB8B8;font-size: 13px;text-decoration:line-through;">原价:${item[s.id] * 2}</span>` : `<span style="color: #2eb20f;font-size: 13px;">折扣:${(new Decimal(giftDiscount).mul(10).getAmount(1))}折</span>`}<span style="color: #D38200;font-size:12px;">${!isGift ? (index == 4 ? '终身可用' : `低至${dayAmount}元/天`) : `<span style="color: #BDB8B8;font-size: 13px;text-decoration:line-through;">原价:${price}</span>`}</span></div>`;
                                                 add++;
                                             }
                                         });
@@ -369,9 +369,9 @@
 
                                 dom.html(`<div class="block block-rounded">
         <div class="block-header block-header-default">
-            <button type="button" class="btn btn-outline-primary btn-sm wallet-recharge">${util.icon("icon-zhifu")}<space></space>${i18n("钱包充值")}</button>
-            <button type="button" class="btn btn-outline-success btn-sm renewal-subscription">${util.icon("icon-update")}<space></space>${i18n("一键续费")}</button>
-            <button type="button" class="btn btn-outline-info btn-sm bind-subscription">${util.icon("icon-mimashezhi-xiugaimima")}<space></space>${i18n("授权更换至本机")}</button>
+            <button type="button" class="btn btn-outline-primary btn-sm wallet-recharge wap-mb1">${util.icon("icon-zhifu")}<space></space>${i18n("钱包充值")}</button>
+            <button type="button" class="btn btn-outline-success btn-sm renewal-subscription wap-mb1">${util.icon("icon-update")}<space></space>${i18n("一键续费")}</button>
+            <button type="button" class="btn btn-outline-info btn-sm bind-subscription wap-mb1">${util.icon("icon-mimashezhi-xiugaimima")}<space></space>${i18n("授权更换至本机")}</button>
         </div>
         <div class="block-content pt-0">
             <table id="store-subscription-table"></table>
@@ -416,6 +416,34 @@
                                         }
                                     },
                                     {
+                                        field: 'sub_free',
+                                        title: '子站免费',
+                                        class: "nowrap",
+                                        type: "switch",
+                                        text: "开启|关闭",
+                                        formatter: (val, item) => {
+                                            if (item?.sub_support == 1) {
+                                                return val;
+                                            }
+                                            return 0;
+                                        },
+                                        change: (value, item) => {
+                                            if (item?.sub_support != 1) {
+                                                layer.msg("开启失败，此订阅项目无法使用此功能。");
+                                                return;
+                                            }
+                                            util.post("/admin/store/power/sub/free", {
+                                                item_id: item.id
+                                            }, res => {
+                                                if (value == 1) {
+                                                    layer.msg("已开启全部子站免费");
+                                                } else {
+                                                    layer.msg("已关闭全部子站免费");
+                                                }
+                                            });
+                                        }
+                                    },
+                                    {
                                         field: 'price', title: '续订价格', class: "nowrap", formatter: price => {
                                             return `<b class="text-warning">￥${format.amounts(price)}</b>`
                                         }, align: "center"
@@ -431,7 +459,14 @@
                                     },
                                     {field: 'create_time', class: "nowrap", title: '开始时间'},
                                     {field: 'server_ip', class: "nowrap", title: '授权IP'},
-                                    {field: 'hwid', class: "nowrap", title: '授权设备'},
+                                    {
+                                        field: 'hwid', class: "nowrap", title: '授权设备', formatter: (val, item) => {
+                                            if (item.is_local_machine) {
+                                                return format.success("本机");
+                                            }
+                                            return val;
+                                        }
+                                    },
                                     {
                                         field: 'message', title: '', formatter: (message, item) => {
                                             if (message) {
@@ -630,6 +665,113 @@
         storePowers();
     });
 
+    $(`.auth-store-sub`).click(() => {
+        component.popup({
+            submit: false,
+            tab: [
+                {
+                    name: util.icon("icon-duliyumingdz") + " 授权子站插件",
+                    form: [
+                        {
+                            name: "user",
+                            type: "custom",
+                            complete: (popup, dom) => {
+                                dom.html(`<div class="block block-rounded"><div class="block-content mt-0 pt-0"><table id="store-sub-user-table"></table></div></div>`);
+                                const subUserTable = new Table("/admin/store/power/sub/list", dom.find('#store-sub-user-table'));
+                                subUserTable.setColumns([
+                                    {
+                                        field: 'username', title: '会员', formatter: function (val, item) {
+                                            return format.user(item);
+                                        }
+                                    },
+                                    {
+                                        field: 'store_id', title: '应用商店', formatter: function (val, item) {
+                                            if (val > 0) {
+                                                return format.success(`${util.icon("icon-chenggong")} 已登录`);
+                                            }
+                                            return format.danger(`${util.icon("icon-yijujue")} 未登录`);
+                                        }
+                                    },
+                                    {
+                                        field: 'store_power', title: '授权/到期时间', formatter: function (val, item) {
+                                            if (item.store_id > 0) {
+                                                if (item?.store?.status == 1) {
+                                                    return item?.store?.expire_time ? item?.store?.expire_time : format.success(`${util.icon("icon-chenggong")} 免费使用`);
+                                                }
+                                                return format.danger(`${util.icon("icon-yijujue")} 无授权`);
+                                            }
+                                            return '-';
+                                        }
+                                    },
+                                    {
+                                        field: 'operation', title: '', type: 'button', buttons: [
+                                            {
+                                                icon: 'icon-gerenshezhi',
+                                                class: 'acg-badge-h-dodgerblue',
+                                                tips: '授权',
+                                                click: (event, value, row, index) => {
+                                                    component.popup({
+                                                        submit: '/admin/store/power/sub/auth',
+                                                        tab: [
+                                                            {
+                                                                name: `${util.icon("icon-peizhixinxi")} Authorization`,
+                                                                form: [
+                                                                    {
+                                                                        title: "user_id",
+                                                                        name: "user_id",
+                                                                        type: "input",
+                                                                        default: row?.id,
+                                                                        hide: true
+                                                                    },
+                                                                    {
+                                                                        title: "是否授权",
+                                                                        name: "status",
+                                                                        type: "switch",
+                                                                        placeholder: "授权|关闭",
+                                                                        default: row?.store?.status
+                                                                    },
+                                                                    {
+                                                                        title: "到期时间",
+                                                                        name: "expire_time",
+                                                                        type: "date",
+                                                                        placeholder: "留空则不限制时间",
+                                                                        default: row?.store?.expire_time
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ],
+                                                        assign: {},
+                                                        autoPosition: true,
+                                                        width: "450px",
+                                                        maxmin: false,
+                                                        shadeClose: true,
+                                                        done: () => {
+                                                            subUserTable.refresh();
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        ]
+                                    },
+                                ]);
+                                subUserTable.setSearch([
+                                    {title: "ID", name: "equal-id", type: "input", width: 90},
+                                    {title: "用户名", name: "equal-username", type: "input", width: 125},
+                                    {title: "备注", name: "search-note", type: "input", width: 125}
+                                ]);
+                                subUserTable.render();
+                            }
+                        }
+                    ]
+                }
+            ],
+            assign: {},
+            autoPosition: true,
+            width: "760px",
+            shadeClose: true,
+        });
+    });
+
 
     util.post({
         url: "/admin/store/personal/info",
@@ -638,6 +780,7 @@
             giveDiscount = res?.data?.group?.give_discount;
             groupSubscription = res?.data?.group?.subscription;
             groupSort = res?.data?.group?.sort;
+
 
             table = new Table("/admin/store/list", "#store-table");
             table.setPagination(12, [12, 20, 50, 100]);
@@ -744,6 +887,11 @@
             table.render();
 
             showStoreGroup();
+
+
+            if (res?.data?.group?.substation == true) {
+                $(`.auth-store-sub`).show();
+            }
         },
         error: () => {
             component.popup({

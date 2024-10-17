@@ -39,6 +39,14 @@
                 $storeUser.append(`<a href="/user/store" class="btn btn-sm btn-outline-dark me-1 d-none d-sm-inline-block"><div class="d-flex align-items-center">
                         <span class="fw-semibold">${res.data.username}(<span class="text-warning store-user-balance">￥${res.data.balance}</span>)</span>
                     </div></a>`);
+
+                if (res?.data?.expire_product > 0) {
+                    layer.tips(`<span style="color: #e6be2f;">您有${res?.data?.expire_product}个产品将在三天内过期，请尽快进行续费，以确保业务的持续正常运作。</span>`, $(`.store-button`), {
+                        tips: 3,
+                        time: 5000,
+                        tipsMore: true
+                    });
+                }
             },
             error: () => {
             },

@@ -277,9 +277,7 @@
                     icon: 'icon-peizhixinxi',
                     title: '基本配置',
                     class: 'acg-badge-h-dodgerblue',
-                    show: item => {
-                        return item.submit != "";
-                    },
+                    show: item => item.submit != "",
                     click: (event, value, row, index) => {
                         let submit = eval(row.submit);
                         submit[0]["name"] = util.icon("icon-peizhixinxi") + " " + row.info.name;
@@ -338,9 +336,7 @@
                             width: "620px",
                         });
                     },
-                    show: item => {
-                        return item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\Pay") && item?.handleSubmit;
-                    }
+                    show: item => item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\Pay") && item?.handleSubmit && item?.state?.run == 1
                 },
                 {
                     icon: 'icon-huoyuan',
@@ -548,9 +544,7 @@
                             width: "820px",
                         });
                     },
-                    show: item => {
-                        return item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\ForeignShip") && item?.handleSubmit;
-                    }
+                    show: item => item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\ForeignShip") && item?.handleSubmit && item?.state?.run == 1
                 },
                 {
                     icon: 'icon-rizhi',
@@ -781,7 +775,7 @@
             field: 'handle', title: '能力', class: "nowrap", formatter: (handle, item) => {
                 let html = format.badge(_Dict.result("plugin_type", item?.info?.type), "acg-badge-h-green");
                 for (const pluginHandleKey in pluginHandle) {
-                    if (handle.hasOwnProperty(pluginHandleKey)) {
+                    if (handle?.hasOwnProperty(pluginHandleKey)) {
                         html += format.badge(pluginHandle[pluginHandleKey], "acg-badge-h-dodgerblue");
                     }
                 }

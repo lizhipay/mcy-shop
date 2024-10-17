@@ -48,7 +48,7 @@ class Form {
                     case 'checkbox':
                     case 'radio':
                     case 'widget':
-                        d += this.getBlockHtml(form);
+                        d += this.getBlockHtml(form, util.icon("icon-loading", "icon-spin", "icon-18px"));
                         break;
                     case 'attribute':
                         d += this.getBlockHtml(form);
@@ -836,6 +836,7 @@ class Form {
         }
 
         _Dict.advanced(form.dict, res => {
+            _this.clearComponent(form.name);
             res.forEach(s => {
                 _this.addCheckbox(form.name, s.id, s.name, val.indexOf(s.id) !== -1 || val.indexOf(s.id.toString()) !== -1, form.disable ? form.disable.includes(s.id) : false, true);
             });
@@ -852,6 +853,7 @@ class Form {
         let _this = this;
         _Dict.advanced(form.dict, res => {
             let checkedValue = null;
+            _this.clearComponent(form.name);
             res.forEach((s, index) => {
                 let checked = s.id == form.default || index == 0;
                 checked && (checkedValue = s.id);
@@ -1247,7 +1249,9 @@ class Form {
         layui.form.render();
     }
 
+
     widgetRegister(form) {
+        this.clearComponent(form.name);
         let preset = form.default ? JSON.parse(form.default) : [];
         if (preset.length <= 0) {
             this.addWidget(form.name);
@@ -1305,10 +1309,10 @@ class Form {
                 d = this.textareaHtml(form);
                 break;
             case 'checkbox':
-                d = this.getBlockHtml(form);
+                d = this.getBlockHtml(form, util.icon("icon-loading", "icon-spin", "icon-18px"));
                 break;
             case 'radio':
-                d = this.getBlockHtml(form);
+                d = this.getBlockHtml(form, util.icon("icon-loading", "icon-spin", "icon-18px"));
                 break;
             case 'switch':
                 d = this.switchHtml(form)

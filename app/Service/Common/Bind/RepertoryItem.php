@@ -77,10 +77,10 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
 
         foreach ($items as $item) {
             try {
-                if (!isset($item['unique_id']) || \App\Model\RepertoryItem::query()->where("unique_id", $item['unique_id'])->exists()) {
-                    $plugin->log("[{$item['name']}]->失败：已经存在此货源：{$item['unique_id']}", true);
-                    continue;
-                }
+                /*      移除重复货源检测        if (!isset($item['unique_id']) || \App\Model\RepertoryItem::query()->where("unique_id", $item['unique_id'])->exists()) {
+                                 $plugin->log("[{$item['name']}]->失败：已经存在此货源：{$item['unique_id']}", true);
+                                 continue;
+                             }*/
 
                 $itemPictureUrl = $item['picture_url'];
                 $itemPictureThumbUrl = $itemPictureUrl;
@@ -103,7 +103,7 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                     $sku['market_control_min_num'] > 0 && $createSku->setMarketControlMinNum($sku['market_control_min_num']);
                     $createSku->setPluginData($sku['options'] ?: []);
                     $createSku->setUniqueId($sku['unique_id']);
-                    $sku['message'] && $createSku->setMessage($sku['message']);
+                    isset($sku['message']) && $createSku->setMessage($sku['message']);
 
                     $skus[] = $createSku;
                 }
@@ -289,15 +289,22 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                 $markupEntity->setSyncRemoteDownload((bool)$template->sync_remote_download);
                 $markupEntity->setExchangeRate((string)$template->exchange_rate);
                 $markupEntity->setKeepDecimals((string)$template->keep_decimals);
+
+                if ($template->sync_amount != 1) {
+                    $markupEntity->setPercentage("0");
+                    return $markupEntity;
+                }
+
                 if ($template->drift_model == 0) {
                     $markupEntity->setPercentage((string)$template->drift_value);
+                    return $markupEntity;
+                }
+
+                if ($template->drift_value > 0) {
+                    $decimal = new Decimal((string)$template->drift_value, 6);
+                    $markupEntity->setPercentage($decimal->div($template->drift_base_amount)->getAmount(6));
                 } else {
-                    if ($template->drift_value > 0) {
-                        $decimal = new Decimal((string)$template->drift_value, 6);
-                        $markupEntity->setPercentage($decimal->div($template->drift_base_amount)->getAmount(6));
-                    } else {
-                        $markupEntity->setPercentage("0");
-                    }
+                    $markupEntity->setPercentage("0");
                 }
             }
         } else {
@@ -311,15 +318,23 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
             $markupEntity->setExchangeRate((string)$markup['exchange_rate']);
             $markupEntity->setKeepDecimals((string)$markup['keep_decimals']);
 
+            if ($markup['sync_amount'] != 1) {
+                $markupEntity->setPercentage("0");
+                return $markupEntity;
+            }
+
+
             if ($markup['drift_model'] == 0) {
                 $markupEntity->setPercentage((string)$markup['drift_value']);
+                return $markupEntity;
+
+            }
+
+            if ($markup['drift_value'] > 0) {
+                $decimal = new Decimal((string)$markup['drift_value'], 6);
+                $markupEntity->setPercentage($decimal->div((string)$markup['drift_base_amount'])->getAmount(6));
             } else {
-                if ($markup['drift_value'] > 0) {
-                    $decimal = new Decimal((string)$markup['drift_value'], 6);
-                    $markupEntity->setPercentage($decimal->div((string)$markup['drift_base_amount'])->getAmount(6));
-                } else {
-                    $markupEntity->setPercentage("0");
-                }
+                $markupEntity->setPercentage("0");
             }
         }
 

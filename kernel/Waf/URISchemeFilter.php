@@ -47,11 +47,14 @@ class URISchemeFilter extends \HTMLPurifier_URIFilter
 
         if (App::$install) {
             $cfg = $this->config->getMainConfig("waf");
+            if (isset($cfg['uri_scheme_filter_open']) && $cfg['uri_scheme_filter_open'] == 1) {
+                return true;
+            }
             if (isset($cfg['uri_scheme_filter_whitelist'])) {
                 $whitelist = Arr::strToList($cfg['uri_scheme_filter_whitelist'], "\n");
             }
         }
-
+        
         foreach ($whitelist as $pattern) {
             $pattern = str_replace('.', '\.', $pattern);
             $pattern = str_replace('*', '.*', $pattern);

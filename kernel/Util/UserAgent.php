@@ -43,11 +43,14 @@ class UserAgent
     ];
 
     /**
-     * @param string $ua
+     * @param string|null $ua
      * @return bool
      */
-    public static function isMobile(string $ua): bool
+    public static function isMobile(?string $ua): bool
     {
+        if (!$ua) {
+            return false;
+        }
         return (bool)preg_match('/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i', $ua);
     }
 

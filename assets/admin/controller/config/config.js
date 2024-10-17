@@ -870,7 +870,13 @@ ${i18n(`<p>4.宝塔的nginx.conf：<b style="color: green;">/www/server/nginx/co
                                 placeholder: "白名单域名，一行一个",
                                 tips: "只有在白名单中的域名，才能够使用视频或图片外链功能，否则都会被底层安全过滤拦截",
                                 height: 280
-                            }
+                            },
+                            {
+                                title: "不过滤外链",
+                                name: "uri_scheme_filter_open",
+                                type: "switch",
+                                tips: "不过滤外链开启后，无需外链白名单，任何URL都可以添加至你的网站"
+                            },
                         ]
                     }
                 ],

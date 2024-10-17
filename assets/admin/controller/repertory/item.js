@@ -18,6 +18,31 @@
                         default: tempId
                     },
                     {
+                        title: "自动入库直营店",
+                        name: "direct_sale",
+                        type: "switch",
+                        placeholder: "自动入库|不自动入库",
+                        default: 1,
+                        tips: "开启此选项后，商品将直接入库至直营店，并在网站首页以可购买状态展示",
+                        change: (form, val) => {
+                            if (val == 1) {
+                                form.show('direct_category_id');
+                            } else {
+                                form.hide('direct_category_id');
+                            }
+                        },
+                        hide: assign?.id > 0
+                    },
+                    {
+                        title: "直营店分类",
+                        name: "direct_category_id",
+                        type: "treeSelect",
+                        placeholder: "请选择直营店的商品分类",
+                        dict: 'shopCategory?userId=',
+                        parent: false,
+                        hide: assign?.id > 0
+                    },
+                    {
                         title: "仓库分类",
                         name: "repertory_category_id",
                         type: "select",
@@ -100,7 +125,7 @@
                         type: "input",
                         placeholder: "自动收货时效",
                         default: 5040,
-                        tips: "自动收货时效，单位/分钟，如果为'0'的情况下，货物会发货并且立即收货，不需要经过顾客同意"
+                        tips: "自动收货时效，单位/分钟，如果为'0'的情况下，货源会发货并且立即收货，不需要经过顾客同意"
                     },
                 ]
             },
@@ -122,7 +147,7 @@
                 name: util.icon("icon-fahuo") + "<space></space>发货插件",
                 form: [
                     {
-                        title: "选择插件",
+                        title: "发货插件",
                         name: "plugin",
                         type: "select",
                         required: true,
@@ -334,9 +359,9 @@
                         change: (obj, value) => {
                             if (value == 1) {
                                 obj.hide("markup_template_id");
-                                obj.show("markup.drift_base_amount");
-                                obj.show("markup.drift_model");
-                                obj.show("markup.drift_value");
+                                // obj.show("markup.drift_base_amount");
+                                // obj.show("markup.drift_model");
+                                //  obj.show("markup.drift_value");
                                 obj.show("markup.sync_name");
                                 obj.show("markup.sync_introduce");
                                 obj.show("markup.sync_picture");
@@ -346,8 +371,9 @@
                                 obj.show("price_module");
                                 obj.show("info_module");
                                 obj.show("markup.sync_remote_download");
-                                obj.show("markup.exchange_rate");
-                                obj.show("markup.keep_decimals");
+                                //    obj.show("markup.exchange_rate");
+                                //     obj.show("markup.keep_decimals");
+                                obj.setRadio("markup.sync_amount", 0, true);
                             } else {
                                 obj.show("markup_template_id");
                                 obj.hide("markup.drift_base_amount");
@@ -389,8 +415,44 @@
                     {
                         title: "同步价格",
                         name: "markup.sync_amount",
-                        type: "switch",
-                        placeholder: "同步|不同步"
+                        type: "radio",
+                        placeholder: "同步|不同步",
+                        dict: [
+                            {id: 0, name: "不同步"},
+                            {id: 1, name: "同步上游并加价"},
+                            {id: 2, name: "同步上游"}
+                        ],
+                        required: true,
+                        tips: "不同步：完全由本地自定义价格\n同步并加价：根据上游的商品价格实时控制盈亏\n同步上游：上游是什么价格，本地商品就是什么价格".replaceAll("\n", "<br>"),
+                        change: (from, val) => {
+                            val = parseInt(val);
+                            switch (val) {
+                                case 0:
+                                    from.hide('markup.exchange_rate');
+                                    from.hide('markup.keep_decimals');
+                                    from.hide('markup.drift_base_amount');
+                                    from.hide('markup.drift_model');
+                                    from.hide('markup.drift_value');
+                                    break;
+                                case 1:
+                                    from.show('markup.exchange_rate');
+                                    from.show('markup.keep_decimals');
+                                    from.show('markup.drift_base_amount');
+                                    from.show('markup.drift_model');
+                                    from.show('markup.drift_value');
+                                    break;
+                                case 2:
+                                    from.hide('markup.exchange_rate');
+                                    from.hide('markup.keep_decimals');
+                                    from.hide('markup.drift_base_amount');
+                                    from.hide('markup.drift_model');
+                                    from.hide('markup.drift_value');
+                                    break;
+                            }
+                        },
+                        complete: (obj, value) => {
+                            obj.triggerOtherPopupChange("markup.sync_amount", value);
+                        }
                     },
                     {
                         title: "货币汇率",
@@ -398,6 +460,7 @@
                         type: "number",
                         default: "0",
                         required: true,
+                        hide: true,
                         tips: "如果对方货币是人民币，填0即可，如果是非人民币，则填写对方货币转人民币的汇率\n\n具体的计算方式：<b class='text-danger'>对方货币</b>÷<b class='text-success'>货币汇率</b>=<b class='text-primary'>人民币</b>\n\n<b class='text-warning'>注意：如果对方是人民币，填'0'即可，无需关心汇率问题</b>".replaceAll("\n", "<br>")
                     },
                     {
@@ -406,7 +469,9 @@
                         type: "input",
                         default: "2",
                         required: true,
-                        tips: "最大支持6位小数"
+                        hide: true,
+                        placeholder: "请输入要保留的小数位数",
+                        tips: "价格小数，最大支持6位小数"
                     },
                     {
                         title: "价格基数",
@@ -415,6 +480,7 @@
                         tips: "基数就是你随便设定一个商品的进货价，比如你想象一个商品的进货价是10元，那么你就把基数设定为10元。<br><br>为什么要有这个设定呢？因为每个商品都有不同的类型和价格，设定一个基数可以帮助我们计算出你想给某个商品增加的进货价。通过基数，我们可以简单地推算出商品的最终进货价。",
                         placeholder: "请设定基数",
                         default: 10,
+                        hide: true,
                         required: true,
                         regex: {
                             value: "^(0\\.\\d+|[1-9]\\d*(\\.\\d+)?)$", message: "基数必须大于0"
@@ -424,6 +490,7 @@
                         title: "加价模式",
                         name: "markup.drift_model",
                         type: "radio",
+                        hide: true,
                         tips: format.success("比例加价") + " 通过基数实现百分比加价，比如你设置基数为10，那么比例设置 0.5，那么10元的商品最终售卖的价格就是：15【算法：(10*0.5)+10】<br>" + format.warning("固定金额加价") + " 通过基数+固定金额算法，得到的比例进行加价，假如基数是10，加价1.2元，那么算法得出加价比例为：1.2/10=0.12，如果一个商品为18元，你加价了1.2元，最终售卖价格则是：20.16【算法：(18*0.12)+18】",
                         dict: "markup_type"
                     },
@@ -434,6 +501,7 @@
                         tips: "百分比 或 金额，根据加价模式自行填写，百分比需要用小数表示",
                         placeholder: "请设置浮动值",
                         default: 0,
+                        hide: true,
                         regex: {
                             value: "^(0\\.\\d+|[0-9]\\d*(\\.\\d+)?)$", message: "浮动值必须是数字 "
                         }
@@ -505,7 +573,6 @@
                     overflow: "inherit"
                 }
             },
-            height: "auto",
             width: "1000px",
             done: () => {
                 table.refresh();
@@ -1253,7 +1320,7 @@
     table.setColumns([
         {checkbox: true},
         {field: 'supplier', title: '供货商', class: "nowrap", formatter: format.user},
-        {field: 'name', title: '货物名称'},
+        {field: 'name', title: '货源名称'},
         {
             field: 'sku', title: 'SKU/出库价/成本/库存', formatter: (sku, item) => {
                 let html = "";
@@ -1312,6 +1379,7 @@
             ]
         },
     ]);
+    table.setPagination(10, [10, 30, 50, 100, 200]);
     table.setFloatMessage([
         {field: 'api_code', title: '对接码'},
         {field: 'privacy', title: '对接权限', dict: "repertory_item_privacy"},
@@ -1399,7 +1467,7 @@
             }
         },
         {title: "货源插件", name: "equal-plugin", type: "select", dict: "ship", hide: true},
-        {title: "货物关键词", name: "search-name", type: "input"},
+        {title: "货源关键词", name: "search-name", type: "input"},
         {title: "分类", name: "equal-repertory_category_id", type: "select", dict: "repertoryCategory"},
         {title: "对接权限", name: "equal-privacy", type: "select", dict: "repertory_item_privacy"}
     ]);
@@ -1422,7 +1490,7 @@
     $('.transfer-repertory-item').click(() => {
         let data = table.getSelectionIds();
         if (data.length == 0) {
-            layer.msg(i18n("请勾选要操作的货物 (·•᷄ࡇ•᷅ ）"));
+            layer.msg(i18n("请勾选要操作的货源 (·•᷄ࡇ•᷅ ）"));
             return;
         }
 
@@ -1435,7 +1503,7 @@
                     layer.close(index);
                 })
             },
-            confirmText: "立即导入",
+            confirmText: util.icon("icon-daochu2") + "立即导入",
             tab: [
                 {
                     name: util.icon("icon-shangxiajia") + " 选择你要入库的分类",
@@ -1480,7 +1548,7 @@
         let data = table.getSelectionIds();
 
         if (data.length == 0) {
-            layer.msg(i18n("请勾选要操作的货物 (·•᷄ࡇ•᷅ ）"));
+            layer.msg(i18n("请勾选要操作的货源 (·•᷄ࡇ•᷅ ）"));
             return;
         }
 
@@ -1496,7 +1564,7 @@
         let selections = table.getSelections();
         let data = table.getSelectionIds();
         if (data.length == 0) {
-            layer.msg(i18n("请勾选要操作的货物 (·•᷄ࡇ•᷅ ）"));
+            layer.msg(i18n("请勾选要操作的货源 (·•᷄ࡇ•᷅ ）"));
             return;
         }
         util.post("/admin/repertory/item/updateStatus", {list: data, status: 0}, res => {
@@ -1504,6 +1572,130 @@
             selections.forEach(item => {
                 message.success(`「${item.name}」已下架`);
             });
+        });
+    });
+
+    $('.item-local').click(() => {
+        let selections = table.getSelections();
+        let data = table.getSelectionIds();
+        if (data.length == 0) {
+            layer.msg(i18n("请勾选要本地化的货源 (·•᷄ࡇ•᷅ ）"));
+            return;
+        }
+
+        component.popup({
+            submit: (res, index) => {
+                res.local = 1;
+                res.markup_mode = 0;
+
+                message.success(`本地化开始执行..`);
+                const loaderIndex = layer.load(2, {shade: ['0.3', '#fff']});
+                let itemIndex = 0;
+
+                util.timer(() => {
+                    return new Promise(resolve => {
+                        const item = selections[itemIndex];
+                        itemIndex++;
+
+                        if (!item) {
+                            layer.close(loaderIndex);
+                            layer.close(index);
+                            message.success(`本地化执行完毕!`);
+                            table.refresh();
+                            resolve(false);
+                        }
+
+                        if (item.user_id > 0) {
+                            message.warning(`「${item.name}」此货源属于供货商，已跳过..`);
+                            resolve(true);
+                            return;
+                        }
+
+                        if (!item.unique_id) {
+                            message.warning(`「${item.name}」此货源已是本地货源，已跳过..`);
+                            resolve(true);
+                            return;
+                        }
+
+                        res.id = item.id;
+
+                        util.post({
+                            url: "/admin/repertory/item/save",
+                            loader: false,
+                            data: res,
+                            error: () => resolve(true),
+                            fail: () => resolve(true),
+                            done: () => {
+                                message.success(`「${item.name}」本地化成功!`);
+                                resolve(true);
+                            }
+                        });
+                    });
+                }, 1, true);
+            },
+            confirmText: util.icon("icon-xiazai") + " 立即本地化",
+            tab: [
+                {
+                    name: util.icon("icon-xiazai") + " 请选择本地发货插件",
+                    form: [
+                        {
+                            title: false,
+                            name: "custom_tips",
+                            type: "custom",
+                            complete: (form, dom) => {
+                                dom.html(`
+<div class="block-tips">
+<p>请谨慎使用此功能。使用后，所有被选中的远程商品将被本地化处理，且上游对接信息将被完全删除，系统将由本地货源插件全权接管商品管理。</p>
+</div>
+                                    `);
+
+                            }
+                        },
+                        {
+                            title: "发货插件",
+                            name: "plugin",
+                            type: "radio",
+                            placeholder: "请选择",
+                            dict: "ship",
+                            required: true,
+                            change: (popup, val) => {
+                                shipForm.forEach(form => {
+                                    popup.removeForm(form.name);
+                                });
+                                shipName = val;
+                                if (val == "" || val == null) {
+                                    return;
+                                }
+                                util.post({
+                                    url: "/admin/plugin/submit/js?name=" + val + "&js=Item.Form",
+                                    done: res => {
+                                        if (!res?.data?.code) {
+                                            return;
+                                        }
+                                        let data = eval('(' + res.data.code + ')');
+                                        if (data == "") {
+                                            return;
+                                        }
+                                        shipForm = data;
+                                        data.forEach(form => {
+                                            popup.createForm(form, "plugin", "after");
+                                        });
+                                    }
+                                });
+                            },
+                        }
+                    ]
+                }
+            ],
+            content: {
+                css: {
+                    height: "auto",
+                    overflow: "inherit"
+                }
+            },
+            autoPosition: true,
+            width: "480px",
+            maxmin: false
         });
     });
 }();

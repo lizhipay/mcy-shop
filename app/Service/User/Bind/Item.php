@@ -223,18 +223,21 @@ class Item implements \App\Service\User\Item
     /**
      * @param int $categoryId
      * @param int $itemId
-     * @param int $markupId
+     * @param int|array $markupId
      * @param User|null $user
+     * @param bool $available
      * @return void
+     * @throws JSONException
+     * @throws \ReflectionException
      * @throws \Throwable
      */
-    public function loadRepertoryItem(int $categoryId, int $itemId, int $markupId, ?User $user = null): void
+    public function loadRepertoryItem(int $categoryId, int $itemId, int|array $markupId, ?User $user = null, bool $available = false): void
     {
-        if (!ItemMarkupTemplate::query()->where("id", $markupId)->exists()) {
+        if (is_int($markupId) && !ItemMarkupTemplate::query()->where("id", $markupId)->exists()) {
             throw new JSONException("同步模版配置不存在");
         }
 
-        $data = Db::transaction(function () use ($categoryId, $user, $itemId, $markupId) {
+        $data = Db::transaction(function () use ($available, $categoryId, $user, $itemId, $markupId) {
             /**
              * @var RepertoryItem $repertoryItem
              */
@@ -244,7 +247,7 @@ class Item implements \App\Service\User\Item
                 throw new JSONException("未找到对应的货物(ID:{$itemId})");
             }
 
-            if ($repertoryItem->status != 2) {
+            if (is_int($markupId) && $repertoryItem->status != 2) {
                 throw new JSONException("「{$repertoryItem->name} 」未上架，无法导入");
             }
 
@@ -264,11 +267,12 @@ class Item implements \App\Service\User\Item
             $item->picture_url = $repertoryItem->picture_url;
             $item->picture_thumb_url = $repertoryItem->picture_thumb_url;
             $item->attr = $repertoryItem->attr;
-            $item->status = 0;
+            $item->status = $available ? 1 : 0;
             $item->create_time = $now;
             $item->sort = 0;
-            $item->markup_mode = 1;
-            $item->markup_template_id = $markupId;
+            $item->markup_mode = is_int($markupId) ? 1 : 0;
+            is_int($markupId) && $item->markup_template_id = $markupId;
+            is_array($markupId) && $item->markup = $markupId;
             $item->save();
 
             # add sku
@@ -329,6 +333,7 @@ class Item implements \App\Service\User\Item
      * @param Model $item
      * @param RepertoryItem $repertoryItem
      * @return void
+     * @throws \ReflectionException
      */
     public function syncRepertoryItem(Model $item, RepertoryItem $repertoryItem): void
     {
@@ -360,6 +365,9 @@ class Item implements \App\Service\User\Item
         }
 
         $item->save();
+
+        $keepDecimals = (int)$markup->keepDecimals;
+
 
         /**
          * 检测sku
@@ -404,7 +412,7 @@ class Item implements \App\Service\User\Item
             }
 
             if ($markup->syncAmount) {
-                $itemSku->price = (new Decimal($touristPrice, 6))->mul($markup->percentage)->add($touristPrice)->getAmount(6);
+                $itemSku->price = (new Decimal($touristPrice, $keepDecimals))->mul($markup->percentage)->add($touristPrice)->getAmount($keepDecimals);
             }
             $itemSku->stock_price = $stockPrice;
             $itemSku->save();
@@ -421,7 +429,7 @@ class Item implements \App\Service\User\Item
              */
             foreach ($itemSkuLevels as $itemSkuLevel) {
                 if ($oldStockPrice != $stockPrice && $markup->syncAmount) {
-                    $itemSkuLevel->price = (new Decimal((string)$itemSkuLevel->price, 6))->div($oldStockPrice)->mul($stockPrice)->getAmount(6);
+                    $itemSkuLevel->price = (new Decimal((string)$itemSkuLevel->price, $keepDecimals))->div($oldStockPrice)->mul($stockPrice)->getAmount($keepDecimals);
                     $itemSkuLevel->save();
                 }
             }
@@ -438,7 +446,7 @@ class Item implements \App\Service\User\Item
              */
             foreach ($itemSkuUsers as $itemSkuUser) {
                 if ($oldStockPrice != $stockPrice && $markup->syncAmount) {
-                    $itemSkuUser->price = (new Decimal((string)$itemSkuUser->price, 6))->div($oldStockPrice)->mul($stockPrice)->getAmount(6);
+                    $itemSkuUser->price = (new Decimal((string)$itemSkuUser->price, $keepDecimals))->div($oldStockPrice)->mul($stockPrice)->getAmount($keepDecimals);
                     $itemSkuUser->save();
                 }
             }
@@ -480,7 +488,7 @@ class Item implements \App\Service\User\Item
 
                 $itemSkuWholesale->quantity = $wholesale->quantity;
                 if ($markup->syncAmount) {
-                    $itemSkuWholesale->price = (new Decimal($stockPrice, 6))->mul($markup->percentage)->add($stockPrice)->getAmount(6);  //进货价，这里要适当的通过规则进行自动加价
+                    $itemSkuWholesale->price = (new Decimal($stockPrice, $keepDecimals))->mul($markup->percentage)->add($stockPrice)->getAmount($keepDecimals);  //进货价，这里要适当的通过规则进行自动加价
                 }
                 $itemSkuWholesale->save();
             }
@@ -490,6 +498,7 @@ class Item implements \App\Service\User\Item
     /**
      * @param int $itemId
      * @return void
+     * @throws \ReflectionException
      */
     public function syncRepertoryItems(int $itemId): void
     {
@@ -540,15 +549,24 @@ class Item implements \App\Service\User\Item
                 $markupEntity->setSyncPicture((bool)$template->sync_picture);
                 $markupEntity->setSyncSkuName((bool)$template->sync_sku_name);
                 $markupEntity->setSyncSkuPicture((bool)$template->sync_sku_picture);
+                $markupEntity->setKeepDecimals((string)$template->keep_decimals);
+
+                if ($template->sync_amount != 1) {
+                    $markupEntity->setPercentage("0");
+                    return $markupEntity;
+                }
+
+
                 if ($template->drift_model == 0) {
                     $markupEntity->setPercentage((string)$template->drift_value);
+                    return $markupEntity;
+                }
+
+                if ($template->drift_value > 0) {
+                    $decimal = new Decimal((string)$template->drift_value, 6);
+                    $markupEntity->setPercentage($decimal->div($template->drift_base_amount)->getAmount(6));
                 } else {
-                    if ($template->drift_value > 0) {
-                        $decimal = new Decimal((string)$template->drift_value, 6);
-                        $markupEntity->setPercentage($decimal->div($template->drift_base_amount)->getAmount(6));
-                    } else {
-                        $markupEntity->setPercentage("0");
-                    }
+                    $markupEntity->setPercentage("0");
                 }
             }
         } else {
@@ -558,15 +576,23 @@ class Item implements \App\Service\User\Item
             $markupEntity->setSyncPicture((bool)$markup['sync_picture']);
             $markupEntity->setSyncSkuName((bool)$markup['sync_sku_name']);
             $markupEntity->setSyncSkuPicture((bool)$markup['sync_sku_picture']);
+            $markupEntity->setKeepDecimals(isset($markup['keep_decimals']) ? (string)$markup['keep_decimals'] : "2");
+
+            if ($markup['sync_amount'] != 1) {
+                $markupEntity->setPercentage("0");
+                return $markupEntity;
+            }
+
             if ($markup['drift_model'] == 0) {
                 $markupEntity->setPercentage((string)$markup['drift_value']);
+                return $markupEntity;
+            }
+
+            if ($markup['drift_value'] > 0) {
+                $decimal = new Decimal((string)$markup['drift_value'], 6);
+                $markupEntity->setPercentage($decimal->div((string)$markup['drift_base_amount'])->getAmount());
             } else {
-                if ($markup['drift_value'] > 0) {
-                    $decimal = new Decimal((string)$markup['drift_value'], 6);
-                    $markupEntity->setPercentage($decimal->div((string)$markup['drift_base_amount'])->getAmount());
-                } else {
-                    $markupEntity->setPercentage("0");
-                }
+                $markupEntity->setPercentage("0");
             }
         }
 
@@ -596,6 +622,7 @@ class Item implements \App\Service\User\Item
     /**
      * @param int $markupTemplateId
      * @return void
+     * @throws \ReflectionException
      */
     public function syncRepertoryItemForMarkupTemplate(int $markupTemplateId): void
     {
