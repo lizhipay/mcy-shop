@@ -45,7 +45,7 @@ class Supply implements \App\Service\User\Supply
         }
 
         if ($item->status != 2) {
-            throw new JSONException("商品不可用");
+            throw new JSONException("商品不可用#0");
         }
 
         $repertoryItem = new \App\Entity\Repertory\RepertoryItem($item);
@@ -61,10 +61,17 @@ class Supply implements \App\Service\User\Supply
             $repertoryItemSku->setStock($this->ship->stock($b->id));
             $repertoryItemSku->setWholesale($this->sku->getWholesale($customer, $b->id));
             $repertoryItemSku->haveWholesale === true && $repertoryItem->setHaveWholesale(true);
-            $skus[] = $repertoryItemSku;
-        }
-        $repertoryItem->setSkus($skus);
 
+            if ($this->sku->isDisplay($b, $customer)) {
+                $skus[] = $repertoryItemSku;
+            }
+        }
+
+        if (count($skus) == 0) {
+            throw new JSONException("商品不可用#1");
+        }
+
+        $repertoryItem->setSkus($skus);
         return $repertoryItem;
     }
 }

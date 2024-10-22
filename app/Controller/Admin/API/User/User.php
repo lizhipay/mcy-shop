@@ -132,22 +132,33 @@ class User extends Base
     public function save(): Response
     {
         $post = $this->request->post();
-
         $save = new Save(Model::class);
-        $save->disableAddable();
         $save->setMap($post, ['username', 'email', 'avatar', 'status', 'note', 'group_id', 'level_id', 'withdraw_amount']);
         try {
-
             //重置密码
-            if (isset($post['id']) && isset($post['password']) && $post['password'] != "" && $post['id'] > 0) {
-                /**
-                 * @var Model $user
-                 */
-                $user = Model::query()->find($post['id']);
-                $save->addForceMap("password", Str::generatePassword($post['password'], $user?->salt));
+            if (isset($post['password']) && $post['password'] != "") {
+
+                if (isset($post['id'])) {
+                    /**
+                     * @var Model $user
+                     */
+                    $user = Model::query()->find($post['id']);
+                    $save->addForceMap("password", Str::generatePassword($post['password'], $user?->salt));
+                } else {
+                    $salt = Str::generateRandStr();
+                    $save->addForceMap("salt", $salt);
+                    $save->addForceMap("password", Str::generatePassword($post['password'], $salt));
+                    $save->addForceMap("api_code", strtoupper(Str::generateRandStr(6)));
+                    $save->addForceMap("app_key", strtoupper(Str::generateRandStr(16)));
+                }
             }
 
-            $this->query->save($save);
+            $model = $this->query->save($save);
+
+            if (!isset($post['id'])) {
+                //创建生涯
+                $this->lifetime->create($model->id, "127.0.0.1", 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36');
+            }
         } catch (\Exception $exception) {
             throw new JSONException("保存失败，错误：" . $exception->getMessage());
         }

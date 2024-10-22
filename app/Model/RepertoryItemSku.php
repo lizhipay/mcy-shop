@@ -28,6 +28,7 @@ use Kernel\Log\Log;
  * @property int $market_control_only_num
  * @property float $cost
  * @property int $sort
+ * @property int $private_display
  * @property string $create_time
  * @property string $temp_id
  * @property string $plugin_data
@@ -55,7 +56,7 @@ class RepertoryItemSku extends Model
     /**
      * @var array
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'market_control_only_num' => 'integer', 'market_control_max_num' => 'integer', 'market_control_min_num' => 'integer', 'repertory_item_id' => 'integer', 'market_control_status' => 'integer', 'sort' => 'integer', 'version' => 'json'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'market_control_only_num' => 'integer', 'private_display' => 'integer', 'market_control_max_num' => 'integer', 'market_control_min_num' => 'integer', 'repertory_item_id' => 'integer', 'market_control_status' => 'integer', 'sort' => 'integer', 'version' => 'json'];
 
 
     #[Inject]

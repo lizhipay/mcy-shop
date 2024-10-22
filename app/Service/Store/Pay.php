@@ -15,4 +15,12 @@ interface Pay
      * @return array
      */
     public function getList(Authentication $authentication, int $equipment = 1): array;
+
+
+    /**
+     * @param Authentication $authentication
+     * @param string $tradeNo
+     * @return array
+     */
+    public function getPayOrder(Authentication $authentication, string $tradeNo): array;
 }

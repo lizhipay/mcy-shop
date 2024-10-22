@@ -4,7 +4,11 @@ declare (strict_types=1);
 namespace Kernel\Context\Abstract;
 
 
+use App\Service\Common\Config;
+use Kernel\Container\Di;
+use Kernel\Context\App;
 use Kernel\Util\Arr;
+use Kernel\Util\Ip;
 use Kernel\Waf\Filter;
 use Kernel\Waf\Firewall;
 
@@ -181,10 +185,14 @@ abstract class Request implements \Kernel\Context\Interface\Request
 
 
     /**
+     * @param bool $secure
      * @return string
      */
-    public function clientIp(): string
+    public function clientIp(bool $secure = true): string
     {
+        if ($secure && ($ip = Ip::get($this))) {
+            return $ip;
+        }
         return $this->clientIp;
     }
 
@@ -200,9 +208,13 @@ abstract class Request implements \Kernel\Context\Interface\Request
 
     /**
      * @return string
+     * @throws \ReflectionException
      */
     public function url(): string
     {
+        if (App::$install && Di::inst()->make(Config::class)?->getMainConfig("site.is_https") == 1) {
+            return "https://{$this->domain}";
+        }
         return $this->url;
     }
 

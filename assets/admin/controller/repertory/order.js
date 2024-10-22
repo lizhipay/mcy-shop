@@ -204,6 +204,7 @@
             hide: true
         },
         {title: "系统/物品/商家订单号", name: "trade_no", type: "input", width: 220},
+        {title: "模糊搜索控件内容(较慢)", name: "search-widget", type: "input", width: 220},
         {title: "商家", name: "equal-customer_id", type: "remoteSelect", dict: "user?type=2"},
         {title: "交易时间", name: "between-trade_time", type: "date"}
     ]);

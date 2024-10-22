@@ -80,7 +80,7 @@
                                 name: "session_expire",
                                 type: "number",
                                 placeholder: "请输入会话过期时间",
-                                tips: "该时间控制用户登录的SESSION存活时间"
+                                tips: "该时间控制用户登录的SESSION存活时间，不能大于：31536000"
                             },
                             {
                                 title: "强制登录",
@@ -90,16 +90,17 @@
                                 tips: "用户必须登录才能访问网站"
                             },
                             {
-                                title: "IP归属地",
-                                name: "is_get_location",
+                                title: "HTTPS",
+                                name: "is_https",
                                 type: "switch",
                                 placeholder: "启用|关闭",
-                                tips: "此功能开启后，IP地址会自动获取归属地并且显示，但由于API是免费的，无法保证稳定性，追求稳定性建议到【应用商店】安装IP归属地相关插件"
+                                tips: "您的网站是否支持HTTPS，如果支持，请务必勾选此选项"
                             },
                             {
                                 title: "备案号",
                                 name: "icp",
-                                type: "input",
+                                type: "textarea",
+                                height: 38,
                                 placeholder: "ICP备案号"
                             }
                         ]

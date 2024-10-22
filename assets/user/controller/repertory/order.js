@@ -9,10 +9,15 @@
             }
         },
         {
-            field: 'amount', title: '订单金额', formatter: function (amount) {
+            field: 'amount', title: '订单金额', formatter: function (amount, item) {
                 if (amount == 0) {
                     return '-';
                 }
+
+                if (item.is_self_operated === true) {
+                    return format.money(amount, "#45bf77") + `(${format.color("自营税" , "red")})`;
+                }
+
                 return format.money(amount, "#45bf77");
             }
         },
@@ -61,6 +66,7 @@
     ]);
     table.setSearch([
         {title: "订单号", name: "equal-main_trade_no", type: "input", width: 220},
+        {title: "模糊搜索控件内容(较慢)", name: "search-widget", type: "input", width: 220},
         {
             title: "选择商品",
             name: "equal-repertory_item_id",

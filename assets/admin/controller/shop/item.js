@@ -138,7 +138,8 @@
                                     title: '私密模式',
                                     class: "nowrap",
                                     type: 'switch',
-                                    text: "ON|OFF"
+                                    text: "ON|OFF",
+                                    reload: true
                                 },
                                 {
                                     field: 'wholesale',
@@ -250,7 +251,7 @@
                             {id: 2, name: "同步仓库"}
                         ],
                         required: true,
-                        tips: "不同步：完全由本地自定义价格\n同步仓库并加价：根据仓库的商品价格实时控制盈亏\n同步仓库：仓库是什么价格，本地商品就是什么价格".replaceAll("\n" , "<br>"),
+                        tips: "不同步：完全由本地自定义价格\n同步仓库并加价：根据仓库的商品价格实时控制盈亏\n同步仓库：仓库是什么价格，本地商品就是什么价格".replaceAll("\n", "<br>"),
                         change: (from, val) => {
                             val = parseInt(val);
                             switch (val) {

@@ -13,6 +13,7 @@ class User extends Base
 {
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function index(): Response
     {
@@ -22,6 +23,7 @@ class User extends Base
 
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function bill(): Response
     {
@@ -31,6 +33,7 @@ class User extends Base
 
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function level(): Response
     {
@@ -39,6 +42,7 @@ class User extends Base
 
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function group(): Response
     {
@@ -48,6 +52,7 @@ class User extends Base
 
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function identity(): Response
     {
@@ -56,6 +61,7 @@ class User extends Base
 
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function withdraw(): Response
     {
@@ -64,6 +70,7 @@ class User extends Base
 
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function site(): Response
     {

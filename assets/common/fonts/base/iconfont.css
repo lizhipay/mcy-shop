@@ -2,9 +2,9 @@
   font-family: "mcy-icon"; /* Project id 4117455 */
   /* Color fonts */
   src: 
-       url('iconfont.woff2?t=1728202131269') format('woff2'),
-       url('iconfont.woff?t=1728202131269') format('woff'),
-       url('iconfont.ttf?t=1728202131269') format('truetype');
+       url('iconfont.woff2?t=1729594342185') format('woff2'),
+       url('iconfont.woff?t=1729594342185') format('woff'),
+       url('iconfont.ttf?t=1729594342185') format('truetype');
 }
 
 .mcy-icon {
@@ -13,6 +13,18 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-css:before {
+  content: "\e68a";
+}
+
+.icon-js:before {
+  content: "\e68b";
+}
+
+.icon-shouyintai-copy:before {
+  content: "\e686";
 }
 
 .icon-change:before {

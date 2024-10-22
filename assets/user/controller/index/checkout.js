@@ -1,10 +1,27 @@
 !function () {
-    let payId = 0, isBalance = false;
-
+    let payId = 0, isBalance = false, payUrl = localStorage.getItem(`pay_${util.getParam("tradeNo")}`);
 
     function initPay() {
         let tradeNo = util.getParam("tradeNo");
         pay.getPayOrder(tradeNo, order => {
+            pay.timer(tradeNo, () => {
+                setTimeout(() => {
+                    window.location.href = "/pay/sync." + tradeNo;
+                }, 500);
+            }, () => {
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 500);
+            }, () => {
+                window.location.href = "/";
+            });
+
+            pay.expire(order.timeout, time => {
+                $payTitle.find(".hour").html(time.hour + i18n("时"));
+                $payTitle.find(".minute").html(time.minute + i18n("分"));
+                $payTitle.find(".second").html(time.second + i18n("秒"));
+            });
+
             if ([3, 4, 5].includes(order.render_mode)) {
                 $renderLoading.hide();
                 $payIcon.show();
@@ -17,14 +34,16 @@
                     text: order.pay_url
                 });
                 $renderPay.find(".block-header").show();
-                pay.timer(tradeNo);
-                pay.expire(order.timeout, time => {
-                    $payTitle.find(".hour").html(time.hour + i18n("时"));
-                    $payTitle.find(".minute").html(time.minute + i18n("分"));
-                    $payTitle.find(".second").html(time.second + i18n("秒"));
-                });
             } else {
-                window.location.href = order.pay_url;
+                $renderPay.find(`.card-body`).html(`<button type="button" class="btn btn-primary me-1 mb-1 continue-payment"><i class="fa fa-upload opacity-50 me-1"></i> 继续付款</button>`);
+                //jump url
+                // window.location.href = order.pay_url;
+                !payUrl && (payUrl = order.pay_url);
+                util.openCheckoutWindowUrl(payUrl);
+
+                $(`.continue-payment`).click(() => {
+                    util.openCheckoutWindowUrl(payUrl);
+                });
             }
             switch (order.render_mode) {
                 case 3: //支付宝
@@ -45,6 +64,8 @@
                     break;
             }
         });
+
+
     }
 
     const $payItem = $('.pay-container .online-pay');
@@ -100,7 +121,8 @@
 
     $btnPay.click(function () {
         util.post("/pay", {trade_no: util.getParam("tradeNo"), method: payId, balance: isBalance ? 1 : 0}, res => {
-            window.location.href = res.data.pay_url;
+            localStorage.setItem(`pay_${util.getParam("tradeNo")}`, res.data.pay_url);
+            window.location.reload();
         });
     });
 

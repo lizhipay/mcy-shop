@@ -21,6 +21,13 @@ interface RepertoryItemSku
 
 
     /**
+     * @param int|\App\Model\RepertoryItemSku $skuModel
+     * @param int|User $userModel
+     * @return bool
+     */
+    public function isDisplay(int|\App\Model\RepertoryItemSku $skuModel, int|User $userModel): bool;
+
+    /**
      * @param string $price
      * @param int $repertoryItemSkuId
      * @param int $userId

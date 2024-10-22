@@ -1,6 +1,4 @@
 const pay = new class Pay {
-
-
     getPayOrder(tradeNo, done = null) {
         util.post({
             url: "/pay/getOrder",
@@ -12,42 +10,39 @@ const pay = new class Pay {
                 const order = res.data;
                 typeof done === "function" && done(order);
             },
-            error: error => {
+            error: () => {
                 window.location.href = "/";
             }
         });
     }
 
-    timer(tradeNo) {
-        let timer = 0;
-        let callback = () => {
-            this.getPayOrder(tradeNo, order => {
-                if (order.status === 2) {
-                    if (new Date() > new Date(order.timeout)) {
-                        //超时
-                        message.error("订单支付超时");
-                        setTimeout(() => {
-                            window.location.href = "/";
-                        }, 500);
-                        clearInterval(timer);
+    timer(tradeNo, done, timeout, error) {
+        util.timer(() => {
+            return new Promise(resolve => {
+                this.getPayOrder(tradeNo, order => {
+                    if (order.status === 2) {
+                        if (new Date() > new Date(order.timeout)) {
+                            //超时
+                            message.error("订单支付超时");
+                            typeof timeout == "function" && timeout();
+                            resolve(false);
+                            return;
+                        }
+                        message.alert("支付成功", "success");
+                        //支付成功
+                        typeof done == "function" && done();
+                        resolve(false);
+                        return;
+                    } else if (order.status === 3) {
+                        typeof error == "function" && error();
+                        resolve(false);
                         return;
                     }
-                    message.alert("支付成功", "success");
-                    //支付成功
-                    setTimeout(() => {
-                        window.location.href = "/pay/sync." + tradeNo;
-                    }, 500);
-                    clearInterval(timer);
-                } else if (order.status === 3) {
-                    window.location.href = "/";
-                    clearInterval(timer);
-                }
+
+                    resolve(true);
+                });
             });
-        }
-        callback();
-        timer = setInterval(() => {
-            callback();
-        }, 1500);
+        }, 2000);
     }
 
     expire(timeout, done = null) {
@@ -199,7 +194,22 @@ const pay = new class Pay {
     payment(payMethod, isBalance, tradeNo) {
         //拉起支付
         util.post("/pay", {trade_no: tradeNo, method: payMethod, balance: isBalance ? 1 : 0}, result => {
-            window.location.href = result.data.pay_url; //跳转到支付页面
+            // window.location.href = result.data.pay_url; //跳转到支付页面
+            /*  util.openCheckoutWindowUrl(result.data.pay_url);
+              pay.timer(tradeNo, () => {
+                  setTimeout(() => {
+                      window.location.reload();
+                  }, 500);
+              }, () => {
+                  setTimeout(() => {
+                      window.location.reload();
+                  }, 500);
+              }, () => {
+                  window.location.reload();
+              });*/
+
+            localStorage.setItem(`pay_${tradeNo}`, result?.data?.pay_url);
+            window.location.href = `/checkout?tradeNo=${tradeNo}`;
         });
     }
 }

@@ -11,6 +11,7 @@ Route::add("/owner", [\App\Controller\Index::class, "owner"], "POST");
 
 Route::add("/admin", [\App\Controller\Admin\Auth::class, "login"], "GET");
 Route::add("/admin", [\App\Controller\Admin\API\Auth::class, "login"], "POST");
+Route::add("/admin/auth/secure/tunnel", [\App\Controller\Admin\API\Auth::class, "getSecureTunnel"], "POST");
 
 Route::add("/admin/dashboard", [\App\Controller\Admin\Main\Dashboard::class, "index"], "GET");
 Route::add("/admin/dashboard/statistics", [\App\Controller\Admin\API\Main\Dashboard::class, "statistics"], "POST");
@@ -227,6 +228,7 @@ Route::add("/admin/store/plugin/version/list", [\App\Controller\Admin\API\Store\
 Route::add("/admin/store/plugin/version/update", [\App\Controller\Admin\API\Store\Store::class, "pluginUpdate"], "POST");
 #应用商店支付
 Route::add("/admin/store/pay/list", [\App\Controller\Admin\API\Store\Pay::class, "getList"], "POST");
+Route::add("/admin/store/pay/order", [\App\Controller\Admin\API\Store\Pay::class, "getPayOrder"], "POST");
 
 #开发者中心
 Route::add("/admin/store/developer", [\App\Controller\Admin\Store\Store::class, "developer"], "GET");
@@ -640,6 +642,7 @@ Route::add("/user/store/plugin/version/list", [\App\Controller\User\API\Store\St
 Route::add("/user/store/plugin/version/update", [\App\Controller\User\API\Store\Store::class, "pluginUpdate"], "POST");
 
 Route::add("/user/store/pay/list", [\App\Controller\User\API\Store\Pay::class, "getList"], "POST");
+Route::add("/user/store/pay/order", [\App\Controller\User\API\Store\Pay::class, "getPayOrder"], "POST");
 
 #个人资料
 Route::add("/user/store/personal/info", [\App\Controller\User\API\Store\Personal::class, "info"], "POST");

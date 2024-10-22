@@ -12,6 +12,7 @@ use App\Interceptor\User;
 use App\Interceptor\Waf;
 use App\Model\RepertoryItem;
 use App\Service\Common\Query;
+use App\Service\Common\RepertoryItemSku;
 use App\Service\Common\RepertoryOrder;
 use App\Service\User\Ownership;
 use App\Validator\Common;
@@ -46,6 +47,10 @@ class Supply extends Base
     #[Inject]
     private Ownership $ownership;
 
+
+    #[Inject]
+    private RepertoryItemSku $repertoryItemSku;
+
     /**
      * 货源
      * @return Response
@@ -77,7 +82,8 @@ class Supply extends Base
                     "stock_price",
                     "market_control_status",
                     "market_control_min_price",
-                    "market_control_max_price"
+                    "market_control_max_price",
+                    "private_display"
                 ]);
             }, "category" => function (HasOne $hasOne) {
                 $hasOne->select(['id', "name", "icon"]);
@@ -102,9 +108,21 @@ class Supply extends Base
 
         foreach ($data->items() as $a => $b) {
             foreach ($b->sku as $c => $d) {
+                if (!$this->repertoryItemSku->isDisplay($d, $this->getUser())) {
+                    unset($arr['data'][$a]["sku"][$c]);
+                    continue;
+                }
                 $arr['data'][$a]["sku"][$c]["stock_price"] = Str::getAmountStr($this->order->getAmount($this->getUser(), $d, 1));
             }
+
+            if (count($arr['data'][$a]["sku"]) > 0) {
+                $arr['data'][$a]["sku"] = array_values($arr['data'][$a]["sku"]);
+            } else {
+                unset($arr['data'][$a]); //隐藏整个商品
+            }
         }
+
+        $arr['data'] = array_values($arr['data']);
 
         return $this->json(data: ["list" => $arr['data'], "total" => $arr['total']]);
     }

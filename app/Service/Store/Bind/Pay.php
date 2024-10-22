@@ -31,4 +31,21 @@ class Pay implements \App\Service\Store\Pay
         }
         return ["list" => $http->data, "balance" => $http->origin['balance']];
     }
+
+    /**
+     * @param Authentication $authentication
+     * @param string $tradeNo
+     * @return array
+     * @throws ServiceException
+     */
+    public function getPayOrder(Authentication $authentication, string $tradeNo): array
+    {
+        $http = $this->http->request("/pay/order", [
+            "trade_no" => $tradeNo
+        ], $authentication);
+        if ($http->code != 200) {
+            throw new ServiceException($http->message ?? "获取支付订单状态失败");
+        }
+        return $http->data;
+    }
 }

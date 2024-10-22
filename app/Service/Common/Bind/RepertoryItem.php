@@ -373,9 +373,18 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
 
         $item = $foreignShip->getItem($repertoryItem->unique_id, json_decode((string)$repertoryItem->plugin_data, true) ?: []);
 
-        //如果对方不存在当前商品，直接移除本地商品
+        //如果对方不存在当前商品
         if (!$item) {
-            $repertoryItem->delete();
+            $repertoryItem->exception_total = $repertoryItem->exception_total + 1;
+
+            //异常总数大于 6 次，将商品拉入审核中
+            if ($repertoryItem->exception_total > 6) {
+                $repertoryItem->status = 0;
+                $repertoryItem->exception_total = 0;
+            }
+
+            $repertoryItem->save();
+            return;
         }
 
         if (empty($repertoryItem->version) || !is_array($repertoryItem->version)) {
@@ -428,6 +437,7 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
 
         $repertoryItem->version = $item->versions;
         $repertoryItem->update_time = Date::current();
+        $repertoryItem->exception_total = 0;
         $repertoryItem->save();
 
         #4 SKU同步

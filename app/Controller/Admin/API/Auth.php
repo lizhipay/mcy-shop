@@ -11,9 +11,11 @@ use Kernel\Annotation\Inject;
 use Kernel\Annotation\Interceptor;
 use Kernel\Context\App;
 use Kernel\Context\Interface\Response;
+use Kernel\Exception\RuntimeException;
 use Kernel\Plugin\Const\Plugin as PGI;
 use Kernel\Plugin\Const\Point;
 use Kernel\Plugin\Plugin;
+use Kernel\Util\Ip;
 
 
 #[Interceptor(class: [PostDecrypt::class, Waf::class], type: Interceptor::API)]
@@ -33,5 +35,22 @@ class Auth extends Base
         if ($hook instanceof Response) return $hook;
 
         return $this->manage->login($this->request, $this->response);
+    }
+
+
+    /**
+     * @return Response
+     */
+    public function getSecureTunnel(): Response
+    {
+        $address = [];
+        $clientIp = $this->request->clientIp(false);
+        $address[] = ["ip" => $clientIp, "mode" => 0, "risk" => $clientIp == "127.0.0.1"];
+        for ($i = 0; $i < 8; $i++) {
+            $clientIp = $this->request->header(Ip::IP_PROTOCOL_HEADER[$i]);
+            $clientIp = $clientIp ? trim(explode(',', $clientIp)[0] ?? "") : "127.0.0.1";
+            $address[] = ["ip" => $clientIp, "mode" => $i, "risk" => $clientIp == "127.0.0.1"];
+        }
+        return $this->response->json(data: $address);
     }
 }

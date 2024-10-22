@@ -7,12 +7,13 @@ use App\Interceptor\Visitor;
 use App\Interceptor\Waf;
 use App\Service\User\Cart;
 use App\Service\User\Category;
+use App\Service\User\Item;
 use App\Service\User\Order;
+use App\Service\User\Pay;
 use App\Validator\Common;
 use Kernel\Annotation\Inject;
 use Kernel\Annotation\Interceptor;
 use Kernel\Annotation\Validator;
-use Kernel\Context\App;
 use Kernel\Context\Interface\Response;
 use Kernel\Exception\JSONException;
 use Kernel\Exception\NotFoundException;
@@ -29,13 +30,13 @@ class Index extends Base
     private Category $category;
 
     #[Inject]
-    private \App\Service\User\Item $item;
+    private Item $item;
 
     #[Inject]
     private Order $order;
 
     #[Inject]
-    private \App\Service\User\Pay $pay;
+    private Pay $pay;
 
 
     #[Inject]

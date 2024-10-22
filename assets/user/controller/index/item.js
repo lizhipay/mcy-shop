@@ -340,4 +340,22 @@
 
 
     updateItemAmount(getPrice($skuId.val(), $quantity.val()), $quantity.val());//初始化金额
+
+
+    $itemImageMain.on('click', function () {
+        let originalHeight = $(this).css('height');
+        if ($(this).data('isExpanded')) {
+            // 如果已经展开，收回去
+            $(this).animate({height: $(this).data('originalHeight')}, 150);
+            $(this).data('isExpanded', false);
+        } else {
+            // 记录原高度并展开
+            $(this).data('originalHeight', originalHeight);
+            $(this).css('height', 'auto');
+            let newHeight = $(this).height();
+            $(this).css('height', originalHeight);
+            $(this).animate({height: newHeight}, 150);
+            $(this).data('isExpanded', true);
+        }
+    });
 }();

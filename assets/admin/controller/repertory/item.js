@@ -295,6 +295,14 @@
                                     ]
                                 },
                                 {
+                                    field: 'private_display',
+                                    title: '私密模式',
+                                    class: "nowrap",
+                                    type: 'switch',
+                                    text: "ON|OFF",
+                                    reload: true
+                                },
+                                {
                                     field: 'operation',
                                     title: '操作',
                                     class: "nowrap",
@@ -573,7 +581,7 @@
                     overflow: "inherit"
                 }
             },
-            width: "1000px",
+            width: "1100px",
             done: () => {
                 table.refresh();
             }
@@ -657,6 +665,12 @@
                         default: 0,
                         tips: "数值越小，商品排名越靠前"
                     },
+                    {
+                        title: "私密",
+                        name: "private_display",
+                        type: "switch",
+                        tips: "启用私密模式后，只有设置过独立显示的【商家权限组】或【分站】才可以看到该SKU，如该货源没有任何SKU可以购买，货源则会完全隐藏。"
+                    }
                 ]
             },
             {

@@ -108,6 +108,7 @@
         });
     }
 
+
     const topUp = () => {
         component.popup({
             submit: false,
@@ -176,7 +177,9 @@
                                             }
 
                                             util.post("/user/store/recharge", {pay_id: payId, amount: amount}, res => {
-                                                window.location.href = res.data.pay_url;
+                                                // window.location.href = res.data.pay_url;
+                                                util.openCheckoutWindowUrl(res.data.pay_url);
+                                                util.syncOrder("/user/store/pay/order", res.data.trade_no);
                                             });
                                         });
                                     }
@@ -191,6 +194,7 @@
             assign: {}
         });
     }
+
 
     const billModal = (item = {}, subscriptionId = 0, success = null) => {
         let billModalIndex = 0;
@@ -277,7 +281,9 @@
                                                 typeof success == "function" && success();
                                                 updateBalance();
                                             } else {
-                                                window.location.href = res.data.pay_url;
+                                                // window.location.href = res.data.pay_url;
+                                                util.openCheckoutWindowUrl(res.data.pay_url);
+                                                util.syncOrder("/user/store/pay/order", res.data.trade_no);
                                             }
                                         });
                                     });

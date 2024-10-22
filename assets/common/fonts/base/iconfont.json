@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "17810983",
+      "name": "css",
+      "font_class": "css",
+      "unicode": "e68a",
+      "unicode_decimal": 59018
+    },
+    {
+      "icon_id": "17811016",
+      "name": "js",
+      "font_class": "js",
+      "unicode": "e68b",
+      "unicode_decimal": 59019
+    },
+    {
+      "icon_id": "30025350",
+      "name": "收银台",
+      "font_class": "shouyintai-copy",
+      "unicode": "e686",
+      "unicode_decimal": 59014
+    },
+    {
       "icon_id": "39546455",
       "name": "更换",
       "font_class": "change",

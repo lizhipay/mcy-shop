@@ -7,9 +7,7 @@
         <div class="row fs-sm">
             <div class="col-sm-6 order-sm-2 py-1 text-center text-sm-end">
                 {% if site.icp != "" %}
-                    <a class="text-gray-dark" href="https://beian.miit.gov.cn/">{{ site.icp }}</a>
-                {% else %}
-                    Crafted with <i class="fa fa-heart text-danger"></i> by <span class="fw-semibold text-success">lizhipay</span>
+                    <a class="text-gray-dark" href="https://beian.miit.gov.cn/">{{ site.icp|raw }}</a>
                 {% endif %}
             </div>
             <div class="col-sm-6 order-sm-1 py-1 text-center text-sm-start">

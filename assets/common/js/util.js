@@ -723,4 +723,58 @@ const util = new class Util {
             });
         }, 2000);
     }
+
+
+    openCheckoutWindowUrl(url) {
+        layer.open({
+            type: 2,
+            title: util.icon("icon-shouyintai-copy") + " 收银台",
+            shadeClose: false,
+            maxmin: util.isPc(),
+            area: util.isPc() ? ['80%', '80%'] : ['100%', '100%'],
+            content: url
+        });
+    }
+
+
+    syncOrder(url, tradeNo) {
+        util.timer(() => {
+            return new Promise(resolve => {
+                util.post({
+                    url: url,
+                    loader: false,
+                    data: {trade_no: tradeNo},
+                    done: res => {
+                        if (res.data.status === 2) {
+                            if (new Date() > new Date(res.data.timeout)) {
+                                //超时
+                                message.error("订单支付超时");
+                                window.location.reload();
+                                resolve(false);
+                                return;
+                            }
+                            message.alert("支付已完成，已经授权成功！", "success");
+                            //支付成功
+                            window.location.reload();
+                            resolve(false);
+                        } else if (res.data.status === 3) {
+                            window.location.reload();
+                            resolve(false);
+                            return;
+                        }
+                        resolve(true);
+                    },
+                    error: () => {
+                        window.location.reload();
+                        resolve(false);
+                    },
+                    fail: () => {
+                        window.location.reload();
+                        resolve(false);
+                    }
+                });
+            });
+        }, 2000);
+    }
+
 }

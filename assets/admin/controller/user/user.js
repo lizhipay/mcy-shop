@@ -29,7 +29,7 @@
                             placeholder: "请输入邮箱"
                         },
                         {
-                            title: "重置登录密码",
+                            title: "设置登录密码",
                             name: "reset_password",
                             type: "switch",
                             change: (form, value) => {
@@ -304,7 +304,7 @@
     table.setFloatMessage([
         {field: 'email', title: '邮箱'},
         {field: 'app_key', title: '对接密钥'},
-        {field: 'api_code', title: '供货码'}, 
+        {field: 'api_code', title: '供货码'},
         {field: 'lifetime.total_consumption_amount', title: '总消费'},
         {field: 'lifetime.total_recharge_amount', title: '总充值'},
         {field: 'lifetime.total_referral_count', title: '总推广人数'},
@@ -347,4 +347,9 @@
         $('.data-count .user-total-balance').html(getVar("CCY") + data.user_total_balance);
     });
     table.render();
+
+
+    $(`.add-user`).click(() => {
+        modal(util.icon("icon-tianjia") + " 添加会员");
+    });
 }();

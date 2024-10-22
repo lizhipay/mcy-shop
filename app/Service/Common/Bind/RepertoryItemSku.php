@@ -105,6 +105,57 @@ class RepertoryItemSku implements \App\Service\Common\RepertoryItemSku
         return new Sku($skuModel->id, $skuModel->name, $this->order->getAmount($user, $skuModel), $sku);
     }
 
+
+    /**
+     * @param int|\App\Model\RepertoryItemSku $skuModel
+     * @param int|User $userModel
+     * @return bool
+     */
+    public function isDisplay(int|\App\Model\RepertoryItemSku $skuModel, int|User $userModel): bool
+    {
+        if (is_int($userModel)) {
+            /**
+             * @var User $userModel
+             */
+            $userModel = User::query()->find($userModel);
+            if (!$userModel) {
+                return false;
+            }
+        }
+
+
+        if (is_int($skuModel)) {
+            /**
+             * @var \App\Model\RepertoryItemSku $skuModel
+             */
+            $skuModel = \App\Model\RepertoryItemSku::query()->find($skuModel);
+            if (!$skuModel) {
+                return false;
+            }
+        }
+
+        $result = $skuModel->private_display != 1; //true
+
+        /**
+         * @var RepertoryItemSkuGroup $groupModel
+         */
+        $groupModel = RepertoryItemSkuGroup::query()->where("group_id", $userModel->group_id)->where("sku_id", $skuModel->id)->first();
+        if ($groupModel?->status == 1) {
+            $result = true;
+        }
+
+        /**
+         * @var RepertoryItemSkuUser $userSkuModel
+         */
+        $userSkuModel = RepertoryItemSkuUser::query()->where("customer_id", $userModel->id)->where("sku_id", $skuModel->id)->first();
+
+        if ($userSkuModel?->status == 1) {
+            $result = true;
+        }
+
+        return $result;
+    }
+
     /**
      * @param string $price
      * @param int $repertoryItemSkuId

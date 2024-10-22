@@ -20,7 +20,8 @@
         util.post("/user/recharge/trade", {amount: $rechargeAmount.val()}, res => {
             //拉起支付
             util.post("/pay", {trade_no: res.data.trade_no, method: payId}, result => {
-                window.location.href = result.data.pay_url;
+                localStorage.setItem(`pay_${res?.data?.trade_no}`, result?.data?.pay_url);
+                window.location.href = `/checkout?tradeNo=${res?.data?.trade_no}`;
             });
         });
     });

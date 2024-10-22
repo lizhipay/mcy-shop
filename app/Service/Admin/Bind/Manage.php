@@ -19,9 +19,11 @@ use Kernel\Plugin\Const\Point;
 use Kernel\Plugin\Plugin;
 use Kernel\Util\Context;
 use Kernel\Util\Date;
+use Kernel\Util\File;
 use Kernel\Util\Route;
 use Kernel\Util\Str;
 use Kernel\Util\Tree;
+use Kernel\Waf\Filter;
 
 class Manage implements \App\Service\Admin\Manage
 {
@@ -56,6 +58,7 @@ class Manage implements \App\Service\Admin\Manage
 
         $config = $this->config->getMainConfig("site");
 
+        $secureTunnel = min($request->post("secure_tunnel", Filter::INTEGER) ?: 0, 8);
 
         $manage->last_login_time = $manage->login_time;
         $manage->login_time = Date::current();
@@ -86,21 +89,25 @@ class Manage implements \App\Service\Admin\Manage
         if ($hook instanceof Response) return $hook;
 
         $this->loginLog->create($manage->id, $request->clientIp(), $request->header("UserAgent"));
-        Context::set(\App\Model\Manage::class, $manage);
+        Context::set(ManageModel::class, $manage);
+
+        File::write(BASE_PATH . "/runtime/secure.tunnel", (string)$secureTunnel);
+
         return $response->json(200, "success", ["token" => $jwt]);
     }
 
     /**
      * @param ManageModel $manage
      * @return array
+     * @throws \ReflectionException
      */
-    public function getMenu(\App\Model\Manage $manage): array
+    public function getMenu(ManageModel $manage): array
     {
         if (Memory::instance()->has(MEM::ADMIN_MANAGE_MENU_ROUTE)) {
             return Memory::instance()->get(MEM::ADMIN_MANAGE_MENU_ROUTE);
         }
 
-        $obj = \App\Model\Manage::with(["role" => function (Relation $relation) {
+        $obj = ManageModel::with(["role" => function (Relation $relation) {
             $relation->with(['permission' => function (Relation $relation) {
                 $relation->orderBy("rank", "asc");
             }]);
