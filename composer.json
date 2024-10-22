@@ -48,8 +48,7 @@
     "twig/twig": "3.14.0",
     "rah/danpu": "^2.7",
     "phpmailer/phpmailer": "^6.9",
-    "pear/net_dns2": "^1.5",
-    "khanamiryan/qrcode-detector-decoder": "2.0.2"
+    "pear/net_dns2": "^1.5"
   },
   "suggest": {
     "ext-openssl": "Required to use Encryption.",
