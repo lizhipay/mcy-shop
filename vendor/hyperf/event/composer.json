@@ -1,0 +1,47 @@
+{
+    "name": "hyperf/event",
+    "description": "an event manager that implements PSR-14.",
+    "license": "MIT",
+    "keywords": [
+        "php",
+        "swoole",
+        "hyperf",
+        "event"
+    ],
+    "homepage": "https://hyperf.io",
+    "support": {
+        "docs": "https://hyperf.wiki",
+        "issues": "https://github.com/hyperf/hyperf/issues",
+        "pull-request": "https://github.com/hyperf/hyperf/pulls",
+        "source": "https://github.com/hyperf/hyperf"
+    },
+    "require": {
+        "php": ">=8.0",
+        "hyperf/contract": "~3.0.0",
+        "psr/event-dispatcher": "^1.0"
+    },
+    "suggest": {
+        "hyperf/di": "Required to use annotatioins."
+    },
+    "autoload": {
+        "psr-4": {
+            "Hyperf\\Event\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HyperfTest\\Event\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.0-dev"
+        },
+        "hyperf": {
+            "config": "Hyperf\\Event\\ConfigProvider"
+        }
+    }
+}
