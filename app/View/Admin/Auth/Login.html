@@ -23,20 +23,6 @@
                                        placeholder="{{ i18n("请输入你的密码")|raw }}..">
                                 <label class="form-label" for="login-password">{{ i18n("密码")|raw }}</label>
                             </div>
-                            <div class="form-floating mb-4">
-                                <select class="form-select" id="secure-tunnel" name="secure_tunnel"
-                                        aria-label="IP安全隧道">
-                                    <option value="">正在获取中..</option>
-                                </select>
-                                <label class="form-label" for="secure-tunnel">IP安全隧道</label>
-                            </div>
-
-                            <div class="mb-4">
-                                <div class="alert alert-warning secure-tunnel-tips" role="alert">
-                                        <div class="mb-3">如果没有显示安全隧道的信任度，这可能意味着您正在使用 CDN。请自行在您自己的 CDN 设置中关闭与“屏蔽透明代理”相关的功能。</div>
-                                        <small class="mb-2 d-block text-primary">下方是您电脑的IP信息，如果不显示，请自行查询自己的电脑IP地址和上方IP安全隧道是否一致</small>
-                                </div>
-                            </div>
 
                             <div class="row" id="form-button">
                                 <div class="col-sm-6 d-sm-flex align-items-center push">
@@ -67,37 +53,6 @@
 <!-- END Page Container -->
 
 <script>
-    function handleGetSecureTunnel() {
-        const test = "127.0.0.1";
-        const $SecureTunnel = $(`#secure-tunnel`);
-        $.ajax({
-            url: "/admin/auth/secure/tunnel",
-            type: "POST",
-            headers: {
-                "Client-Ip": test,
-                "X-Forwarded-For": test,
-                "X-Forwarded": test,
-                "X-Cluster-Client-Ip": test,
-                "Forwarded-For": test,
-                "Forwarded": test,
-                "X-Real-Ip": test,
-                "Remote-Addr": test
-            },
-            success: function (res) {
-                $SecureTunnel.html(``);
-                if (res.code == 200) {
-                    res.data.forEach((item, index) => {
-                        $SecureTunnel.append(`<option ${ {{ secure_tunnel }} == index ? "selected" : "" } style="color: ${item.risk ? `red` : `green`};" value="${index}">模式(${index}) - ${item.ip} (${item.risk ? `风险较高/不可信` : `安全/可信`})</option>`);
-                    });
-                }else{
-                    $SecureTunnel.html(`<option value="0">自动获取 (风险未知/检查CDN相关功能)</option>`);
-                }
-            },
-            error: (xhr, status, error) => {
-                $SecureTunnel.html(`<option value="0">自动获取 (风险未知/检查CDN相关功能)</option>`);
-            }
-        });
-    }
 
     window.onload = function () {
         $('.button-login').click(function () {
@@ -114,10 +69,6 @@
                 $(".button-login").click();
             }
         });
-
-        handleGetSecureTunnel();
-
-        $(`.secure-tunnel-tips`).append(`<iframe scrolling="no" src="https://ip.skk.moe/simple" style="width: 100%; border: 0;height: 200px; overflow: hidden;"></iframe>`);
     }
 </script>
 

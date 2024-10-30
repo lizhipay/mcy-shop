@@ -60,13 +60,9 @@
     table.setUpdate("/admin/shop/category/save");
     table.setColumns([
         {checkbox: true},
-        {
-            field: 'user', title: '商户', formatter: format.user
-        },
-        {field: 'icon', title: '图标', type: "image", style: "border-radius:25%;"},
-        {
-            field: 'name', title: '分类名称'
-        },
+        {field: 'user', title: '商户', formatter: format.user},
+        {field: 'icon', title: '', type: "image", style: "border-radius:25%;", width: 28},
+        {field: 'name', title: '分类名称'},
         {field: 'item_all_count', title: '总商品', sort: true},
         {field: 'item_shelf_count', title: '在售', sort: true},
         {

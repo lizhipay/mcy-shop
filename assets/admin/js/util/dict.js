@@ -22,7 +22,7 @@ const _Dict = new class _Dict extends _DictUtil {
                 {id: 0, name: format.danger('未启用')},
             ],
             repertory_item_status: [
-                {id: 0, name: format.danger('审核中')},
+                {id: 0, name: format.danger('暂未入库')},
                 {id: 1, name: format.warning('未上架')},
                 {id: 2, name: format.success('已上架')},
                 {id: 3, name: format.dark('已封禁')},

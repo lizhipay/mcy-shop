@@ -323,18 +323,14 @@ class Helper extends AbstractExtension
             $routes = [];
             $alert = Language::inst()->output('要使用插件的路由和菜单功能，必须通过您自己绑定的域名进行访问。当前您正在通过主站域名访问，这是不支持的。');
             foreach ($pluginMenus as $menu) {
-                $routes[] = $menu['route'];
-
+                $route = $menu['route'] ?? "";
+                $routes[] = $route;
                 $icon = str_starts_with($menu['icon'] ?? '', 'icon-') ? H::inst()->loadIcon($menu['icon'], "nav-main-link-icon") : '<img class="nav-menu-img-icon" src="' . $menu["icon"] . '">';
-
-                //$route = Usr::inst()->getUsr() == "*" ? "javascript:message.alert('{$alert}','error');" : $menu['route'];  //废弃
-                $route = $menu['route'];
-
                 $target = isset($menu['target']) ? 'target="' . $menu['target'] . '"' : "";
 
                 $submenu .= <<<HTML
 <li class="nav-main-item">
-            <a class="nav-main-link {$this->linkActive($menu['route'])}" href="{$route}"  {$target}>
+            <a class="nav-main-link {$this->linkActive($route)}" href="{$route}"  {$target}>
               {$icon}
               <span class="nav-main-link-name">{$menu['name']}</span>
             </a>

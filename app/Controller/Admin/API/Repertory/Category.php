@@ -11,13 +11,15 @@ use App\Interceptor\Admin;
 use App\Interceptor\PostDecrypt;
 use App\Model\RepertoryCategory as Model;
 use App\Service\Common\Query;
-use App\Validator\Common;
+use Hyperf\Database\Model\Builder;
+use Hyperf\Database\Model\Relations\Relation;
 use Kernel\Annotation\Inject;
 use Kernel\Annotation\Interceptor;
 use Kernel\Annotation\Validator;
 use Kernel\Context\Interface\Response;
 use Kernel\Exception\JSONException;
 use Kernel\Exception\RuntimeException;
+use Kernel\Waf\Filter;
 
 #[Interceptor(class: [PostDecrypt::class, Admin::class], type: Interceptor::API)]
 class Category extends Base
@@ -31,17 +33,18 @@ class Category extends Base
      * @return Response
      * @throws RuntimeException
      */
-    #[Validator([
-        [Common::class, ["page", "limit"]]
-    ])]
     public function get(): Response
     {
+        $map = $this->request->post();
         $get = new Get(Model::class);
-        $get->setWhere($this->request->post());
-        $get->setPaginate((int)$this->request->post("page"), (int)$this->request->post("limit"));
+        $get->setWhere($map);
         $get->setOrderBy(...$this->query->getOrderBy($this->request->post(), "sort", "asc"));
-        $data = $this->query->get($get);
-        return $this->json(data: $data);
+        $data = $this->query->get($get, function (Builder $builder) {
+            return $builder->withCount(["repertoryItem as item_shelf_count" => function (Builder $relation) {
+                $relation->where("status", 1);
+            }, "repertoryItem as item_all_count"]);
+        });
+        return $this->json(data: ["list" => $data]);
     }
 
     /**
@@ -55,7 +58,7 @@ class Category extends Base
     {
         $save = new Save(Model::class);
         $save->enableCreateTime();
-        $save->setMap($this->request->post());
+        $save->setMap($this->request->post(flags: Filter::NORMAL));
         try {
             $this->query->save($save);
         } catch (\Exception $exception) {

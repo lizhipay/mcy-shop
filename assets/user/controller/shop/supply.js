@@ -251,9 +251,9 @@
 
     table.setSearch([
         {
-            title: "仓库",
+            title: "分类",
             name: "equal-repertory_category_id",
-            type: "select",
+            type: "treeSelect",
             dict: "repertoryCategory",
             default: 0,
             search: true

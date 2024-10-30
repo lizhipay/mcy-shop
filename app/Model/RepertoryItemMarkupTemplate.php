@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Hyperf\Database\Model\Relations\HasOne;
-use Kernel\Component\Inject;
 use Kernel\Database\Model;
 
 /**
@@ -27,26 +26,9 @@ use Kernel\Database\Model;
  */
 class RepertoryItemMarkupTemplate extends Model
 {
-    use Inject;
-
-
     protected ?string $table = 'repertory_item_markup_template';
     public bool $timestamps = false;
     protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'drift_model' => 'integer', 'drift_value' => 'float', 'drift_base_amount' => 'float', 'sync_amount' => 'integer', 'sync_name' => 'integer', 'sync_introduce' => 'integer', 'sync_picture' => 'integer', 'sync_sku_name' => 'integer', 'sync_sku_picture' => 'integer', 'sync_remote_download' => 'integer'];
-
-
-    #[\Kernel\Annotation\Inject]
-    private \App\Service\Common\RepertoryItem $repertoryItem;
-
-    public function saved(): void
-    {
-        if ($this->id) {
-            $items = RepertoryItem::query()->where("markup_template_id", $this->id)->get();
-            foreach ($items as $item) {
-                $this->repertoryItem->forceSyncRemoteItemPrice($item);
-            }
-        }
-    }
 
     /**
      * @return HasOne

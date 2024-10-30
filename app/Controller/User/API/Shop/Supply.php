@@ -67,7 +67,7 @@ class Supply extends Base
         $get->setWhere($map);
         $get->setPaginate((int)$this->request->post("page"), (int)$this->request->post("limit"));
         $get->setOrderBy("sort", "asc");
-        $get->setColumn("id", "name", "picture_thumb_url", "repertory_category_id");
+        $get->setColumn("id", "name", "picture_thumb_url", "repertory_category_id", "sort");
         /**
          * @var LengthAwarePaginatorInterface $data
          */
@@ -87,7 +87,7 @@ class Supply extends Base
                 ]);
             }, "category" => function (HasOne $hasOne) {
                 $hasOne->select(['id', "name", "icon"]);
-            }])->where("status", 2);
+            }])->where("status", 2)->where("is_review", 0);
 
             if (strlen($apiCode) == 6) {
                 $supply = \App\Model\User::query()->where("api_code", $apiCode)->first();
@@ -96,9 +96,10 @@ class Supply extends Base
                 $builder = $builder->where("api_code", $apiCode)->where("privacy", 1);
             } else {
                 $builder = $builder->where("privacy", 2);
-                if (!isset($map["search-name"]) || $map["search-name"] === "") {
-                    $builder = $builder->orWhere("user_id", $this->getUser()->id)->where("status", 2);
-                }
+                //移除代码，此代码是为了 显示供货商自己的货源
+                /*        if (!isset($map["search-name"]) || $map["search-name"] === "") {
+                            $builder = $builder->orWhere("user_id", $this->getUser()->id);
+                        }*/
             }
 
             return $builder;

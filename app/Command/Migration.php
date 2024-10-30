@@ -8,7 +8,6 @@ use App\Service\User\Level;
 use App\Service\User\Lifetime;
 use Kernel\Annotation\Inject;
 use Kernel\Console\Command;
-use Kernel\Log\Log;
 use Kernel\Util\Decimal;
 use Kernel\Util\Str;
 
@@ -34,7 +33,7 @@ class Migration extends Command
             $this->error("没有找到用户数据");
         }
 
-        $regex = "\((\d+),\s*'([^']*)',\s*(NULL|'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'),\s*(NULL|'1[3-9]\d{9}'),\s*(NULL|\d+),\s*'([a-zA-Z0-9]{40})',\s*'([a-zA-Z0-9]{32})',\s*'([a-zA-Z0-9]{16})',.*?,\s*'(\d+\.\d{2})',\s*'(\d+\.\d{2})',\s*(\d+),\s*'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})',.*?,.*?,\s*'(.*?)',.*?,.*?,.*?,.*?,\s*(\d)";
+        $regex = "\((\d+),\s*'([^']*)',\s*(NULL|'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'),\s*(NULL|'1[3-9]\d{9}'),.*?,\s*'([a-zA-Z0-9]{40})',\s*'([a-zA-Z0-9]{32})',\s*'([a-zA-Z0-9]{16})',\s*'.*?',([\s\S]+?),([\s\S]+?),\s*(\d+),\s*'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})'";
 
         $total = count($matches[0]);
         $success = 0;
@@ -44,24 +43,21 @@ class Migration extends Command
 
         foreach ($matches[0] as $match) {
             preg_match("/{$regex}/", $match, $result);
-            if (count($result) == 15) {
+            if (count($result) == 12) {
                 $username = $result[2];
                 $email = trim($result[3], "'");
                 $phone = trim($result[4], "'");
-                $qq = trim($result[5], "'");
-                $password = $result[6];
-                $salt = $result[7];
-                $appKey = $result[8];
-                $balance = $result[9];
-                $coin = $result[10];
-                $integral = $result[11];
-                $createTime = $result[12];
-                $ip = $result[13];
-                $status = $result[14];
+                $password = $result[5];
+                $salt = $result[6];
+                $appKey = $result[7];
+                $balance = trim(trim((string)$result[8]), "'");
+                $coin = trim(trim((string)$result[9]), "'");
+                $integral = $result[10];
+                $createTime = $result[11];
 
                 try {
                     $user = new User();
-                    $user->username = $username;
+                    $user->username = trim($username);
                     $email != "NULL" && $user->email = $email;
                     $user->password = $password;
                     $user->salt = $salt;
@@ -69,17 +65,18 @@ class Migration extends Command
                     $user->api_code = strtoupper(Str::generateRandStr(6));
                     $user->avatar = "/favicon.ico";
                     $user->integral = $integral;
-                    $user->status = $status;
+                    $user->status = 1;
                     $user->balance = (new Decimal($balance))->add($coin)->getAmount();
                     $user->withdraw_amount = $coin;
                     $user->level_id = $this->level->getDefaultId(null);
                     $user->save();
-                    $this->lifetime->create($user->id, $ip, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36");
+                    $this->lifetime->create($user->id, "127.0.0.1", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36");
                     $this->lifetime->update($user->id, "register_time", $createTime);
-                    $this->success("会员:[{$username}] 迁移完成，资产：{$user->balance}，可提现：{$user->withdraw_amount}");
+
+                    $this->success("会员:[{$username}] 迁移完成，资产：{$balance}，可提现：{$coin}");
                     $success++;
                 } catch (\Throwable $e) {
-                    $this->error("会员:[{$username}]导入失败，原因：{$e->getMessage()}");
+                    $this->error("会员:[{$username}]导入失败，或已存在");
                     $error++;
                 }
             }

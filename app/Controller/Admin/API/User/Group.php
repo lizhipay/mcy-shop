@@ -57,7 +57,7 @@ class Group extends Base
         $map = $this->request->post();
         $save = new Save(Model::class);
         $save->enableCreateTime();
-        $save->setMap($map, ["icon", "name", "sort", "is_merchant", "is_supplier", "price", "tax_ratio", "dividend_amount"]);
+        $save->setMap($map, ["icon", "name", "sort", "is_merchant", "is_supplier", "is_upgradable", "price", "tax_ratio", "dividend_amount"]);
         try {
             $this->query->save($save);
         } catch (\Exception $exception) {

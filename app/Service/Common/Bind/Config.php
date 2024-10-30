@@ -118,4 +118,17 @@ class Config implements \App\Service\Common\Config
         Context::set(Currency::class, $entity);
         return $entity;
     }
+
+    /**
+     * @return string
+     * @throws \ReflectionException
+     */
+    public function getAsyncUrl(): string
+    {
+        $payCfg = $this->getMainConfig("pay");
+        if (isset($payCfg['async_custom'], $payCfg['async_host']) && $payCfg['async_custom'] == 1) {
+            return $payCfg['async_protocol'] . "://" . $payCfg['async_host'];
+        }
+        return (string)Context::get(Request::class)?->url();
+    }
 }

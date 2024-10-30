@@ -58,8 +58,6 @@ class Manage implements \App\Service\Admin\Manage
 
         $config = $this->config->getMainConfig("site");
 
-        $secureTunnel = min($request->post("secure_tunnel", Filter::INTEGER) ?: 0, 8);
-
         $manage->last_login_time = $manage->login_time;
         $manage->login_time = Date::current();
         $manage->last_login_ip = $manage->login_ip;
@@ -90,9 +88,7 @@ class Manage implements \App\Service\Admin\Manage
 
         $this->loginLog->create($manage->id, $request->clientIp(), $request->header("UserAgent"));
         Context::set(ManageModel::class, $manage);
-
-        File::write(BASE_PATH . "/runtime/secure.tunnel", (string)$secureTunnel);
-
+        
         return $response->json(200, "success", ["token" => $jwt]);
     }
 

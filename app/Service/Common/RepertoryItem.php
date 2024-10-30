@@ -63,6 +63,14 @@ interface RepertoryItem
      */
     public function forceSyncRemoteItemPrice(\App\Model\RepertoryItem|int $repertoryItem): void;
 
+
+    /**
+     * @param array $originMarkup
+     * @param array $newMarkup
+     * @return bool
+     */
+    public function checkForceSyncRemoteItemPrice(array $originMarkup, array $newMarkup): bool;
+
     /**
      * @param bool $isOnlyId
      * @param int|null $userId

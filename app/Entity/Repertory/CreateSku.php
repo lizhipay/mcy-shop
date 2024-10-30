@@ -11,6 +11,8 @@ class CreateSku
 
     public string $price;
 
+    public ?string $cost = null;
+
     public ?string $message = null;
 
     public bool $marketControlStatus = false;
@@ -93,5 +95,14 @@ class CreateSku
     public function setMessage(?string $message): void
     {
         $this->message = $message;
+    }
+
+
+    /**
+     * @param string|null $cost
+     */
+    public function setCost(?string $cost): void
+    {
+        $this->cost = $cost;
     }
 }

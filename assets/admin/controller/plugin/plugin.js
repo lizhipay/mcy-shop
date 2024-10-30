@@ -437,9 +437,10 @@
                                                                                                                 {
                                                                                                                     title: "仓库分类",
                                                                                                                     name: "category_id",
-                                                                                                                    type: "select",
+                                                                                                                    type: "treeSelect",
                                                                                                                     placeholder: "请选择仓库分类",
                                                                                                                     dict: 'repertoryCategory',
+                                                                                                                    parent: false,
                                                                                                                     regex: {
                                                                                                                         value: "^[1-9]\\d*$",
                                                                                                                         message: "必须选中一个分类"

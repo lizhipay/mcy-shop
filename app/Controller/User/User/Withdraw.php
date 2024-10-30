@@ -6,6 +6,7 @@ namespace App\Controller\User\User;
 use App\Controller\User\Base;
 use App\Interceptor\Identity;
 use App\Interceptor\User;
+use App\View\Helper;
 use Kernel\Annotation\Inject;
 use Kernel\Annotation\Interceptor;
 use Kernel\Context\Interface\Response;
@@ -22,6 +23,7 @@ class Withdraw extends Base
 
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function index(): Response
     {
@@ -34,6 +36,23 @@ class Withdraw extends Base
             );
         }
 
-        return $this->theme(Theme::USER_WITHDRAW, "User/Withdraw.html", "提现", ['card' => $list]);
+        $withdraw = $this->_config->getMainConfig("withdraw");
+        $defaultWithdrawAmount = $this->getUser()->withdraw_amount;
+
+        if ($withdraw['max_withdraw_amount'] != 0 && $defaultWithdrawAmount > $withdraw['max_withdraw_amount']) {
+            $defaultWithdrawAmount = $withdraw['max_withdraw_amount'];
+        }
+
+        if ($withdraw['min_withdraw_amount'] != 0 && $defaultWithdrawAmount < $withdraw['min_withdraw_amount']) {
+            $defaultWithdrawAmount = $withdraw['min_withdraw_amount'];
+        }
+
+
+        return $this->theme(Theme::USER_WITHDRAW, "User/Withdraw.html", "提现", [
+            'card' => $list,
+            'min_withdraw_amount' => $withdraw['min_withdraw_amount'] > 0 ? Helper::inst()->currency() . $withdraw['min_withdraw_amount'] : "无限制",
+            'max_withdraw_amount' => $withdraw['max_withdraw_amount'] > 0 ? Helper::inst()->currency() . $withdraw['max_withdraw_amount'] : "无限制",
+            "default_withdraw_amount" => $defaultWithdrawAmount
+        ]);
     }
 }

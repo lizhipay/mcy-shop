@@ -11,6 +11,7 @@ use App\Interceptor\Admin;
 use App\Interceptor\PostDecrypt;
 use App\Model\ItemMarkupTemplate as Model;
 use App\Service\Common\Query;
+use App\Service\Common\RepertoryItem;
 use App\Validator\Common;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Database\Model\Relations\Relation;
@@ -28,6 +29,12 @@ class ItemMarkupTemplate extends Base
     #[Inject]
     private Query $query;
 
+    #[Inject]
+    private RepertoryItem $repertoryItem;
+
+    #[Inject]
+    private \App\Service\User\Item $item;
+
 
     /**
      * @return Response
@@ -39,7 +46,6 @@ class ItemMarkupTemplate extends Base
     public function get(): Response
     {
         $map = $this->request->post();
-
 
         $get = new Get(Model::class);
         $get->setWhere($map);
@@ -69,11 +75,17 @@ class ItemMarkupTemplate extends Base
     ])]
     public function save(): Response
     {
+        $map = $this->request->post();
         $save = new Save(Model::class);
         $save->enableCreateTime();
-        $save->setMap($this->request->post());
+        $save->setMap($map);
         try {
-            $this->query->save($save);
+            $origin = isset($map['id']) ? Model::find($map['id']) : null;
+            $saved = $this->query->save($save);
+
+            if ($origin && $this->repertoryItem->checkForceSyncRemoteItemPrice($origin->toArray(), $saved->toArray())) {
+                $this->item->syncRepertoryItemForMarkupTemplate($origin->id); //同步模版
+            }
         } catch (\Exception $exception) {
             throw new JSONException("保存失败，错误：" . $exception->getMessage());
         }

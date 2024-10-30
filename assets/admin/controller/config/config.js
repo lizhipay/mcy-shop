@@ -97,6 +97,14 @@
                                 tips: "您的网站是否支持HTTPS，如果支持，请务必勾选此选项"
                             },
                             {
+                                title: "IP获取模式",
+                                name: "ip_mode",
+                                type: "select",
+                                placeholder: "请选择",
+                                dict: "ipMode",
+                                default: "auto"
+                            },
+                            {
                                 title: "备案号",
                                 name: "icp",
                                 type: "textarea",
@@ -930,6 +938,66 @@ ${i18n(`<p>4.宝塔的nginx.conf：<b style="color: green;">/www/server/nginx/co
                 assign: config,
                 autoPosition: true,
                 width: "600px"
+            });
+        });
+    });
+
+
+    $('.withdraw-setting').click(() => {
+        getConfig("withdraw", config => {
+            component.popup({
+                submit: '/admin/config/save?key=withdraw',
+                tab: [
+                    {
+                        name: util.icon('icon-tixian') + ' 兑现设置',
+                        form: [
+                            {
+                                title: "单次最低兑现金额",
+                                name: "min_withdraw_amount",
+                                type: "number",
+                                placeholder: "单次最低兑现金额",
+                                tips: "单次最低兑现金额，0 为不限制",
+                                required: true,
+                                default: 0
+                            },
+                            {
+                                title: "单次最大兑现金额",
+                                name: "max_withdraw_amount",
+                                type: "number",
+                                placeholder: "单次最大兑现金额",
+                                tips: "单次最大兑现金额，0 为不限制",
+                                required: true,
+                                default: 0
+                            }
+                        ]
+                    }
+                ],
+                assign: config,
+                autoPosition: true
+            });
+        });
+    });
+
+    $('.repertory-setting').click(() => {
+        getConfig("repertory", config => {
+            component.popup({
+                submit: '/admin/config/save?key=repertory',
+                tab: [
+                    {
+                        name: util.icon('icon-cangkuguanli') + ' 仓库设置',
+                        form: [
+                            {
+                                title: "货源变更审核",
+                                name: "is_modify_review",
+                                type: "switch",
+                                placeholder: "是|否",
+                                tips: "当供货商的货源的介绍信息或名称变更时，商品会进入审核"
+                            }
+                        ]
+                    }
+                ],
+                assign: config,
+                autoPosition: true
             });
         });
     });

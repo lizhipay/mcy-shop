@@ -59,7 +59,7 @@ class Dict extends Base
         foreach ($data as &$item) {
             $item['name'] = strip_tags($item['name']);
         }
-        
+
         $tree = Tree::generate($data, "id", "pid", "children");
         return $this->json(data: $tree);
     }
@@ -73,15 +73,22 @@ class Dict extends Base
     public function repertoryCategory(): Response
     {
         $get = new Get(RepertoryCategory::class);
-        $get->setColumn("id", "name");
-        $data = $this->query->get($get);
-        return $this->json(data: $data);
+        $get->setColumn("id", "name", "pid");
+        $data = $this->query->get($get, function (Builder $builder) {
+            return $builder->where("status", 1);
+        });
+        foreach ($data as &$item) {
+            $item['name'] = strip_tags($item['name']);
+        }
+        $tree = Tree::generate($data, "id", "pid", "children");
+        return $this->json(data: $tree);
     }
 
 
     /**
      * @return Response
      * @throws RuntimeException
+     * @throws \ReflectionException
      */
     #[Interceptor(class: [User::class, Merchant::class])]
     public function getTheme(): Response

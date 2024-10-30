@@ -45,9 +45,10 @@
                     {
                         title: "仓库分类",
                         name: "repertory_category_id",
-                        type: "select",
+                        type: "treeSelect",
                         placeholder: "请选择仓库分类",
                         dict: 'repertoryCategory',
+                        parent: false,
                         regex: {
                             value: "^[1-9]\\d*$",
                             message: "必须选中一个分类"
@@ -1346,6 +1347,14 @@
         },
         {field: 'plugin_name', title: '插件'},
         {field: 'status', title: '状态', class: "nowrap", dict: "repertory_item_status"},
+        {
+            field: 'is_review', title: '供货状态', formatter: val => {
+                if (val == 1) {
+                    return format.danger("需审核");
+                }
+                return format.success("正常");
+            }
+        },
         {field: 'sort', title: '排序', type: 'input', reload: true, width: 85, sort: true},
         {
             field: 'operation', class: "nowrap", title: '操作', type: 'button', buttons: [
@@ -1354,14 +1363,12 @@
                     class: 'acg-badge-h-tan',
                     click: (event, value, row, index) => {
                         message.ask("请在提交审核前确认该商品的进货价格已进行相应调整", () => {
-                            util.post("/admin/repertory/item/save", {id: row.id, status: 1}, res => {
+                            util.post("/admin/repertory/item/save", {id: row.id, is_review: 0}, res => {
                                 table.refresh();
                             });
                         });
                     },
-                    show: item => {
-                        return item.status == 0;
-                    }
+                    show: item => item.is_review == 1
                 },
                 {
                     icon: 'icon-fuzhi',
@@ -1481,11 +1488,15 @@
             }
         },
         {title: "货源插件", name: "equal-plugin", type: "select", dict: "ship", hide: true},
+        {title: "货源状态", name: "equal-status", type: "select", dict: "repertory_item_status"},
         {title: "货源关键词", name: "search-name", type: "input"},
-        {title: "分类", name: "equal-repertory_category_id", type: "select", dict: "repertoryCategory"},
+        {title: "分类", name: "equal-repertory_category_id", type: "treeSelect", dict: "repertoryCategory"},
         {title: "对接权限", name: "equal-privacy", type: "select", dict: "repertory_item_privacy"}
     ]);
-    table.setState("status", "repertory_item_status");
+    table.setState("is_review", [
+        {id: 0, name: "可用货源"},
+        {id: 1, name: "需审核"}
+    ]);
     table.setUpdate("/admin/repertory/item/save");
     table.setDeleteSelector(".del-repertory-item", "/admin/repertory/item/del");
     table.onResponse(data => {
@@ -1513,14 +1524,14 @@
                 res.data = data;
                 util.post("/admin/repertory/item/transferShop", res, ret => {
                     table.refresh();
-                    message.alert("导入成功，如果你还要导入更多商品，可以继续操作。");
+                    message.alert("接入成功，如果你还要接入更多商品，可以继续操作。");
                     layer.close(index);
                 })
             },
-            confirmText: util.icon("icon-daochu2") + "立即导入",
+            confirmText: util.icon("icon-daochu2") + "立即接入",
             tab: [
                 {
-                    name: util.icon("icon-shangxiajia") + " 选择你要入库的分类",
+                    name: util.icon("icon-shangxiajia") + " 选择直营店商品分类",
                     form: [
                         {
                             title: "商品分类",
@@ -1550,7 +1561,6 @@
                 }
             },
             autoPosition: true,
-            height: "auto",
             width: "580px",
             maxmin: false
         });

@@ -135,6 +135,12 @@
                             type: "input",
                             placeholder: "排序每个等级的价值",
                             tips: "数值越大，代表该等级价值越高，排序不可重复"
+                        },
+                        {
+                            title: "可购买",
+                            name: "is_upgradable",
+                            type: "switch",
+                            placeholder: "启用|关闭"
                         }
                     ]
                 }
@@ -177,6 +183,7 @@
                 return '-';
             }
         },
+        {field: 'is_upgradable', title: '可购买', type: "switch", reload: true, text: "开启|关闭"},
         {field: 'sort', title: '价值排序', type: 'input', reload: true, width: 85},
         {
             field: 'operation', title: '操作', type: 'button', buttons: [

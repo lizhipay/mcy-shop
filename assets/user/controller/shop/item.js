@@ -143,7 +143,12 @@
                                     text: "ON|OFF"
                                 },
                                 {
-                                    field: 'wholesale', title: '批发', width: 95, class: "nowrap", type: 'button', buttons: [
+                                    field: 'wholesale',
+                                    title: '批发',
+                                    width: 95,
+                                    class: "nowrap",
+                                    type: 'button',
+                                    buttons: [
                                         {
                                             icon: 'icon-shezhi',
                                             title: '配置',
@@ -155,7 +160,12 @@
                                     ]
                                 },
                                 {
-                                    field: 'operation',  width: 95, class: "nowrap", title: '操作', type: 'button', buttons: [
+                                    field: 'operation',
+                                    width: 95,
+                                    class: "nowrap",
+                                    title: '操作',
+                                    type: 'button',
+                                    buttons: [
                                         {
                                             icon: 'icon-biaoge-xiugai',
                                             title: '修改',
@@ -184,9 +194,9 @@
                         change: (obj, value) => {
                             if (value == 0) {
                                 obj.hide("markup_template_id");
-                            //    obj.show("markup.drift_base_amount");
-                             //   obj.show("markup.drift_model");
-                             //   obj.show("markup.drift_value");
+                                //    obj.show("markup.drift_base_amount");
+                                //   obj.show("markup.drift_model");
+                                //   obj.show("markup.drift_value");
                                 obj.show("markup.sync_name");
                                 obj.show("markup.sync_introduce");
                                 obj.show("markup.sync_picture");
@@ -206,8 +216,10 @@
                                 obj.hide("markup.sync_sku_name");
                                 obj.hide("markup.sync_sku_picture");
                                 obj.hide("markup.sync_amount");
+                                obj.hide("markup.keep_decimals");
                                 obj.hide("price_module");
                                 obj.hide("info_module");
+                                obj.setRadio("markup.sync_amount", 0, true);
                             }
                         },
                         complete: (obj, value) => {
@@ -241,7 +253,7 @@
                             {id: 2, name: "同步仓库"}
                         ],
                         required: true,
-                        tips: "不同步：完全由本地自定义价格\n同步仓库并加价：根据仓库的商品价格实时控制盈亏\n同步仓库：仓库是什么价格，本地商品就是什么价格".replaceAll("\n" , "<br>"),
+                        tips: "不同步：完全由本地自定义价格\n同步仓库并加价：根据仓库的商品价格实时控制盈亏\n同步仓库：仓库是什么价格，本地商品就是什么价格".replaceAll("\n", "<br>"),
                         change: (from, val) => {
                             val = parseInt(val);
                             switch (val) {
@@ -896,12 +908,12 @@
 
     $('.control-item').click(() => {
         const selections = table.getSelections();
-        if (selections.length == 0){
+        if (selections.length == 0) {
             layer.msg("至少选中1个商品才可以进行操作");
             return;
         }
         component.popup({
-            submit: data =>{
+            submit: data => {
                 let index = 0;
                 const startLoadIndex = layer.load(2, {shade: ['0.3', '#fff']});
                 util.timer(() => {
@@ -963,7 +975,7 @@
             },
             height: "auto",
             width: "380px",
-            closeBtn:false,
+            closeBtn: false,
             done: () => {
                 table.refresh();
             }

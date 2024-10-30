@@ -14,7 +14,7 @@ class Group implements \App\Service\User\Group
      */
     public function list(?int $currentGroupId): array
     {
-        $groups = UserGroup::query();
+        $groups = UserGroup::query()->where("is_upgradable", 1);
         if ($currentGroupId > 0) {
             $groups = $groups->where("id", "!=", $currentGroupId);
         }

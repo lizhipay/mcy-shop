@@ -218,6 +218,7 @@
                                 obj.hide("markup.sync_amount");
                                 obj.hide("price_module");
                                 obj.hide("info_module");
+                                obj.setRadio("markup.sync_amount", 0, true);
                             }
                         },
                         complete: (obj, value) => {

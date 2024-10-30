@@ -173,7 +173,7 @@ class Image implements \App\Service\Common\Image
     {
         $extension = $this->getImageExtensionFromURL($url);
 
-        if (!in_array($extension, ['jpg', 'jpeg', 'gif', 'png'])) {
+        if (!in_array($extension, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
             throw new ServiceException("检测到[$url]不是一张有效的图片");
         }
 

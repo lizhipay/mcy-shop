@@ -93,7 +93,7 @@ class RepertoryOrder implements \App\Service\Common\RepertoryOrder
         $widgetList = (array)json_decode((string)$repertoryItem->widget, true) ?: [];
         foreach ($widgetList as $item) {
             $value = $trade->widget[$item['name']] ?? "";
-            if ($item['regex']) {
+            if (!empty($item['regex'])) {
                 if ($value === "") {
                     throw new JSONException(sprintf("%s 不能为空", $item['title']));
                 }
@@ -226,7 +226,7 @@ class RepertoryOrder implements \App\Service\Common\RepertoryOrder
             $repertoryOrder->save();
 
             Plugin::instance()->unsafeHook(Usr::inst()->userToEnv($repertoryItem->user_id), Point::SERVICE_REPERTORY_ORDER_TRADE_AFTER, \Kernel\Plugin\Const\Plugin::HOOK_TYPE_PAGE, $repertoryOrder, $trade, $customer, $widgetJson, $repertoryItemSku, $repertoryItem, $totalAmount);
-            return new Deliver($repertoryOrder->trade_no, $repertoryOrder->contents, $repertoryOrder->amount);
+            return new Deliver($repertoryOrder);
         }, \Kernel\Database\Const\Db::ISOLATION_SERIALIZABLE);
     }
 

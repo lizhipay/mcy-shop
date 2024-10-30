@@ -38,7 +38,7 @@ class Level implements \App\Service\User\Level
      */
     public function getList(User $user): array
     {
-        $query = UserLevel::query();
+        $query = UserLevel::query()->where("is_upgradable", 1);
         if ($user->pid > 0) {
             $query = $query->where("user_id", $user->pid);
         } else {

@@ -11,6 +11,7 @@ use App\Interceptor\PostDecrypt;
 use App\Interceptor\Supplier;
 use App\Interceptor\User;
 use App\Interceptor\Waf;
+use App\Model\Category;
 use App\Model\RepertoryItem as Model;
 use App\Model\RepertoryItemSku;
 use App\Service\Common\Query;
@@ -45,6 +46,10 @@ class Item extends Base
 
     #[Inject]
     private Ship $ship;
+
+    #[Inject]
+    private \App\Service\User\Item $item;
+
 
     /**
      * @return Response
@@ -121,24 +126,39 @@ class Item extends Base
         $save->enableCreateTime();
 
         $skuTempId = $map['sku_temp_id'] ?? "";
-        unset($map['sku_temp_id']);
+        $directSale = $map['direct_sale'] ?? null;
+        $directCategoryId = $map['direct_category_id'] ?? 0;
+
+        unset($map['sku_temp_id'], $map['direct_sale'], $map['direct_category_id']);
+
+        if ($directSale == 1 && $directCategoryId == 0) {
+            throw new JSONException("请选择直营店的商品分类");
+        }
+
+        /**
+         * @var Model $origin
+         */
+        $origin = isset($map['id']) ? Model::where("user_id", $this->getUser()->id)->find($map['id']) : null;
+
         if (!isset($map['id'])) {
             $count = RepertoryItemSku::query()->where("temp_id", $skuTempId)->where("user_id", $this->getUser()->id)->count();
             if ($count <= 0) {
                 throw new JSONException("根据系统的逻辑，每个商品必须至少添加一个SKU。");
             }
             $map['api_code'] = Str::generateRandStr(5);
+            $save->addForceMap("is_review", 1);
         } else {
-            $item = Model::where("user_id", $this->getUser()->id)->find($map['id']);
-            if (!$item) {
+            if (!$origin) {
                 throw new JSONException("商品不存在");
             }
 
-            foreach ($reExaminationFields as $field) {
-                if (isset($map[$field])) {
-                    if (trim($item->$field) != trim($map[$field])) {
-                        $save->addForceMap("status", 0);
-                        break;
+            if ($this->_config->getMainConfig("repertory.is_modify_review") == 1) {
+                foreach ($reExaminationFields as $field) {
+                    if (isset($map[$field])) {
+                        if (trim($origin->$field) != trim($map[$field])) {
+                            $save->addForceMap("is_review", 1);
+                            break;
+                        }
                     }
                 }
             }
@@ -146,20 +166,41 @@ class Item extends Base
 
         $save->addForceMap("user_id", $this->getUser()->id);
         $save->setMap(map: $map, forbidden: ["user_id", "status", "sort", "create_time"]);
+
         try {
-            if (isset($map['id'])) {
-                //刷新缓存
-                $repertoryItem = Model::find($map['id']);
-                if ((isset($map['plugin']) && $repertoryItem->plugin != $map['plugin']) || (isset($map['status']) && $repertoryItem->status != $map['status'])) {
-                    $this->sku->syncCacheForItem($repertoryItem->id);
-                }
-                $this->repertoryItem->forceSyncRemoteItemPrice((int)$map['id']);
+            if ($origin && ((isset($map['plugin']) && $origin->plugin != $map['plugin']) || (isset($map['status']) && $origin->status != $map['status']))) {
+                $this->sku->syncCacheForItem($origin->id);
             }
+
             $saved = $this->query->save($save);
             if (!isset($map['id'])) {
                 RepertoryItemSku::query()->where("temp_id", $skuTempId)->where("user_id", $this->getUser()->id)->update([
                     "repertory_item_id" => $saved->id
                 ]);
+            }
+
+            if ($origin && isset($map['markup_mode']) && $map['markup_mode'] == 1 && isset($map['markup']) && is_array($origin->markup) && $this->repertoryItem->checkForceSyncRemoteItemPrice($origin->markup, $map['markup'])) {
+                $this->repertoryItem->forceSyncRemoteItemPrice($origin->id);
+            }
+
+
+            //导入直营店
+            if ($directSale == 1 && !isset($map['id'])) {
+                if (!Category::where("user_id", $this->getUser()->id)->where("id", $directCategoryId)->exists()) {
+                    throw new JSONException("直营店商品分类不存在");
+                }
+                $this->item->loadRepertoryItem((int)$directCategoryId, (int)$saved->id, [
+                    "sync_amount" => 0,
+                    "keep_decimals" => 2,
+                    "drift_base_amount" => 1,
+                    "drift_model" => 1,
+                    "drift_value" => 0,
+                    "sync_name" => 1,
+                    "sync_introduce" => 1,
+                    "sync_picture" => 1,
+                    "sync_sku_name" => 1,
+                    "sync_sku_picture" => 1
+                ], user: $this->getUser());
             }
         } catch (\Exception $exception) {
             throw new JSONException("保存失败，错误：" . $exception->getMessage());
@@ -178,7 +219,7 @@ class Item extends Base
     {
         $list = (array)$this->request->post("list", Filter::INTEGER);
         $status = $this->request->post("status", Filter::INTEGER);
-        \App\Model\RepertoryItem::query()->where("user_id", $this->getUser()->id)->where("status", "!=", 0)->whereIn("id", $list)->update(["status" => $status == 1 ? 2 : 1]);
+        Model::query()->where("user_id", $this->getUser()->id)->whereIn("id", $list)->update(["status" => $status == 1 ? 2 : 1]);
         return $this->json();
     }
 

@@ -64,11 +64,11 @@ class Level extends Base
         $privilegeContent = $this->request->post("privilege_content", Filter::NORMAL);
         $save = new Save(Model::class);
         $save->enableCreateTime();
-        $save->setMap($map, ["icon", "name", "upgrade_price", "sort"]);
+        $save->setMap($map, ["icon", "name", "upgrade_price", "sort", "is_upgradable"]);
         $save->addForceMap("upgrade_requirements", json_encode($this->getUpgradeRequirements($map)));
         $save->addForceMap("user_id", $this->getUser()->id);
-        $save->addForceMap("privilege_introduce", $privilegeIntroduce);
-        $save->addForceMap("privilege_content", $privilegeContent);
+        $privilegeIntroduce && $save->addForceMap("privilege_introduce", $privilegeIntroduce);
+        $privilegeContent && $save->addForceMap("privilege_content", $privilegeContent);
         if (isset($map['sort']) && $map['sort'] === "") {
             $level = UserLevel::query()->where("user_id", $this->getUser()->id)->orderBy("sort", "desc")->first();
             if ($level) {

@@ -13,6 +13,7 @@ class Item extends Base
 {
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function index(): Response
     {

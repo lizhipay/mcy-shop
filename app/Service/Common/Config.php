@@ -37,4 +37,10 @@ interface Config
      * @return Currency
      */
     public function getCurrency(): Currency;
+
+
+    /**
+     * @return string
+     */
+    public function getAsyncUrl(): string;
 }

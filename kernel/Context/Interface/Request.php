@@ -97,9 +97,10 @@ interface Request
 
     /**
      * 客户端IP地址
+     * @param bool $secure
      * @return string
      */
-    public function clientIp(): string;
+    public function clientIp(bool $secure = true): string;
 
 
     /**

@@ -178,14 +178,13 @@ class App
 
     /**
      * @return void
-     * @throws \ReflectionException
      */
     public static function command(): void
     {
         if (!App::$cli) {
             return;
         }
-        Console::instance()->generateCompletion();
+        //Console::instance()->generateCompletion();
         Config::get("command");
     }
 

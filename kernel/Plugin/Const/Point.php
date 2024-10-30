@@ -181,4 +181,7 @@ interface Point
 
     public const SERVICE_CART_ADD_BEFORE = 0x9046;
     public const SERVICE_CART_ADD_AFTER = 0x9047;
+
+
+    public const MODEL_REPERTORY_ORDER_SAVE = 0x9048;
 }

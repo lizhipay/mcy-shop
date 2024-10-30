@@ -101,6 +101,9 @@
 
     <div class="block block-rounded">
         <div class="block-header block-header-default">
+            {% if user.group.is_merchant == 1 %}
+            <button type="button" class="btn btn-outline-success btn-sm transfer-repertory-item wap-mb1">{{ icon("icon-daochu2")|raw }} {{ i18n("将货源接入至")|raw}} {{ icon("icon-shuangyoujiantou")|raw }}{{ i18n("直营店")|raw }}</button>
+            {% endif %}
             <button type="button" class="btn btn-outline-success btn-sm add-repertory-item wap-mb1">{{ icon("icon-tianjia")|raw }} {{i18n("添加货源")|raw}}</button>
             <button type="button" class="btn btn-outline-primary btn-sm item-up wap-mb1">{{ icon("icon-shangjia")|raw }} {{i18n("一键上架")|raw}}</button>
             <button type="button" class="btn btn-outline-primary btn-sm item-down wap-mb1">{{ icon("icon-shangxiajia")|raw }} {{i18n("一键下架")|raw}}</button>
@@ -113,5 +116,5 @@
 </div>
 <!-- END Page Content -->
 
-{{ ready("/assets/user/controller/repertory/item.js" , { "hookItemPopup": hook(env(false) , point("ADMIN_REPERTORY_ITEM_POPUP")) })|raw }}
+{{ ready("/assets/user/controller/repertory/item.js" , { "isMerchant" : user.group.is_merchant , "hookItemPopup": hook(env(false) , point("ADMIN_REPERTORY_ITEM_POPUP")) })|raw }}
 {{include ("Common/Footer.html")}}

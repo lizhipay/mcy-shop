@@ -9,8 +9,9 @@ use Kernel\Context\Interface\Request;
 class Ip
 {
 
+    public const MODE_FILE = BASE_PATH . "/runtime/ip.mode";
 
-    public const IP_PROTOCOL_HEADER = ['XRealIp', 'XForwardedFor', 'ClientIp', 'XForwarded', 'XClusterClientIp', 'ForwardedFor', 'Forwarded', 'CfConnectingIp'];
+    public const IP_PROTOCOL_HEADER = ['XForwardedFor', 'XRealIp', 'ClientIp', 'XForwarded', 'XClusterClientIp', 'ForwardedFor', 'Forwarded', 'CfConnectingIp'];
 
     /**
      * @param Request $request
@@ -19,9 +20,9 @@ class Ip
     public static function get(Request $request): ?string
     {
         if (App::$install) {
-            $secure = (int)(File::read(BASE_PATH . "/runtime/secure.tunnel") ?: 0);
-            if ($secure > 0 && isset(self::IP_PROTOCOL_HEADER[$secure - 1])) {
-                $clientIp = $request->header(self::IP_PROTOCOL_HEADER[$secure - 1]);
+            $mode = (File::read(self::MODE_FILE) ?: "auto");
+            if ($mode != "auto") {
+                $clientIp = $request->header($mode);
                 $clientIp = $clientIp ? trim(explode(',', $clientIp)[0]) : null;
                 if ($clientIp) {
                     return $clientIp;
@@ -29,5 +30,15 @@ class Ip
             }
         }
         return null;
+    }
+
+
+    /**
+     * @param string $header
+     * @return void
+     */
+    public static function setMode(string $header): void
+    {
+        File::write(self::MODE_FILE, $header);
     }
 }

@@ -272,7 +272,7 @@
                             width: "620px",
                         });
                     },
-                    show: item =>  item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\Pay") && item?.handleSubmit && item?.state?.run == 1
+                    show: item => item?.handle?.hasOwnProperty("Kernel\\Plugin\\Handle\\Pay") && item?.handleSubmit && item?.state?.run == 1
                 },
                 {
                     icon: 'icon-huoyuan',
@@ -373,9 +373,10 @@
                                                                                                                 {
                                                                                                                     title: "仓库分类",
                                                                                                                     name: "category_id",
-                                                                                                                    type: "select",
+                                                                                                                    type: "treeSelect",
                                                                                                                     placeholder: "请选择仓库分类",
                                                                                                                     dict: 'repertoryCategory',
+                                                                                                                    parent: false,
                                                                                                                     regex: {
                                                                                                                         value: "^[1-9]\\d*$",
                                                                                                                         message: "必须选中一个分类"

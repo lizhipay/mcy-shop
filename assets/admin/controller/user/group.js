@@ -93,6 +93,12 @@
                             name: "sort",
                             type: "input",
                             placeholder: "越小，显示在越前面"
+                        },
+                        {
+                            title: "可购买",
+                            name: "is_upgradable",
+                            type: "switch",
+                            placeholder: "启用|关闭"
                         }
                     ]
                 }
@@ -127,6 +133,7 @@
         },
         {field: 'is_merchant', title: '商家权限', type: "switch", reload: true, text: "开启|关闭"},
         {field: 'is_supplier', title: '供货权限', type: "switch", reload: true, text: "开启|关闭"},
+        {field: 'is_upgradable', title: '可购买', type: "switch", reload: true, text: "开启|关闭"},
         {
             field: 'tax_ratio', title: '税率', formatter: amount => {
                 return (amount * 100) + "%";

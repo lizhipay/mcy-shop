@@ -141,14 +141,17 @@ class Site implements \App\Service\User\Site
         $request = Context::get(Request::class);
         $host = (string)$request->header("Host");
 
-
-
         /**
          * @var Route $route
          */
         $route = Context::get(Route::class);
 
         if (in_array([$route->class(), $route->action()], self::EFFECTIVE_WHITELIST)) {
+            return true;
+        }
+
+        //如果是插件路由则不验证
+        if (str_starts_with($route->route(), "/plugin/")) {
             return true;
         }
 

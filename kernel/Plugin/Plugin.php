@@ -458,8 +458,7 @@ class Plugin
      * @return UpdateLog|null
      * @throws \ReflectionException
      */
-    public
-    function getLogs(string $hash, string $name, string $env): ?UpdateLog
+    public function getLogs(string $hash, string $name, string $env): ?UpdateLog
     {
         $plugin = Plugin::instance()->getPlugin($name, $env);
         if (!$plugin) {
@@ -487,7 +486,22 @@ class Plugin
             $timeout++;
         }
 
-        return new UpdateLog($hash, file_get_contents($file));
+
+        $maxSize = 1024 * 128;
+        $fileSize = filesize($file);
+        $bytesToRead = min($fileSize, $maxSize);
+
+        if ($bytesToRead <= 0) {
+            return new UpdateLog($hash, "");
+        }
+
+        $fileObject = new \SplFileObject($file, 'r');
+        $fileObject->fseek($fileSize - $bytesToRead);
+        $data = $fileObject->fread($bytesToRead);
+        $lines = explode(PHP_EOL, trim($data));
+        $lines = array_slice($lines, -2000);
+
+        return new UpdateLog($hash, implode(PHP_EOL, $lines));
     }
 
     /**

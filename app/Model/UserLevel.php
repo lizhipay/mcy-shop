@@ -18,6 +18,7 @@ use Kernel\Database\Model;
  * @property string $create_time
  * @property float $upgrade_price
  * @property int $sort
+ * @property int $is_upgradable
  */
 class UserLevel extends Model
 {
@@ -34,7 +35,7 @@ class UserLevel extends Model
     /**
      * @var array
      */
-    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'sort' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'is_upgradable' => 'integer', 'sort' => 'integer'];
 
 
     /**

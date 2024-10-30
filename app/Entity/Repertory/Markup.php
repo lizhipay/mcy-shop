@@ -31,15 +31,22 @@ class Markup
             $this->syncRemoteDownload = (bool)$itemMarkupTemplate->sync_remote_download;
             $this->exchangeRate = (string)$itemMarkupTemplate->exchange_rate;
             $this->keepDecimals = (string)$itemMarkupTemplate->keep_decimals;
+
+            if ($itemMarkupTemplate->sync_amount != 1) {
+                $this->setPercentage("0");
+                return;
+            }
+
             if ($itemMarkupTemplate->drift_model == 0) {
                 $this->setPercentage((string)$itemMarkupTemplate->drift_value);
+                return;
+            }
+
+            if ($itemMarkupTemplate->drift_value > 0) {
+                $decimal = new Decimal((string)$itemMarkupTemplate->drift_value, 6);
+                $this->setPercentage($decimal->div($itemMarkupTemplate->drift_base_amount)->getAmount(6));
             } else {
-                if ($itemMarkupTemplate->drift_value > 0) {
-                    $decimal = new Decimal((string)$itemMarkupTemplate->drift_value, 6);
-                    $this->setPercentage($decimal->div($itemMarkupTemplate->drift_base_amount)->getAmount(6));
-                } else {
-                    $this->setPercentage("0");
-                }
+                $this->setPercentage("0");
             }
         }
     }

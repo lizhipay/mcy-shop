@@ -146,7 +146,7 @@ const util = new class Util {
                     if (typeof error === 'function') {
                         error(res, loaderIndex);
                     } else if (error !== false) {
-                        console.log(e);
+                        util.stdout(`POST(致命异常): ${url} | 请将下面信息截图反馈给维护人员:\n` , "red", res);
                         message.error("服务器数据返回错误，可通过F12查看浏览器错误并且反馈给维护人员");
                     }
                 }
@@ -391,6 +391,11 @@ const util = new class Util {
         if (!(typeof getVar("DEBUG") == "boolean" && getVar("DEBUG") == true)) {
             return;
         }
+        this.stdout(message, color, ...val);
+    }
+
+
+    stdout(message, color, ...val) {
         const date = new Date();
         const d = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
         console.log('%c[' + d + ']-> %c' + message, 'color: #519dfb;font-weight: bold;', 'color: ' + color + '; font-weight: bold;', ...val);

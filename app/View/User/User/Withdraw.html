@@ -24,9 +24,9 @@
                     </div>
 
                     <div class="layout-box">
-                        <div class="title">{{ i18n("提现金额")|raw }}</div>
+                        <div class="title">{{ i18n("提现金额")|raw }} <span class="text-danger fs-sm fw-normal">单次最低：{{  min_withdraw_amount }} / 单次最大：{{ max_withdraw_amount }}</span></div>
                         <div class="recharge-content amount"><input type="text" class="withdraw-amount user-withdraw-amount"
-                                                                    value="{{ user.withdraw_amount }}"></div>
+                                                                    value="{{ default_withdraw_amount }}"></div>
                     </div>
 
                     <div class="layout-box">

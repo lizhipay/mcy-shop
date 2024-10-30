@@ -5,7 +5,11 @@ namespace App\Model;
 
 use Hyperf\Database\Model\Relations\HasMany;
 use Hyperf\Database\Model\Relations\HasOne;
+use Kernel\Component\Inject;
 use Kernel\Database\Model;
+use Kernel\Plugin\Const\Point;
+use Kernel\Plugin\Plugin;
+use Kernel\Plugin\Usr;
 
 /**
  * @property int $id
@@ -29,6 +33,12 @@ use Kernel\Database\Model;
  */
 class RepertoryOrder extends Model
 {
+
+    use Inject;
+
+    #[\Kernel\Annotation\Inject]
+    private \App\Service\User\Order $order;
+
     /**
      * @var string|null
      */
@@ -43,6 +53,17 @@ class RepertoryOrder extends Model
      * @var array
      */
     protected array $casts = ['id' => 'integer', 'user_id' => 'integer', 'customer_id' => 'integer', 'repertory_item_id' => 'integer', 'repertory_item_sku_id' => 'integer', 'quantity' => 'integer', 'status' => 'integer'];
+
+
+    /**
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function saved(): void
+    {
+        $this->id && $this->order->syncDeliver($this->item_trade_no, $this->contents, $this->status == 1 ? 1 : 0);
+        Plugin::inst()->unsafeHook(Usr::inst()->userToEnv($this->user_id), Point::MODEL_REPERTORY_ORDER_SAVE, \Kernel\Plugin\Const\Plugin::HOOK_TYPE_PAGE, $this);
+    }
 
 
     /**

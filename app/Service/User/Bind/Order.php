@@ -39,6 +39,7 @@ use Kernel\Util\Date;
 use Kernel\Util\Decimal;
 use Kernel\Util\Str;
 use Kernel\Util\UserAgent;
+use Kernel\Waf\Firewall;
 
 class Order implements \App\Service\User\Order
 {
@@ -234,7 +235,7 @@ class Order implements \App\Service\User\Order
                     $widgets = (array)json_decode((string)$repertoryItem->widget, true) ?: [];
 
                     foreach ($widgets as $wid) {
-                        if ($wid['regex']) {
+                        if (!empty($wid['regex'])) {
                             if (!isset($cart[$wid['name']]) || $cart[$wid['name']] === "") {
                                 throw new JSONException(sprintf("%s 不能为空", $wid['title']));
                             }
@@ -666,7 +667,7 @@ class Order implements \App\Service\User\Order
                             $trade->setAmount((string)$item->amount);
                             $deliver = $this->repertoryOrder->trade($trade, $clientIp);
                             $item->treasure = $deliver->contents;
-                            $item->status = $repertoryItem->auto_receipt_time == 0 ? 3 : 1;
+                            $item->status = $deliver->status == 0 ? 0 : ($repertoryItem->auto_receipt_time == 0 ? 3 : 1);
                         } catch (\Throwable $e) {
                             Log::inst()->error("发货失败：" . $e->getMessage());
                             $item->treasure = "上游发货失败，请自行补单";
@@ -756,6 +757,28 @@ class Order implements \App\Service\User\Order
 
         //订单被支付
         $this->orderPaid($order->customer, $order->user, $payOrder, $order, $option);
+    }
+
+
+    /**
+     * @param string $tradeNo
+     * @param string|null $treasure
+     * @param int $status
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function syncDeliver(string $tradeNo, ?string $treasure, int $status): void
+    {
+        /**
+         * @var OrderItem $orderItem
+         */
+        $orderItem = OrderItem::query()->where("trade_no", $tradeNo)->first();
+        if (!$orderItem) {
+            return;
+        }
+        (($orderItem->status == 0 || $orderItem->status == 2) && $status == 1) && ($orderItem->status = 1);
+        $treasure && $orderItem->treasure = Firewall::inst()->xssKiller($treasure);
+        $orderItem->save();
     }
 
 
@@ -967,6 +990,7 @@ class Order implements \App\Service\User\Order
     /**
      * @param Collection $list
      * @return void
+     * @throws \Throwable
      */
     private function autoReceiptItem(Collection $list): void
     {
@@ -974,11 +998,14 @@ class Order implements \App\Service\User\Order
          * @var OrderItem $orderItem
          */
         foreach ($list as $orderItem) {
-            $orderItem->status = 3;
-            $orderItem->update_time = Date::current();
-            $orderItem->save();
+            OrderItem::where("id", $orderItem->id)->update(['status' => 3, 'update_time' => Date::current()]);
             //更新关连账单
-            $this->bill->unfreeze($orderItem->trade_no);
+            try {
+                Db::transaction(function () use ($orderItem) {
+                    $this->bill->unfreeze($orderItem->trade_no);
+                }, \Kernel\Database\Const\Db::ISOLATION_SERIALIZABLE);
+            } catch (\Throwable $e) {
+            }
         }
     }
 
@@ -1003,42 +1030,39 @@ class Order implements \App\Service\User\Order
             return (clone $query)->leftJoin("item", "order_item.item_id", "=", "item.id")
                 ->leftJoin("repertory_item", "item.repertory_item_id", "=", "repertory_item.id")
                 ->where("repertory_item.user_id", $userId)
-                ->get();
+                ->get("order_item.*");
         };
 
         //商家
         $merchant = function () use ($query, $userId): Collection {
-            return (clone $query)->where("order_item.user_id", $userId)->get();
+            return (clone $query)->where("order_item.user_id", $userId)->get("order_item.*");
         };
 
         //客户
         $customer = function () use ($query, $userId): Collection {
             return (clone $query)->leftJoin("order", "order_item.order_id", "=", "order.id")
                 ->where("order.customer_id", $userId)
-                ->get();
+                ->get("order_item.*");
         };
 
         $user = $userId > 0 ? User::query()->with("group")->find($userId) : null;
 
-        Db::transaction(function () use ($supplier, $merchant, $customer, $main, $user) {
-            if ($user) {
-                //customer
-                $this->autoReceiptItem($customer());
-                if ($user->group) {
-                    //merchant
-                    if ($user->group->is_merchant) {
-                        $this->autoReceiptItem($merchant());
-                    }
-                    //supplier
-                    if ($user->group->is_supplier) {
-                        $this->autoReceiptItem($supplier());
-                    }
+        if ($user) {
+            //customer
+            $this->autoReceiptItem($customer());
+            if ($user->group) {
+                //merchant
+                if ($user->group->is_merchant) {
+                    $this->autoReceiptItem($merchant());
                 }
-            } else {
-                $this->autoReceiptItem($main());
+                //supplier
+                if ($user->group->is_supplier) {
+                    $this->autoReceiptItem($supplier());
+                }
             }
-
-        }, \Kernel\Database\Const\Db::ISOLATION_SERIALIZABLE);
+        } else {
+            $this->autoReceiptItem($main());
+        }
     }
 
     /**

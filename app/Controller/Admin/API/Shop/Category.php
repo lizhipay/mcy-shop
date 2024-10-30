@@ -38,7 +38,6 @@ class Category extends Base
         $map = $this->request->post();
         $get = new Get(Model::class);
         $get->setWhere($map);
-        //$get->setPaginate((int)$this->request->post("page"), (int)$this->request->post("limit"));
         $get->setOrderBy(...$this->query->getOrderBy($this->request->post(), "sort", "asc"));
         $data = $this->query->get($get, function (Builder $builder) use ($map) {
             if (isset($map['user_id']) && $map['user_id'] > 0) {

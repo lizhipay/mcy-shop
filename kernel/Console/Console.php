@@ -83,6 +83,7 @@ class Console
      * @param string|null $name
      * @param string|null $desc
      * @return void
+     * @throws \ReflectionException
      */
     public function add(string $command, array $callable, mixed $extend = null, ?string $name = null, ?string $desc = null): void
     {
@@ -152,6 +153,7 @@ class Console
     /**
      * 注册MYSQL连接池
      * @return void
+     * @throws \ReflectionException
      */
     private function startMysql(): void
     {
@@ -185,6 +187,7 @@ class Console
 
     /**
      * @return void
+     * @throws \ReflectionException
      */
     public function generateCompletion(): void
     {

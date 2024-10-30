@@ -225,6 +225,4 @@ abstract class Request implements \Kernel\Context\Interface\Request
     {
         return $this->raw;
     }
-
-
 }

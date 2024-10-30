@@ -412,7 +412,7 @@ class Item implements \App\Service\User\Item
             }
 
             if ($markup->syncAmount) {
-                $itemSku->price = (new Decimal($touristPrice, $keepDecimals))->mul($markup->percentage)->add($touristPrice)->getAmount($keepDecimals);
+                $itemSku->price = (new Decimal($touristPrice, 6))->mul($markup->percentage)->add($touristPrice)->getAmount($keepDecimals);
             }
             $itemSku->stock_price = $stockPrice;
             $itemSku->save();
@@ -429,7 +429,7 @@ class Item implements \App\Service\User\Item
              */
             foreach ($itemSkuLevels as $itemSkuLevel) {
                 if ($oldStockPrice != $stockPrice && $markup->syncAmount) {
-                    $itemSkuLevel->price = (new Decimal((string)$itemSkuLevel->price, $keepDecimals))->div($oldStockPrice)->mul($stockPrice)->getAmount($keepDecimals);
+                    $itemSkuLevel->price = (new Decimal((string)$itemSkuLevel->price, 6))->div($oldStockPrice)->mul($stockPrice)->getAmount($keepDecimals);
                     $itemSkuLevel->save();
                 }
             }
@@ -446,7 +446,7 @@ class Item implements \App\Service\User\Item
              */
             foreach ($itemSkuUsers as $itemSkuUser) {
                 if ($oldStockPrice != $stockPrice && $markup->syncAmount) {
-                    $itemSkuUser->price = (new Decimal((string)$itemSkuUser->price, $keepDecimals))->div($oldStockPrice)->mul($stockPrice)->getAmount($keepDecimals);
+                    $itemSkuUser->price = (new Decimal((string)$itemSkuUser->price, 6))->div($oldStockPrice)->mul($stockPrice)->getAmount($keepDecimals);
                     $itemSkuUser->save();
                 }
             }
@@ -488,7 +488,7 @@ class Item implements \App\Service\User\Item
 
                 $itemSkuWholesale->quantity = $wholesale->quantity;
                 if ($markup->syncAmount) {
-                    $itemSkuWholesale->price = (new Decimal($stockPrice, $keepDecimals))->mul($markup->percentage)->add($stockPrice)->getAmount($keepDecimals);  //进货价，这里要适当的通过规则进行自动加价
+                    $itemSkuWholesale->price = (new Decimal($stockPrice, 6))->mul($markup->percentage)->add($stockPrice)->getAmount($keepDecimals);  //进货价，这里要适当的通过规则进行自动加价
                 }
                 $itemSkuWholesale->save();
             }

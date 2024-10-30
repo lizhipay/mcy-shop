@@ -11,7 +11,6 @@ Route::add("/owner", [\App\Controller\Index::class, "owner"], "POST");
 
 Route::add("/admin", [\App\Controller\Admin\Auth::class, "login"], "GET");
 Route::add("/admin", [\App\Controller\Admin\API\Auth::class, "login"], "POST");
-Route::add("/admin/auth/secure/tunnel", [\App\Controller\Admin\API\Auth::class, "getSecureTunnel"], "POST");
 
 Route::add("/admin/dashboard", [\App\Controller\Admin\Main\Dashboard::class, "index"], "GET");
 Route::add("/admin/dashboard/statistics", [\App\Controller\Admin\API\Main\Dashboard::class, "statistics"], "POST");
@@ -60,6 +59,7 @@ Route::add("/admin/dict/itemSku", [\App\Controller\Admin\API\Dict::class, "itemS
 Route::add("/admin/dict/storeGroup", [\App\Controller\Admin\API\Dict::class, "getStoreGroup"], "POST");
 Route::add("/admin/dict/pluginConfig", [\App\Controller\Admin\API\Dict::class, "pluginConfig"], "POST");
 Route::add("/admin/dict/currency", [\App\Controller\Admin\API\Dict::class, "currency"], "POST");
+Route::add("/admin/dict/ipMode", [\App\Controller\Admin\API\Dict::class, "ipMode"], "POST");
 
 
 //后台文件上传相关API
@@ -434,6 +434,10 @@ Route::add("/user/shop/supply/get", [\App\Controller\User\API\Shop\Supply::class
 Route::add("/user/shop/supply/item", [\App\Controller\User\API\Shop\Supply::class, "item"], "POST");
 Route::add("/user/shop/supply/trade", [\App\Controller\User\API\Shop\Supply::class, "trade"], "POST"); //进货
 Route::add("/user/shop/supply/dock", [\App\Controller\User\API\Shop\Supply::class, "dock"], "POST");
+Route::add("/user/shop/supply/order", [\App\Controller\User\Shop\Supply::class, "order"], "GET");
+Route::add("/user/shop/supply/order/get", [\App\Controller\User\API\Shop\SupplyOrder::class, "get"], "POST");
+Route::add("/user/shop/supply/order/detail", [\App\Controller\User\API\Shop\SupplyOrder::class, "detail"], "POST");
+
 # 商品管理
 Route::add("/user/shop/item", [\App\Controller\User\Shop\Item::class, "index"], "GET");
 Route::add("/user/shop/item/get", [\App\Controller\User\API\Shop\Item::class, "get"], "POST");

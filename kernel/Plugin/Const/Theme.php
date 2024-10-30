@@ -17,6 +17,7 @@ interface Theme
     public const USER_SHOP_CATEGORY = 0x14;
     public const USER_SHOP_ITEM = 0x15;
     public const USER_SHOP_SUPPLY = 0x16;
+    public const USER_SHOP_SUPPLY_ORDER = 0x46;
     public const USER_CONFIG = 0x17;
     public const USER_ITEM_MARKUP_TEMPLATE = 0x18;
 

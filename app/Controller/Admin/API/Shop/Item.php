@@ -106,24 +106,22 @@ class Item extends Base
     ])]
     public function save(): Response
     {
-        $item = \App\Model\Item::with([
-            "repertoryItem" => function (HasOne $one) {
-                $one->with(["sku" => function (HasMany $hasMany) {
-                    $hasMany->with(["wholesale"]);
-                }]);
-            }
-        ])->find($this->request->post(key: 'id', flags: Filter::INTEGER));
-
-        if (!$item) {
-            throw new JSONException("商品不存在");
-        }
-
+        $map = $this->request->post(flags: Filter::NORMAL);
         $save = new Save(Model::class);
         $save->disableAddable();
-        $save->setMap($this->request->post(flags: Filter::NORMAL));
+        $save->setMap($map);
         try {
             $this->query->save($save);
-            $this->item->syncRepertoryItem($item, $item->repertoryItem); //同步
+
+            $item = isset($map['id']) ? Model::with([
+                "repertoryItem" => function (HasOne $one) {
+                    $one->with(["sku" => function (HasMany $hasMany) {
+                        $hasMany->with(["wholesale"]);
+                    }]);
+                }
+            ])->find($map['id']) : null;
+
+            $item && $this->item->syncRepertoryItem($item, $item->repertoryItem);
         } catch (\Exception $exception) {
             throw new JSONException("保存失败，错误：" . $exception->getMessage());
         }

@@ -13,6 +13,7 @@ class Sku
     public string $name;
     public string $pictureUrl;
     public string $price;
+    public ?string $cost = null;
     public array $options = [];
     public ?string $message = null;
 
@@ -97,5 +98,17 @@ class Sku
     public function setMessage(?string $message): void
     {
         $this->message = $message;
+    }
+
+
+    /**
+     * @param string|int|float|null $cost
+     */
+    public function setCost(string|int|float|null $cost): void
+    {
+        if ($cost === null) {
+            return;
+        }
+        $this->cost = (string)$cost;
     }
 }

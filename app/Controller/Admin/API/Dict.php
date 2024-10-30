@@ -32,7 +32,7 @@ use Kernel\Language\Language;
 use Kernel\Plugin\Const\Plugin;
 use Kernel\Plugin\Usr;
 use Kernel\Util\Config;
-use Kernel\Util\Str;
+use Kernel\Util\Ip;
 use Kernel\Util\Tree;
 
 #[Interceptor(class: [PostDecrypt::class, Admin::class], type: Interceptor::API)]
@@ -89,7 +89,6 @@ class Dict extends Base
         return $this->json(data: $generate);
     }
 
-
     /**
      * @return Response
      * @throws RuntimeException
@@ -97,9 +96,15 @@ class Dict extends Base
     public function repertoryCategory(): Response
     {
         $get = new Get(RepertoryCategory::class);
-        $get->setColumn("id", "name");
-        $data = $this->query->get($get);
-        return $this->json(data: $data);
+        $get->setColumn("id", "name", "pid");
+        $data = $this->query->get($get, function (Builder $builder) {
+            return $builder->where("status", 1);
+        });
+        foreach ($data as &$item) {
+            $item['name'] = strip_tags($item['name']);
+        }
+        $tree = Tree::generate($data, "id", "pid", "children");
+        return $this->json(data: $tree);
     }
 
     /**
@@ -400,5 +405,23 @@ class Dict extends Base
     {
         $groups = $this->store->getGroup(1, $this->getStoreAuth());
         return $this->json(data: $groups);
+    }
+
+    /**
+     * @return Response
+     * @throws RuntimeException
+     */
+    public function ipMode(): Response
+    {
+        $address = [];
+        $clientIp = $this->request->clientIp(false);
+        $clientIp && $address[] = ["name" => $clientIp . " - 自动获取", "id" => "auto"];
+        for ($i = 0; $i < 8; $i++) {
+            $key = Ip::IP_PROTOCOL_HEADER[$i];
+            $clientIp = $this->request->header($key);
+            $clientIp = $clientIp ? trim(explode(',', $clientIp)[0] ?? "") : null;
+            $clientIp && $address[] = ["name" => $clientIp . " - " . $key, "id" => $key];
+        }
+        return $this->json(data: $address);
     }
 }

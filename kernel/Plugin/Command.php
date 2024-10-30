@@ -18,6 +18,7 @@ class Command
      * @param string $name
      * @param string $env
      * @return void
+     * @throws \ReflectionException
      */
     public function add(string $name, string $env): void
     {
@@ -35,7 +36,7 @@ class Command
                 "env" => App::$mEnv
             ], $callable[2] ?? null, $callable[3] ?? null);
         }
-        Console::instance()->generateCompletion();
+        //Console::instance()->generateCompletion();
     }
 
     /**
@@ -43,6 +44,7 @@ class Command
      * @param string $env
      * @return void
      * @throws RuntimeException
+     * @throws \ReflectionException
      */
     public function del(string $name, string $env): void
     {
@@ -60,6 +62,6 @@ class Command
                 Console::instance()->del($command->getCommand());
             }
         }
-        Console::instance()->generateCompletion();
+        //Console::instance()->generateCompletion();
     }
 }

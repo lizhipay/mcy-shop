@@ -150,15 +150,19 @@ class Item extends Base
         $save->setMap(map: $map, forbidden: ["user_id"]);
 
         try {
-            if (isset($map['id'])) {
-                //刷新缓存
-                $repertoryItem = Model::find($map['id']);
-                if ((isset($map['plugin']) && $repertoryItem->plugin != $map['plugin']) || (isset($map['status']) && $repertoryItem->status != $map['status'])) {
-                    $this->sku->syncCacheForItem($repertoryItem->id);
-                }
-                $this->repertoryItem->forceSyncRemoteItemPrice((int)$map['id']);
+            $origin = isset($map['id']) ? Model::find($map['id']) : null;
+
+            //刷新缓存
+            if ($origin && ((isset($map['plugin']) && $origin->plugin != $map['plugin']) || (isset($map['status']) && $origin->status != $map['status']))) {
+                $this->sku->syncCacheForItem($origin->id);
             }
+
             $saved = $this->query->save($save);
+
+            if ($origin && isset($map['markup_mode']) && $map['markup_mode'] == 1 && isset($map['markup']) && is_array($origin->markup) && $this->repertoryItem->checkForceSyncRemoteItemPrice($origin->markup, $map['markup'])) {
+                $this->repertoryItem->forceSyncRemoteItemPrice($origin->id);
+            }
+
             if (!isset($map['id'])) {
                 RepertoryItemSku::query()->where("temp_id", $skuTempId)->whereNull("user_id")->update([
                     "repertory_item_id" => $saved->id

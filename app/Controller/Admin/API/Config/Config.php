@@ -23,6 +23,7 @@ use Kernel\Exception\RuntimeException;
 use Kernel\Util\Date;
 use Kernel\Util\File;
 use Kernel\Util\Http;
+use Kernel\Util\Ip;
 use Kernel\Waf\Filter;
 
 #[Interceptor(class: [PostDecrypt::class, Admin::class], type: Interceptor::API)]
@@ -133,7 +134,7 @@ class Config extends Base
         try {
             if ($key == "subdomain") {
 
-                if (!App::$cli){
+                if (!App::$cli) {
                     try {
                         $response = Http::make()->get($post['nginx_fpm_url'] . "/hello");
                         $contents = (array)json_decode((string)$response->getBody()->getContents());
@@ -156,13 +157,15 @@ class Config extends Base
                 /**
                  * @var Site $item
                  */
-                foreach ($list as $item){
+                foreach ($list as $item) {
                     $nginxInfo = $this->site->getNginxInfo($item->host);
-                    $nginxProxyConfig = $this->site->getNginxProxyConfig($nginxInfo, $proxyPass , $post['nginx_conf']);
+                    $nginxProxyConfig = $this->site->getNginxProxyConfig($nginxInfo, $proxyPass, $post['nginx_conf']);
                     if (!File::write($nginxInfo->conf, $nginxProxyConfig)) {
                         throw new JSONException("配置环境写入失败，请检查文件写入权限");
                     }
                 }
+            } elseif ($key == "site") {
+                $post['ip_mode'] && Ip::setMode($post['ip_mode']);
             }
             $config->value = json_encode($post, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             $config->save();

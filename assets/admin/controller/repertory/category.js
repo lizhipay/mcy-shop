@@ -8,6 +8,13 @@
                     name: title,
                     form: [
                         {
+                            title: "父级分类",
+                            name: "pid",
+                            type: "treeSelect",
+                            dict: "repertoryCategory",
+                            placeholder: "父级分类，可不选"
+                        },
+                        {
                             title: "图标",
                             name: "icon",
                             type: "image",
@@ -45,9 +52,12 @@
     }
 
     const table = new Table("/admin/repertory/category/get", "#repertory-category-table");
+    table.setTree(2);
+    table.disablePagination();
     table.setColumns([
         {checkbox: true},
-        {field: 'name', title: '分类名称', formatter: format.category},
+        {field: 'icon', title: '', type: "image", style: "border-radius:25%;", width: 28},
+        {field: 'name', title: '分类名称'},
         {field: 'create_time', title: '创建时间'},
         {field: 'sort', title: '排序', type: 'input', reload: true},
         {field: 'status', title: '状态', type: "switch", text: "启用|关闭", reload: true, class: "nowrap"},
@@ -74,7 +84,7 @@
     ]);
     table.setUpdate("/admin/repertory/category/save");
     table.setDeleteSelector(".del-repertory-category", "/admin/repertory/category/del");
-    table.setState("status", "repertory_category_status");
+   /* table.setState("status", "repertory_category_status");*/
     table.render();
 
     $('.add-repertory-category').click(() => {

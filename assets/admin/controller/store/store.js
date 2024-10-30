@@ -173,9 +173,9 @@
                                             }
 
                                             util.post("/admin/store/recharge", {pay_id: payId, amount: amount}, res => {
-                                                // window.location.href = res.data.pay_url;
-                                                util.openCheckoutWindowUrl(res.data.pay_url);
-                                                util.syncOrder("/admin/store/pay/order", res.data.trade_no);
+                                                window.location.href = res.data.pay_url;
+                                                /*   util.openCheckoutWindowUrl(res.data.pay_url);
+                                                   util.syncOrder("/admin/store/pay/order", res.data.trade_no);*/
                                             });
                                         });
                                     }
@@ -310,9 +310,7 @@
                                                     typeof success == "function" && success();
                                                     updateBalance();
                                                 } else {
-                                                    // window.location.href = res.data.pay_url;
-                                                    util.openCheckoutWindowUrl(res.data.pay_url);
-                                                    util.syncOrder("/admin/store/pay/order", res.data.trade_no);
+                                                    window.location.href = res.data.pay_url;
                                                 }
                                             });
                                         });

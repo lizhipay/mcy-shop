@@ -13,6 +13,7 @@ use App\Interceptor\User;
 use App\Interceptor\Waf;
 use App\Model\RepertoryItemMarkupTemplate as Model;
 use App\Service\Common\Query;
+use App\Service\Common\RepertoryItem;
 use App\Validator\Common;
 use Hyperf\Database\Model\Builder;
 use Kernel\Annotation\Inject;
@@ -22,6 +23,7 @@ use Kernel\Context\Interface\Response;
 use Kernel\Database\Exception\Resolver;
 use Kernel\Exception\JSONException;
 use Kernel\Exception\RuntimeException;
+use Kernel\Util\Call;
 
 #[Interceptor(class: [PostDecrypt::class, Waf::class, User::class, Supplier::class], type: Interceptor::API)]
 class ItemMarkupTemplate extends Base
@@ -30,6 +32,8 @@ class ItemMarkupTemplate extends Base
     #[Inject]
     private Query $query;
 
+    #[Inject]
+    private RepertoryItem $repertoryItem;
 
     /**
      * @return Response
@@ -64,12 +68,35 @@ class ItemMarkupTemplate extends Base
     ])]
     public function save(): Response
     {
+        $map = $this->request->post();
         $save = new Save(Model::class);
         $save->enableCreateTime();
-        $save->setMap($this->request->post());
+        $save->setMap($map);
         $save->addForceMap("user_id", $this->getUser()->id);
         try {
-            $this->query->save($save);
+            /**
+             * @var Model $origin
+             */
+            $origin = isset($map['id']) ? Model::query()->where("user_id", $this->getUser()->id)->find($map['id']) : null;
+
+            /**
+             * @var Model $saved
+             */
+            $saved = $this->query->save($save);
+
+            if ($origin && $this->repertoryItem->checkForceSyncRemoteItemPrice($origin->toArray(), $saved->toArray())) {
+                //强制同步价格
+                Call::create(function () use ($saved) {
+                    $repertoryItems = \App\Model\RepertoryItem::query()
+                        ->where("markup_mode", "!=", 0)
+                        ->where("markup_template_id", $saved->id)
+                        ->get();
+                    foreach ($repertoryItems as $repertoryItem) {
+                        $this->repertoryItem->forceSyncRemoteItemPrice($repertoryItem);
+                    }
+                });
+            }
+
         } catch (\Exception $exception) {
             throw new JSONException(Resolver::make($exception)->getMessage());
         }

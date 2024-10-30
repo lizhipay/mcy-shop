@@ -94,8 +94,6 @@ class Ship extends Base
             throw new JSONException("请选择要导入的商品");
         }
 
-        var_dump($markupTemplateId);
-
         if (!RepertoryItemMarkupTemplate::query()->where("id", $markupTemplateId)->where("user_id", $this->getUser()->id)->exists()) {
             throw new JSONException("远程同步模板不存在");
         }

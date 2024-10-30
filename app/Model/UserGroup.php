@@ -17,6 +17,7 @@ use Kernel\Database\Model;
  * @property int $is_supplier
  * @property int $tax_ratio
  * @property float $dividend_amount
+ * @property int $is_upgradable
  */
 class UserGroup extends Model
 {
@@ -33,7 +34,7 @@ class UserGroup extends Model
     /**
      * @var array
      */
-    protected array $casts = ['id' => 'integer', 'price' => 'float', 'sort' => 'integer', 'is_supplier' => 'integer', 'is_merchant' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'is_upgradable' => 'integer', 'price' => 'float', 'sort' => 'integer', 'is_supplier' => 'integer', 'is_merchant' => 'integer'];
 
 
     /**

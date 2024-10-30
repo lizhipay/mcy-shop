@@ -21,4 +21,13 @@ class Supply extends Base
     {
         return $this->theme(Theme::USER_SHOP_SUPPLY, "Shop/Supply.html", "货源市场");
     }
+
+
+    /**
+     * @return Response
+     */
+    public function order(): Response
+    {
+        return $this->theme(Theme::USER_SHOP_SUPPLY_ORDER, "Shop/SupplyOrder.html", "货源订单");
+    }
 }

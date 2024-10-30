@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use Hyperf\Database\Model\Relations\HasMany;
 use Kernel\Database\Model;
 
 /**
@@ -28,5 +29,14 @@ class RepertoryCategory extends Model
     /**
      * @var array
      */
-    protected array $casts = ['id' => 'integer' , 'sort' => 'integer' , 'status' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'sort' => 'integer', 'status' => 'integer'];
+
+
+    /**
+     * @return HasMany
+     */
+    public function repertoryItem(): HasMany
+    {
+        return $this->hasMany(RepertoryItem::class, 'repertory_category_id', 'id');
+    }
 }

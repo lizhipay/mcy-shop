@@ -29,13 +29,13 @@ App::$startTime = Date::timestamp();
 App::$cli = (php_sapi_name() == "cli");
 App::$database = Config::get("database");
 App::$session = Config::get("session");
-App::$debug = Config::get("app")['debug'];
 App::$version = Config::get("app")['version'];
 App::$opcache = extension_loaded("Zend OPcache") || extension_loaded("opcache");
 App::$install = file_exists(BASE_PATH . "/kernel/Install/Lock");
 App::$lock = App::$install ? (string)file_get_contents(BASE_PATH . "/kernel/Install/Lock") : "";
 App::$language = Config::get("language");
 App::$mode = (isset($argv[1]) && $argv[1] === "dev") ? "dev" : "service";
+App::$debug = App::$mode == "service" ? Config::get("app")['debug'] : true;
 
 /** @noinspection PhpUnhandledExceptionInspection */
 Plugin::instance()->hook(Usr::MAIN, Point::KERNEL_INIT_BEFORE);

@@ -25,16 +25,42 @@
                         default: tempId
                     },
                     {
+                        title: "自动入库直营店",
+                        name: "direct_sale",
+                        type: "switch",
+                        placeholder: "自动入库|不自动入库",
+                        default: getVar("isMerchant") != 1 ? 0 : 1,
+                        tips: "开启此选项后，商品将直接入库至直营店，并在网站首页以可购买状态展示",
+                        change: (form, val) => {
+                            if (val == 1) {
+                                form.show('direct_category_id');
+                            } else {
+                                form.hide('direct_category_id');
+                            }
+                        },
+                        hide: assign?.id > 0 || getVar("isMerchant") != 1
+                    },
+                    {
+                        title: "直营店分类",
+                        name: "direct_category_id",
+                        type: "treeSelect",
+                        placeholder: "请选择直营店的商品分类",
+                        dict: getVar("isMerchant") == 1 ? 'shopCategory' : 'repertoryCategory',
+                        parent: false,
+                        hide: assign?.id > 0 || getVar("isMerchant") != 1
+                    },
+                    {
                         title: "仓库分类",
                         name: "repertory_category_id",
-                        type: "select",
+                        type: "treeSelect",
                         placeholder: "请选择仓库分类",
                         dict: 'repertoryCategory',
                         regex: {
                             value: "^[1-9]\\d*$",
                             message: "必须选中一个分类"
                         },
-                        required: true
+                        required: true,
+                        parent: false
                     },
                     {
                         title: "商品名称",
@@ -359,7 +385,7 @@
                             {id: 2, name: "同步上游"}
                         ],
                         required: true,
-                        tips: "不同步：完全由本地自定义价格\n同步并加价：根据上游的商品价格实时控制盈亏\n同步上游：上游是什么价格，本地商品就是什么价格".replaceAll("\n" , "<br>"),
+                        tips: "不同步：完全由本地自定义价格\n同步并加价：根据上游的商品价格实时控制盈亏\n同步上游：上游是什么价格，本地商品就是什么价格".replaceAll("\n", "<br>"),
                         change: (from, val) => {
                             val = parseInt(val);
                             switch (val) {
@@ -787,6 +813,14 @@
         {field: 'plugin_name', title: '插件'},
         {field: 'status', title: '状态', dict: "repertory_item_status"},
         {
+            field: 'is_review', title: '供货状态', formatter: val => {
+                if (val == 1) {
+                    return format.danger("审核中");
+                }
+                return format.success("正常");
+            }
+        },
+        {
             field: 'operation', title: '操作', type: 'button', buttons: [
                 {
                     icon: 'icon-fuzhi',
@@ -821,8 +855,14 @@
     table.setSearch([
         {title: "货源插件", name: "equal-plugin", type: "select", dict: "ship"},
         {title: "货物关键词", name: "search-name", type: "input"},
-        {title: "分类", name: "equal-repertory_category_id", type: "select", dict: "repertoryCategory"},
-        {title: "对接权限", name: "equal-privacy", type: "select", dict: "repertory_item_privacy"}
+        {title: "分类", name: "equal-repertory_category_id", type: "treeSelect", dict: "repertoryCategory"},
+        {title: "对接权限", name: "equal-privacy", type: "select", dict: "repertory_item_privacy"},
+        {
+            title: "供货状态", name: "equal-is_review", type: "select", dict: [
+                {id: 0, name: "正常"},
+                {id: 1, name: "审核中"}
+            ]
+        },
     ]);
     table.setFloatMessage([
         {field: 'api_code', class: "nowrap", title: '对接码'},
@@ -864,6 +904,60 @@
             table.getSelections().forEach(item => {
                 message.success(`「${item.name}」已上架`);
             });
+        });
+    });
+
+    $('.transfer-repertory-item').click(() => {
+        let data = table.getSelectionIds();
+        if (data.length == 0) {
+            layer.msg(i18n("请勾选要操作的货源 (·•᷄ࡇ•᷅ ）"));
+            return;
+        }
+
+        component.popup({
+            submit: (res, index) => {
+                res.data = data;
+                util.post("/user/shop/supply/dock", res, ret => {
+                    table.refresh();
+                    message.alert("接入完成，如果你还要接入更多商品，可以继续操作。");
+                    layer.close(index);
+                })
+            },
+            confirmText: util.icon("icon-daochu2") + "立即接入",
+            tab: [
+                {
+                    name: util.icon("icon-shangxiajia") + " 选择直营店商品分类",
+                    form: [
+                        {
+                            title: "商品分类",
+                            name: "category_id",
+                            type: "treeSelect",
+                            placeholder: "请选择直营店的商品分类",
+                            dict: "shopCategory",
+                            search: true,
+                            required: true,
+                            parent: false
+                        },
+                        {
+                            title: "同步模版",
+                            name: "markup_id",
+                            type: "select",
+                            placeholder: "请选择模版",
+                            dict: "itemMarkupTemplate",
+                            required: true
+                        }
+                    ]
+                }
+            ],
+            content: {
+                css: {
+                    height: "auto",
+                    overflow: "inherit"
+                }
+            },
+            autoPosition: true,
+            width: "580px",
+            maxmin: false
         });
     });
 

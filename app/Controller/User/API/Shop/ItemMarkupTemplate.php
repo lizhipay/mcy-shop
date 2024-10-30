@@ -13,6 +13,7 @@ use App\Interceptor\User;
 use App\Interceptor\Waf;
 use App\Model\ItemMarkupTemplate as Model;
 use App\Service\Common\Query;
+use App\Service\Common\RepertoryItem;
 use App\Service\User\Ownership;
 use App\Validator\Common;
 use Hyperf\Database\Model\Builder;
@@ -33,6 +34,12 @@ class ItemMarkupTemplate extends Base
 
     #[Inject]
     private Ownership $ownership;
+
+    #[Inject]
+    private RepertoryItem $repertoryItem;
+
+    #[Inject]
+    private \App\Service\User\Item $item;
 
     /**
      * @return Response
@@ -57,6 +64,7 @@ class ItemMarkupTemplate extends Base
     /**
      * @return Response
      * @throws JSONException
+     * @throws RuntimeException
      * @throws \ReflectionException
      */
     #[Validator([
@@ -71,22 +79,27 @@ class ItemMarkupTemplate extends Base
         $save->setMap($map);
         $save->addForceMap("user_id", $this->getUser()->id);
         try {
-            $this->query->save($save);
+            $origin = isset($map['id']) ? Model::find($map['id']) : null;
+            $saved = $this->query->save($save);
+            if ($origin && $this->repertoryItem->checkForceSyncRemoteItemPrice($origin->toArray(), $saved->toArray())) {
+                $this->item->syncRepertoryItemForMarkupTemplate($origin->id);
+            }
         } catch (\Exception $exception) {
             throw new JSONException(Resolver::make($exception)->getMessage());
         }
-        return $this->response->json(message: "保存成功");
+        return $this->json(message: "保存成功");
     }
 
 
     /**
      * @return Response
+     * @throws RuntimeException
      */
     public function del(): Response
     {
         $delete = new Delete(Model::class, (array)$this->request->post("list"));
         $delete->setWhere("user_id", $this->getUser()->id);
         $this->query->delete($delete);
-        return $this->response->json(message: "删除成功");
+        return $this->json(message: "删除成功");
     }
 }

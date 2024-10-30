@@ -84,6 +84,15 @@ interface Order
 
 
     /**
+     * @param string $tradeNo
+     * @param string|null $treasure
+     * @param int $status
+     * @return void
+     */
+    public function syncDeliver(string $tradeNo, ?string $treasure, int $status): void;
+
+
+    /**
      * @param int $orderItemId
      * @return void
      */
@@ -174,4 +183,5 @@ interface Order
      * @return void
      */
     public function clearUnpaidOrder(int $userId, int $type): void;
+
 }

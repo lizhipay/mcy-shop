@@ -35,6 +35,9 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
     #[Inject]
     private \App\Service\Common\Config $config;
 
+    #[Inject]
+    private \App\Service\Common\RepertoryItemSku $repertoryItemSku;
+
     /**
      * @param int|null $userId
      * @param int $markupTemplateId
@@ -104,6 +107,7 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                     $createSku->setPluginData($sku['options'] ?: []);
                     $createSku->setUniqueId($sku['unique_id']);
                     isset($sku['message']) && $createSku->setMessage($sku['message']);
+                    isset($sku['cost']) && $createSku->setCost($sku['cost']);
 
                     $skus[] = $createSku;
                 }
@@ -217,12 +221,12 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
     {
         $currency = $this->config->getCurrency();
         if ($exchangeRate != 0) {
-            $amount = (new Decimal($amount, $keepDecimals))->div($exchangeRate)->getAmount($keepDecimals);
+            $amount = (new Decimal($amount, 6))->div($exchangeRate)->getAmount($keepDecimals);
         }
         if ($currency->code != "rmb") {
-            $amount = (new Decimal($amount, $keepDecimals))->div($currency->rate)->getAmount($keepDecimals);
+            $amount = (new Decimal($amount, 6))->div($currency->rate)->getAmount($keepDecimals);
         }
-        return (new Decimal($amount, $keepDecimals))->mul($percentage)->add($amount)->getAmount($keepDecimals);
+        return (new Decimal($amount, 6))->mul($percentage)->add($amount)->getAmount($keepDecimals);
     }
 
     /**
@@ -246,7 +250,7 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
         $repertoryItemSku->market_control_min_num = $sku->marketControlMinNum;
         $repertoryItemSku->market_control_max_num = $sku->marketControlMaxNum;
         $repertoryItemSku->market_control_only_num = $sku->marketControlOnlyNum;
-        $repertoryItemSku->cost = $this->getPercentageAmount($sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, "0");
+        $repertoryItemSku->cost = $this->getPercentageAmount($sku->cost ?? $sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, "0");
         $repertoryItemSku->create_time = Date::current();
         $repertoryItemSku->plugin_data = json_encode($sku->pluginData);
         $repertoryItemSku->version = $sku->versions;
@@ -476,6 +480,7 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                     $sku->marketControlMinNum > 0 && $createSku->setMarketControlMinNum($sku->marketControlMinNum);
                     $createSku->setPluginData($sku->options);
                     $createSku->setUniqueId($sku->uniqueId);
+                    $sku->cost && $createSku->setCost($sku->cost);
                     $this->createSku($repertoryItem->user_id, $repertoryItem->id, $createSku, $markup);
                 } else {
                     ##1 SKU名称同步
@@ -497,21 +502,25 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
 
                     ##3 SKU价格同步
                     if ($markup->syncAmount && $sku->versions['price'] != $repertoryItemSku->version['price']) {
-                        $originalStockPrice = $repertoryItemSku->stock_price;
+
                         $price = $this->getPercentageAmount($sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, $markup->percentage); //新的价格
+
+
                         $keepDecimals = (int)$markup->keepDecimals;
 
                         if ($repertoryItem->user_id > 0) {
                             $originalSupplyPrice = $repertoryItemSku->supply_price;
                             $repertoryItemSku->supply_price = $price;
-                            $repertoryItemSku->stock_price = (new Decimal($repertoryItemSku->supply_price, $keepDecimals))->div($originalSupplyPrice)->mul($repertoryItemSku->stock_price)->getAmount($keepDecimals); //增加进货价格
+                            $repertoryItemSku->stock_price = (new Decimal($repertoryItemSku->supply_price, 6))->div($originalSupplyPrice)->mul($repertoryItemSku->stock_price)->getAmount($keepDecimals); //增加进货价格
+                            $profitRatio = (new Decimal($repertoryItemSku->supply_price, 6))->div($originalSupplyPrice);
                         } else {
+                            $originalStockPrice = $repertoryItemSku->stock_price;
                             $repertoryItemSku->stock_price = $price;
+                            $profitRatio = (new Decimal($repertoryItemSku->stock_price, 6))->div($originalStockPrice);
                         }
 
-                        $repertoryItemSku->cost = $this->getPercentageAmount($sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, "0");
-                        //获取上调或下调价格比例，对隐藏的价格自动计算盈亏
-                        $profitRatio = (new Decimal($repertoryItemSku->stock_price, $keepDecimals))->div($originalStockPrice);
+                        $repertoryItemSku->cost = $this->getPercentageAmount($sku->cost ?? $sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, "0");
+
 
                         /**
                          * 同步用户组进货价
@@ -565,6 +574,9 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
         } catch (\Throwable $e) {
             $plugin->log("[{$repertoryItem->name}]SKU同步失败：{$e->getMessage()}", true);
         }
+
+        #5 缓存同步
+        $this->repertoryItemSku->syncCacheForItem($repertoryItem->id);
     }
 
 
@@ -578,11 +590,14 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
             $repertoryItem = \App\Model\RepertoryItem::find($repertoryItem);
         }
 
-        if ($repertoryItem->markup_mode != 0) {
+        if ($repertoryItem->markup_mode == 0) {
             return;
         }
 
         $list = RepertoryItemSku::query()->where("repertory_item_id", $repertoryItem->id)->get();
+        /**
+         * @var RepertoryItemSku $sku
+         */
         foreach ($list as $sku) {
             if (is_array($sku->version) && isset($sku->version['price'])) {
                 $version = $sku->version;
@@ -613,5 +628,40 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
             return $items->pluck('id')->toArray();
         }
         return $items->get();
+    }
+
+    /**
+     * @param array $originMarkup
+     * @param array $newMarkup
+     * @return bool
+     */
+    public function checkForceSyncRemoteItemPrice(array $originMarkup, array $newMarkup): bool
+    {
+        if ($originMarkup["sync_amount"] != $newMarkup["sync_amount"]) {
+            return true;
+        }
+
+        if ($originMarkup["drift_base_amount"] != $newMarkup["drift_base_amount"]) {
+            return true;
+        }
+
+        if ($originMarkup["drift_value"] != $newMarkup["drift_value"]) {
+            return true;
+        }
+
+        if ($originMarkup["drift_model"] != $newMarkup["drift_model"]) {
+            return true;
+        }
+
+        //兼容店铺同步模版
+        if (isset($originMarkup["exchange_rate"]) && $originMarkup["exchange_rate"] != $newMarkup["exchange_rate"]) {
+            return true;
+        }
+
+        if ($originMarkup["keep_decimals"] != $newMarkup["keep_decimals"]) {
+            return true;
+        }
+
+        return false;
     }
 }

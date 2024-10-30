@@ -17,6 +17,7 @@ use Kernel\Annotation\Inject;
 use Kernel\Annotation\Interceptor;
 use Kernel\Annotation\Validator;
 use Kernel\Context\Interface\Response;
+use Kernel\Exception\JSONException;
 use Kernel\Exception\RuntimeException;
 use Kernel\Waf\Filter;
 
@@ -28,6 +29,7 @@ class Withdraw extends Base
 
     #[Inject]
     private \App\Service\User\Withdraw $withdraw;
+
 
     /**
      * @return Response
@@ -51,6 +53,8 @@ class Withdraw extends Base
 
 
     /**
+     * @return Response
+     * @throws JSONException
      * @throws RuntimeException
      */
     #[Validator([
@@ -58,6 +62,18 @@ class Withdraw extends Base
     ])]
     public function apply(): Response
     {
+        $amount = $this->request->post("amount");
+        $withdraw = $this->_config->getMainConfig("withdraw");
+
+        if ($withdraw['min_withdraw_amount'] != 0 && $amount < $withdraw['min_withdraw_amount']) {
+            throw new JSONException("最低兑现金额为：{$withdraw['min_withdraw_amount']}");
+        }
+
+        if ($withdraw['max_withdraw_amount'] != 0 && $amount > $withdraw['max_withdraw_amount']) {
+            throw new JSONException("最大兑现金额为：{$withdraw['max_withdraw_amount']}");
+        }
+
+
         $this->withdraw->apply($this->getUser()->id, $this->request->post("card_id", Filter::INTEGER), $this->request->post("amount"));
         return $this->json();
     }
