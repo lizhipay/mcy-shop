@@ -39,7 +39,6 @@ class Install
         $finder = Finder::create()->files()->name('*.php')->name('*.html')->name("*.css")->name("*.js")->in(BASE_PATH . $env . "/{$name}");
         $ignorePlugin = $sandbox['ignore_plugin'] ?? [];
         foreach ($finder as $file) {
-            var_dump($file->getRealPath());
             $raw = file_get_contents($file->getRealPath());
             switch ($file->getExtension()) {
                 case "php":

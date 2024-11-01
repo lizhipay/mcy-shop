@@ -23,8 +23,7 @@ class Recharge extends Base
      */
     public function index(): Response
     {
-        $equipment = UserAgent::isMobile((string)$this->request->header("UserAgent")) ? 1 : 2;
-        $pay = $this->pay->getList($equipment, "recharge");
+        $pay = $this->pay->getList(UserAgent::getEquipment($this->request->header("UserAgent")), "recharge");
         return $this->theme(Theme::USER_RECHARGE, "User/Recharge.html", "余额充值", ['pay' => $pay]);
     }
 }

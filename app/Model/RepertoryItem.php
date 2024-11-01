@@ -37,6 +37,7 @@ use Kernel\Util\Date;
  * @property string $update_time
  * @property string $plugin_data
  * @property int $exception_total
+ * @property int $is_review
  */
 class RepertoryItem extends Model
 {
@@ -56,7 +57,7 @@ class RepertoryItem extends Model
     /**
      * @var array
      */
-    protected array $casts = ['id' => 'integer', 'markup_template_id' => 'integer', 'exception_total' => 'integer', 'markup_mode' => 'integer', 'markup' => 'json', 'version' => 'json', 'user_id' => 'integer', 'ship_config_id' => 'integer', 'refund_mode' => 'integer', 'money_freeze_time' => 'integer', 'repertory_category_id' => 'integer', 'status' => 'integer', 'sort' => 'integer', 'item_type' => 'integer', 'privacy' => 'integer'];
+    protected array $casts = ['id' => 'integer', 'markup_template_id' => 'integer', 'exception_total' => 'integer', 'is_review' => 'integer', 'markup_mode' => 'integer', 'markup' => 'json', 'version' => 'json', 'user_id' => 'integer', 'ship_config_id' => 'integer', 'refund_mode' => 'integer', 'money_freeze_time' => 'integer', 'repertory_category_id' => 'integer', 'status' => 'integer', 'sort' => 'integer', 'item_type' => 'integer', 'privacy' => 'integer'];
 
 
     #[Inject]

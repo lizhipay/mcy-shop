@@ -27,9 +27,9 @@
                             name: "sync_amount",
                             type: "radio",
                             dict: [
-                                {id: 0, name: "不同步"},
-                                {id: 1, name: "同步并加价"},
-                                {id: 2, name: "同步上游"}
+                                {id: 0, name: "🚫不同步"},
+                                {id: 1, name: "💲同步并自定义价格"},
+                                {id: 2, name: "♻️同步上游"}
                             ],
                             required: true,
                             tips: "不同步：完全由本地自定义价格\n同步并加价：根据上游的商品价格实时控制盈亏\n同步上游：上游是什么价格，本地商品就是什么价格".replaceAll("\n", "<br>"),
@@ -46,7 +46,7 @@
                                     case 1:
                                         from.show('exchange_rate');
                                         from.show('keep_decimals');
-                                        from.show('drift_base_amount');
+                                        [1, 3].includes(parseInt(from.getData("drift_model"))) && from.show('drift_base_amount');
                                         from.show('drift_model');
                                         from.show('drift_value');
                                         break;
@@ -83,6 +83,21 @@
                             tips: "价格小数，最大支持6位小数"
                         },
                         {
+                            title: "加价模式",
+                            name: "drift_model",
+                            type: "radio",
+                            hide: true,
+                            tips: format.success("比例向上/向下浮动") + " 如果你的商品是10元，那么【浮动值】设置 0.5，那么10元的商品最终售卖的价格就是：15【算法：10+(10*0.5)】<br>" + format.warning("固定金额向上/向下浮动") + " 通过基数+固定金额算法，得到的绝对比例进行加价，假如基数是10，加价1.2元，那么算法得出加价比例为：1.2÷10=0.12(12%)，假设一个商品为18元，最终售卖价格则是：20.16【算法：18+(18*0.12)】<br><br>注意：如果是向下浮动，就是把加法变成减法",
+                            dict: "markup_type",
+                            change: (form, val) => {
+                                if (val == 1 || val == 3) {
+                                    form.show('drift_base_amount');
+                                } else {
+                                    form.hide('drift_base_amount');
+                                }
+                            }
+                        },
+                        {
                             title: "价格基数",
                             name: "drift_base_amount",
                             tips: "基数就是你随便设定一个商品的成本价，比如你想象一个商品的成本价是10元，那么你就把基数设定为10元。<br><br>为什么要有这个设定呢？因为每个商品都有不同的类型和价格，设定一个基数可以帮助我们计算出你想给某个商品增加的价格。通过基数，我们可以简单地推算出商品的最终价格。",
@@ -90,24 +105,16 @@
                             placeholder: "请设定一个基数",
                             default: 10,
                             required: true,
-                            hide: true,
+                            hide: assign?.sync_amount != 1 || assign?.drift_model == 0 || assign?.drift_model == 2,
                             regex: {
                                 value: "^(0\\.\\d+|[1-9]\\d*(\\.\\d+)?)$", message: "基数必须大于0"
                             }
                         },
                         {
-                            title: "加价模式",
-                            name: "drift_model",
-                            type: "radio",
-                            hide: true,
-                            tips: format.success("比例加价") + " 通过基数实现百分比加价，比如你设置基数为10，那么比例设置 0.5，那么10元的商品最终售卖的价格就是：15【算法：(10*0.5)+10】<br>" + format.warning("固定金额加价") + " 通过基数+固定金额算法，得到的比例进行加价，假如基数是10，加价1.2元，那么算法得出加价比例为：1.2/10=0.12，如果一个商品为18元，你加价了1.2元，最终售卖价格则是：20.16【算法：(18*0.12)+18】",
-                            dict: "markup_type"
-                        },
-                        {
                             title: "浮动值",
                             name: "drift_value",
                             type: "input",
-                            tips: "百分比 或 金额，根据浮动类型自行填写，百分比需要用小数表示",
+                            tips: "【固定金额浮动模式】下填写具体金额<br><br>【比例浮动模式】下填写百分比，用小数代替，比如 10% 用小数表示就是 0.1，填写 0.1 即可",
                             placeholder: "请设置浮动值",
                             default: 1,
                             required: true,
@@ -180,9 +187,9 @@
         {field: 'user', title: '商户', formatter: format.user},
         {field: 'name', title: '模板名称'},
         {
-            field: 'sync_amount', title: '同步价格', dict: [
+            field: 'sync_amount', title: '同步模式', dict: [
                 {id: 0, name: "🚫不同步"},
-                {id: 1, name: "💲同步上游并加价"},
+                {id: 1, name: "💲同步并自定义价格"},
                 {id: 2, name: "♻️同步上游"}
             ], text: "同步|不同步", reload: true, align: `center`
         },
@@ -199,12 +206,24 @@
                 if (item.sync_amount != 1) {
                     return '-';
                 }
-                return item.drift_model == 1 ?  (new Decimal(val)).div(item.drift_base_amount).mul(100).getAmount() + "%" : (new Decimal(val)).mul(100).getAmount() + "%";
+
+                switch (item.drift_model) {
+                    case 0:
+                        return util.icon("icon-shangzhang") + (new Decimal(val)).mul(100).getAmount() + "%";
+                    case 1:
+                        return util.icon("icon-shangzhang") + (new Decimal(val)).div(item.drift_base_amount).mul(100).getAmount() + "%";
+                    case 2:
+                        return util.icon("icon-xiajiang") + (new Decimal(val)).mul(100).getAmount() + "%";
+                    case 3:
+                        return util.icon("icon-xiajiang") + (new Decimal(val)).div(item.drift_base_amount).mul(100).getAmount() + "%";
+                }
+
+                return '-';
             }
         },
         {
             field: 'drift_base_amount', title: '基数', width: 120, formatter: (val, item) => {
-                if (item.sync_amount != 1) {
+                if (item.sync_amount != 1 || item.drift_model == 0 || item.drift_model == 2) {
                     return '-';
                 }
                 return val;

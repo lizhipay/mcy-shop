@@ -52,6 +52,14 @@ interface Item
     public function loadRepertoryItem(int $categoryId, int $itemId, int|array $markupId, ?User $user = null, bool $available = false): void;
 
     /**
+     * @param string $amount
+     * @param string $percentage
+     * @param int $keepDecimals
+     * @return string
+     */
+    public function getPercentageAmount(string $amount, string $percentage, int $keepDecimals): string;
+
+    /**
      * @param \App\Model\Item $item
      * @param RepertoryItem $repertoryItem
      * @return void

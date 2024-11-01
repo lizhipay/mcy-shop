@@ -17,12 +17,54 @@ class Sku
     public array $options = [];
     public ?string $message = null;
 
-    public bool $marketControlStatus = false;
-    //单次最少购买数量
+    /**
+     * @var bool
+     */
+    public bool $marketControl = false;
+
+
+    /**
+     * @var string
+     */
+    public string $marketControlMinPrice = "0";
+
+    /**
+     * @var string
+     */
+    public string $marketControlMaxPrice = "0";
+
+    /**
+     * @var string
+     */
+    public string $marketControlLevelMinPrice = "0";
+
+    /**
+     * @var string
+     */
+    public string $marketControlLevelMaxPrice = "0";
+    /**
+     * @var string
+     */
+    public string $marketControlUserMinPrice = "0";
+
+    /**
+     * @var string
+     */
+    public string $marketControlUserMaxPrice = "0";
+
+    /**
+     * @var int
+     */
     public int $marketControlMinNum = 0;
-    //单次最大购买数量
+
+    /**
+     * @var int
+     */
     public int $marketControlMaxNum = 0;
-    //总共最多购买数量
+
+    /**
+     * @var int
+     */
     public int $marketControlOnlyNum = 0;
 
     /**
@@ -65,11 +107,76 @@ class Sku
 
 
     /**
+     * @param string $price
+     */
+    public function setPrice(string $price): void
+    {
+        $this->price = $price;
+        $this->versions["price"] = md5($price);
+    }
+
+    /**
+     * @param bool $marketControl
+     */
+    public function setMarketControl(bool $marketControl): void
+    {
+        $this->marketControl = $marketControl;
+    }
+
+    /**
+     * @param string $marketControlMinPrice
+     */
+    public function setMarketControlMinPrice(string $marketControlMinPrice): void
+    {
+        $this->marketControlMinPrice = $marketControlMinPrice;
+    }
+
+
+    /**
+     * @param string $marketControlMaxPrice
+     */
+    public function setMarketControlMaxPrice(string $marketControlMaxPrice): void
+    {
+        $this->marketControlMaxPrice = $marketControlMaxPrice;
+    }
+
+    /**
+     * @param string $marketControlLevelMaxPrice
+     */
+    public function setMarketControlLevelMaxPrice(string $marketControlLevelMaxPrice): void
+    {
+        $this->marketControlLevelMaxPrice = $marketControlLevelMaxPrice;
+    }
+
+    /**
+     * @param string $marketControlLevelMinPrice
+     */
+    public function setMarketControlLevelMinPrice(string $marketControlLevelMinPrice): void
+    {
+        $this->marketControlLevelMinPrice = $marketControlLevelMinPrice;
+    }
+
+    /**
+     * @param string $marketControlUserMaxPrice
+     */
+    public function setMarketControlUserMaxPrice(string $marketControlUserMaxPrice): void
+    {
+        $this->marketControlUserMaxPrice = $marketControlUserMaxPrice;
+    }
+
+    /**
+     * @param string $marketControlUserMinPrice
+     */
+    public function setMarketControlUserMinPrice(string $marketControlUserMinPrice): void
+    {
+        $this->marketControlUserMinPrice = $marketControlUserMinPrice;
+    }
+
+    /**
      * @param int $marketControlMinNum
      */
     public function setMarketControlMinNum(int $marketControlMinNum): void
     {
-        $this->marketControlStatus = true;
         $this->marketControlMinNum = $marketControlMinNum;
     }
 
@@ -78,7 +185,6 @@ class Sku
      */
     public function setMarketControlMaxNum(int $marketControlMaxNum): void
     {
-        $this->marketControlStatus = true;
         $this->marketControlMaxNum = $marketControlMaxNum;
     }
 
@@ -87,7 +193,6 @@ class Sku
      */
     public function setMarketControlOnlyNum(int $marketControlOnlyNum): void
     {
-        $this->marketControlStatus = true;
         $this->marketControlOnlyNum = $marketControlOnlyNum;
     }
 

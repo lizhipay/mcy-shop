@@ -29,7 +29,7 @@ class ItemMarkupTemplate
     }
 
     #[Required("加价模式选择错误", \Kernel\Validator\Required::LOOSE)]
-    #[Regex("/^[01]+$/", "加价模式错误")]
+    #[Regex("/^[0123]+$/", "加价模式错误")]
     public function driftModel(): bool
     {
         return true;

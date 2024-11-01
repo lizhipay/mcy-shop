@@ -77,9 +77,14 @@ class Item extends Base
             $raw['shelves_have_count'] = (clone $builder)->where("status", 2)->count();
             $raw['banned_count'] = (clone $builder)->where("status", 3)->count();
 
-            return $builder->with(['sku' => function (HasMany $hasMany) {
-                $hasMany->orderBy("sort", "asc")->select(["id", "name", "repertory_item_id", "picture_thumb_url", "picture_url", "supply_price", "cost"]);
-            }])
+            return $builder->with([
+                'sku' => function (HasMany $hasMany) {
+                    $hasMany->orderBy("sort", "asc")->select(["id", "name", "repertory_item_id", "picture_thumb_url", "picture_url", "supply_price", "cost"]);
+                },
+                'userItem' => function (HasMany $hasMany) {
+                    $hasMany->where("user_id", $this->getUser()->id)->select(['id', 'repertory_item_id']);
+                }
+            ])
                 ->withCount("order as order_count")
                 ->withCount("todayOrder as today_count")
                 ->withCount("yesterdayOrder as yesterday_count")
@@ -96,6 +101,8 @@ class Item extends Base
             if ($plugin) {
                 $dat["plugin_name"] = $plugin->info['name'] . "(v{$plugin->info['version']})";
             }
+
+            $dat['is_direct_sale'] = count($dat['user_item']) > 0;
 
             foreach ($dat['sku'] as &$sku) {
                 try {

@@ -55,6 +55,33 @@ class UserAgent
     }
 
     /**
+     * @param string|null $ua
+     * @return bool
+     */
+    public static function isWeChat(?string $ua): bool
+    {
+        if (!$ua) {
+            return false;
+        }
+        return preg_match('/MicroMessenger/i', $ua) === 1;
+    }
+
+    /**
+     * @param string|null $ua
+     * @return int
+     */
+    public static function getEquipment(?string $ua): int
+    {
+        if (self::isWeChat($ua)) {
+            return 3;
+        }
+        if (self::isMobile($ua)) {
+            return 1;
+        }
+        return 2;
+    }
+
+    /**
      * @param string $ua
      * @return string
      */

@@ -13,6 +13,7 @@ class ItemMarkupTemplate extends Base
 {
     /**
      * @return Response
+     * @throws \ReflectionException
      */
     public function index(): Response
     {

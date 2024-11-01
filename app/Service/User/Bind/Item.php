@@ -285,8 +285,15 @@ class Item implements \App\Service\User\Item
                 $itemSku->repertory_item_sku_id = $repertoryItemSku->id;
                 $itemSku->item_id = $item->id;
                 $itemSku->name = $repertoryItemSku->name;
-                $itemSku->price = ($repertoryItemSku->market_control_status == 1 && $repertoryItemSku->market_control_min_price > 0) ? $repertoryItemSku->market_control_min_price : $repertoryItemSku->stock_price; //市场控制
-                $itemSku->stock_price = $repertoryItemSku->stock_price;
+
+                if ($item->user_id > 0 && $repertoryItem->user_id > 0 && $item->user_id === $repertoryItem->user_id) {
+                    $itemSku->price = $repertoryItemSku->supply_price;
+                    $itemSku->stock_price = $repertoryItemSku->supply_price;
+                } else {
+                    $itemSku->price = ($repertoryItemSku->market_control_status == 1 && $repertoryItemSku->market_control_min_price > 0) ? $repertoryItemSku->market_control_min_price : $repertoryItemSku->stock_price; //市场控制
+                    $itemSku->stock_price = $repertoryItemSku->stock_price;
+                }
+
                 $itemSku->sort = $repertoryItemSku->sort;
                 $itemSku->create_time = $now;
                 $itemSku->picture_url = $repertoryItemSku->picture_url;
@@ -327,6 +334,22 @@ class Item implements \App\Service\User\Item
 
 
         $this->syncRepertoryItem(...$data);
+    }
+
+    /**
+     * @param string $amount
+     * @param string $percentage
+     * @param int $keepDecimals
+     * @return string
+     */
+    public function getPercentageAmount(string $amount, string $percentage, int $keepDecimals): string
+    {
+        $src = $amount;
+        $amount = (new Decimal($amount, 6))->mul($percentage)->add($amount)->getAmount($keepDecimals);
+        if ($amount > 0) {
+            return $amount;
+        }
+        return $src;
     }
 
     /**
@@ -376,7 +399,7 @@ class Item implements \App\Service\User\Item
         foreach ($repertoryItem->sku as $sku) {
             $itemSku = ItemSku::query()->where("repertory_item_sku_id", $sku->id)->where("item_id", $item->id)->first();
             //进货价
-            $stockPrice = (string)$sku->stock_price;
+            $stockPrice = ($item->user_id > 0 && $repertoryItem->user_id > 0 && $item->user_id === $repertoryItem->user_id) ? (string)$sku->supply_price : (string)$sku->stock_price;
             //游客底价
             $touristPrice = $stockPrice;
             //原来的进货价（旧的）
@@ -412,8 +435,9 @@ class Item implements \App\Service\User\Item
             }
 
             if ($markup->syncAmount) {
-                $itemSku->price = (new Decimal($touristPrice, 6))->mul($markup->percentage)->add($touristPrice)->getAmount($keepDecimals);
+                $itemSku->price = $this->getPercentageAmount($touristPrice, $markup->percentage, $keepDecimals);
             }
+
             $itemSku->stock_price = $stockPrice;
             $itemSku->save();
 
@@ -556,17 +580,19 @@ class Item implements \App\Service\User\Item
                     return $markupEntity;
                 }
 
-
-                if ($template->drift_model == 0) {
-                    $markupEntity->setPercentage((string)$template->drift_value);
-                    return $markupEntity;
-                }
-
-                if ($template->drift_value > 0) {
-                    $decimal = new Decimal((string)$template->drift_value, 6);
-                    $markupEntity->setPercentage($decimal->div($template->drift_base_amount)->getAmount(6));
-                } else {
-                    $markupEntity->setPercentage("0");
+                switch ($template->drift_model) {
+                    case 0:
+                        $markupEntity->setPercentage((string)$template->drift_value);
+                        return $markupEntity;
+                    case 1:
+                        $markupEntity->setPercentage($template->drift_value > 0 ? (new Decimal((string)$template->drift_value, 6))->div($template->drift_base_amount)->getAmount(6) : "0");
+                        return $markupEntity;
+                    case 2:
+                        $markupEntity->setPercentage((string)-$template->drift_value);
+                        return $markupEntity;
+                    case 3:
+                        $markupEntity->setPercentage($template->drift_value > 0 ? (string)-((new Decimal((string)$template->drift_value, 6))->div($template->drift_base_amount)->getAmount(6)) : "0");
+                        return $markupEntity;
                 }
             }
         } else {
@@ -583,16 +609,19 @@ class Item implements \App\Service\User\Item
                 return $markupEntity;
             }
 
-            if ($markup['drift_model'] == 0) {
-                $markupEntity->setPercentage((string)$markup['drift_value']);
-                return $markupEntity;
-            }
-
-            if ($markup['drift_value'] > 0) {
-                $decimal = new Decimal((string)$markup['drift_value'], 6);
-                $markupEntity->setPercentage($decimal->div((string)$markup['drift_base_amount'])->getAmount());
-            } else {
-                $markupEntity->setPercentage("0");
+            switch ($markup['drift_model']) {
+                case 0:
+                    $markupEntity->setPercentage((string)$markup['drift_value']);
+                    return $markupEntity;
+                case 1:
+                    $markupEntity->setPercentage($markup['drift_value'] > 0 ? (new Decimal((string)$markup['drift_value'], 6))->div($markup['drift_base_amount'])->getAmount(6) : "0");
+                    return $markupEntity;
+                case 2:
+                    $markupEntity->setPercentage((string)-$markup['drift_value']);
+                    return $markupEntity;
+                case 3:
+                    $markupEntity->setPercentage($markup['drift_value'] > 0 ? (string)-((new Decimal((string)$markup['drift_value'], 6))->div($markup['drift_base_amount'])->getAmount(6)) : "0");
+                    return $markupEntity;
             }
         }
 

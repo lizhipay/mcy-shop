@@ -29,10 +29,9 @@ class Pay extends Base
      */
     public function getList(): Response
     {
-        $equipment = UserAgent::isMobile((string)$this->request->header("UserAgent")) ? 1 : 2;
         $business = (string)$this->request->post("business");
         $amount = (string)$this->request->post("amount");
-        $methods = $this->pay->getList(equipment: $equipment, business: $business, user: $this->getSiteOwner(), amount: $amount, options: $this->request->post());
+        $methods = $this->pay->getList(equipment: UserAgent::getEquipment($this->request->header("UserAgent")), business: $business, user: $this->getSiteOwner(), amount: $amount, options: $this->request->post());
         return $this->json(data: $methods, ext: ["balance" => $this->getUser()?->balance, "is_login" => (bool)$this->getUser()]);
     }
 }

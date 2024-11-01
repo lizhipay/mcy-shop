@@ -37,16 +37,20 @@ class Markup
                 return;
             }
 
-            if ($itemMarkupTemplate->drift_model == 0) {
-                $this->setPercentage((string)$itemMarkupTemplate->drift_value);
-                return;
-            }
 
-            if ($itemMarkupTemplate->drift_value > 0) {
-                $decimal = new Decimal((string)$itemMarkupTemplate->drift_value, 6);
-                $this->setPercentage($decimal->div($itemMarkupTemplate->drift_base_amount)->getAmount(6));
-            } else {
-                $this->setPercentage("0");
+            switch ($itemMarkupTemplate->drift_model) {
+                case 0:
+                    $this->setPercentage((string)$itemMarkupTemplate->drift_value);
+                    break;
+                case 1:
+                    $this->setPercentage($itemMarkupTemplate->drift_value > 0 ? (new Decimal((string)$itemMarkupTemplate->drift_value, 6))->div($itemMarkupTemplate->drift_base_amount)->getAmount(6) : "0");
+                    break;
+                case 2:
+                    $this->setPercentage((string)-$itemMarkupTemplate->drift_value);
+                    break;
+                case 3:
+                    $this->setPercentage($itemMarkupTemplate->drift_value > 0 ? (string)-((new Decimal((string)$itemMarkupTemplate->drift_value, 6))->div($itemMarkupTemplate->drift_base_amount)->getAmount(6)) : "0");
+                    break;
             }
         }
     }

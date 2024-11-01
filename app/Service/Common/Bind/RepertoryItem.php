@@ -101,9 +101,20 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                     }
 
                     $createSku = new CreateSku((isset($sku['versions']) && is_array($sku['versions'])) ? $sku['versions'] : [], $sku['name'], $skuPictureUrl, $skuPictureThumbUrl, $sku['price']);
-                    $sku['market_control_only_num'] > 0 && $createSku->setMarketControlOnlyNum($sku['market_control_only_num']);
-                    $sku['market_control_max_num'] > 0 && $createSku->setMarketControlMaxNum($sku['market_control_max_num']);
-                    $sku['market_control_min_num'] > 0 && $createSku->setMarketControlMinNum($sku['market_control_min_num']);
+
+                    if ($sku['market_control']) {
+                        $createSku->setMarketControl(true);
+                        $createSku->setMarketControlMinPrice($sku['market_control_min_price'] ?? "0");
+                        $createSku->setMarketControlMaxPrice($sku['market_control_max_price'] ?? "0");
+                        $createSku->setMarketControlLevelMinPrice($sku['market_control_level_min_price'] ?? "0");
+                        $createSku->setMarketControlLevelMaxPrice($sku['market_control_level_max_price'] ?? "0");
+                        $createSku->setMarketControlUserMinPrice($sku['market_control_user_min_price'] ?? "0");
+                        $createSku->setMarketControlUserMinPrice($sku['market_control_user_max_price'] ?? "0");
+                        $createSku->setMarketControlMinNum((int)$sku['market_control_min_num']);
+                        $createSku->setMarketControlMaxNum((int)$sku['market_control_max_num']);
+                        $createSku->setMarketControlOnlyNum((int)$sku['market_control_only_num']);
+                    }
+
                     $createSku->setPluginData($sku['options'] ?: []);
                     $createSku->setUniqueId($sku['unique_id']);
                     isset($sku['message']) && $createSku->setMessage($sku['message']);
@@ -195,6 +206,7 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
             $repertoryItem->markup_mode = 2;
             $repertoryItem->update_time = $repertoryItem->create_time;
             $repertoryItem->plugin_data = json_encode($createItem->pluginData);
+            $repertoryItem->is_review = 1;
 
             !empty($createItem->uniqueId) && $repertoryItem->unique_id = $createItem->uniqueId;
             $repertoryItem->save();
@@ -220,13 +232,20 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
     public function getPercentageAmount(string $amount, string $exchangeRate, int $keepDecimals, string $percentage): string
     {
         $currency = $this->config->getCurrency();
+
         if ($exchangeRate != 0) {
             $amount = (new Decimal($amount, 6))->div($exchangeRate)->getAmount($keepDecimals);
         }
         if ($currency->code != "rmb") {
             $amount = (new Decimal($amount, 6))->div($currency->rate)->getAmount($keepDecimals);
         }
-        return (new Decimal($amount, 6))->mul($percentage)->add($amount)->getAmount($keepDecimals);
+
+        $src = $amount;
+        $amount = (new Decimal($amount, 6))->mul($percentage)->add($amount)->getAmount($keepDecimals);
+        if ($amount > 0) {
+            return $amount;
+        }
+        return $src;
     }
 
     /**
@@ -246,10 +265,18 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
         $repertoryItemSku->picture_thumb_url = $sku->pictureThumbUrl;
         $repertoryItemSku->name = $sku->name;
         $userId > 0 ? $repertoryItemSku->supply_price = $price : $repertoryItemSku->stock_price = $price;
-        $repertoryItemSku->market_control_status = (int)$sku->marketControlStatus;
-        $repertoryItemSku->market_control_min_num = $sku->marketControlMinNum;
-        $repertoryItemSku->market_control_max_num = $sku->marketControlMaxNum;
-        $repertoryItemSku->market_control_only_num = $sku->marketControlOnlyNum;
+
+        $sku->marketControl && $repertoryItemSku->market_control_status = 1;
+        $sku->marketControlMinNum && $repertoryItemSku->market_control_min_num = $sku->marketControlMinNum;
+        $sku->marketControlMaxNum && $repertoryItemSku->market_control_max_num = $sku->marketControlMaxNum;
+        $sku->marketControlOnlyNum && $repertoryItemSku->market_control_only_num = $sku->marketControlOnlyNum;
+        $sku->marketControlMinPrice && $repertoryItemSku->market_control_min_price = $sku->marketControlMinPrice;
+        $sku->marketControlMaxPrice && $repertoryItemSku->market_control_max_price = $sku->marketControlMaxPrice;
+        $sku->marketControlLevelMinPrice && $repertoryItemSku->market_control_level_min_price = $sku->marketControlLevelMinPrice;
+        $sku->marketControlLevelMaxPrice && $repertoryItemSku->market_control_level_max_price = $sku->marketControlLevelMaxPrice;
+        $sku->marketControlUserMinPrice && $repertoryItemSku->market_control_user_min_price = $sku->marketControlUserMinPrice;
+        $sku->marketControlUserMaxPrice && $repertoryItemSku->market_control_user_max_price = $sku->marketControlUserMaxPrice;
+
         $repertoryItemSku->cost = $this->getPercentageAmount($sku->cost ?? $sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, "0");
         $repertoryItemSku->create_time = Date::current();
         $repertoryItemSku->plugin_data = json_encode($sku->pluginData);
@@ -299,16 +326,19 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                     return $markupEntity;
                 }
 
-                if ($template->drift_model == 0) {
-                    $markupEntity->setPercentage((string)$template->drift_value);
-                    return $markupEntity;
-                }
-
-                if ($template->drift_value > 0) {
-                    $decimal = new Decimal((string)$template->drift_value, 6);
-                    $markupEntity->setPercentage($decimal->div($template->drift_base_amount)->getAmount(6));
-                } else {
-                    $markupEntity->setPercentage("0");
+                switch ($template->drift_model) {
+                    case 0:
+                        $markupEntity->setPercentage((string)$template->drift_value);
+                        return $markupEntity;
+                    case 1:
+                        $markupEntity->setPercentage($template->drift_value > 0 ? (new Decimal((string)$template->drift_value, 6))->div($template->drift_base_amount)->getAmount(6) : "0");
+                        return $markupEntity;
+                    case 2:
+                        $markupEntity->setPercentage((string)-$template->drift_value);
+                        return $markupEntity;
+                    case 3:
+                        $markupEntity->setPercentage($template->drift_value > 0 ? (string)-((new Decimal((string)$template->drift_value, 6))->div($template->drift_base_amount)->getAmount(6)) : "0");
+                        return $markupEntity;
                 }
             }
         } else {
@@ -327,18 +357,19 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                 return $markupEntity;
             }
 
-
-            if ($markup['drift_model'] == 0) {
-                $markupEntity->setPercentage((string)$markup['drift_value']);
-                return $markupEntity;
-
-            }
-
-            if ($markup['drift_value'] > 0) {
-                $decimal = new Decimal((string)$markup['drift_value'], 6);
-                $markupEntity->setPercentage($decimal->div((string)$markup['drift_base_amount'])->getAmount(6));
-            } else {
-                $markupEntity->setPercentage("0");
+            switch ($markup['drift_model']) {
+                case 0:
+                    $markupEntity->setPercentage((string)$markup['drift_value']);
+                    return $markupEntity;
+                case 1:
+                    $markupEntity->setPercentage($markup['drift_value'] > 0 ? (new Decimal((string)$markup['drift_value'], 6))->div($markup['drift_base_amount'])->getAmount(6) : "0");
+                    return $markupEntity;
+                case 2:
+                    $markupEntity->setPercentage((string)-$markup['drift_value']);
+                    return $markupEntity;
+                case 3:
+                    $markupEntity->setPercentage($markup['drift_value'] > 0 ? (string)-((new Decimal((string)$markup['drift_value'], 6))->div($markup['drift_base_amount'])->getAmount(6)) : "0");
+                    return $markupEntity;
             }
         }
 
@@ -483,6 +514,9 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                     $sku->cost && $createSku->setCost($sku->cost);
                     $this->createSku($repertoryItem->user_id, $repertoryItem->id, $createSku, $markup);
                 } else {
+                    //保留小数
+                    $keepDecimals = (int)$markup->keepDecimals;
+
                     ##1 SKU名称同步
                     if ($markup->syncSkuName && $sku->versions['name'] != $repertoryItemSku->version['name']) {
                         $repertoryItemSku->name = $sku->name;
@@ -500,71 +534,80 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                         $repertoryItemSku->picture_thumb_url = $skuPictureThumbUrl;
                     }
 
+
                     ##3 SKU价格同步
-                    if ($markup->syncAmount && $sku->versions['price'] != $repertoryItemSku->version['price']) {
+                    if ($markup->syncAmount) {
+                        $repertoryItemSku->market_control_min_num = $sku->marketControlMinNum;
+                        $repertoryItemSku->market_control_max_num = $sku->marketControlMaxNum;
+                        $repertoryItemSku->market_control_only_num = $sku->marketControlOnlyNum;
+                        $repertoryItemSku->market_control_min_price = $this->getPercentageAmount($sku->marketControlMinPrice, $markup->exchangeRate, $keepDecimals, $markup->percentage);
+                        $repertoryItemSku->market_control_max_price = $this->getPercentageAmount($sku->marketControlMaxPrice, $markup->exchangeRate, $keepDecimals, $markup->percentage);
+                        $repertoryItemSku->market_control_level_min_price = $this->getPercentageAmount($sku->marketControlLevelMinPrice, $markup->exchangeRate, $keepDecimals, $markup->percentage);
+                        $repertoryItemSku->market_control_level_max_price = $this->getPercentageAmount($sku->marketControlLevelMaxPrice, $markup->exchangeRate, $keepDecimals, $markup->percentage);
+                        $repertoryItemSku->market_control_user_min_price = $this->getPercentageAmount($sku->marketControlUserMinPrice, $markup->exchangeRate, $keepDecimals, $markup->percentage);
+                        $repertoryItemSku->market_control_user_max_price = $this->getPercentageAmount($sku->marketControlUserMaxPrice, $markup->exchangeRate, $keepDecimals, $markup->percentage);
 
-                        $price = $this->getPercentageAmount($sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, $markup->percentage); //新的价格
+                        if ($sku->versions['price'] != $repertoryItemSku->version['price'] || $repertoryItemSku->market_control_status != (int)$sku->marketControl) {
+                            $repertoryItemSku->market_control_status = (int)$sku->marketControl;
 
+                            $price = $this->getPercentageAmount($sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, $markup->percentage); //新的价格
 
-                        $keepDecimals = (int)$markup->keepDecimals;
-
-                        if ($repertoryItem->user_id > 0) {
-                            $originalSupplyPrice = $repertoryItemSku->supply_price;
-                            $repertoryItemSku->supply_price = $price;
-                            $repertoryItemSku->stock_price = (new Decimal($repertoryItemSku->supply_price, 6))->div($originalSupplyPrice)->mul($repertoryItemSku->stock_price)->getAmount($keepDecimals); //增加进货价格
-                            $profitRatio = (new Decimal($repertoryItemSku->supply_price, 6))->div($originalSupplyPrice);
-                        } else {
-                            $originalStockPrice = $repertoryItemSku->stock_price;
-                            $repertoryItemSku->stock_price = $price;
-                            $profitRatio = (new Decimal($repertoryItemSku->stock_price, 6))->div($originalStockPrice);
-                        }
-
-                        $repertoryItemSku->cost = $this->getPercentageAmount($sku->cost ?? $sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, "0");
-
-
-                        /**
-                         * 同步用户组进货价
-                         * @var RepertoryItemSkuGroup[] $repertoryItemSkuGroups
-                         */
-                        $repertoryItemSkuGroups = RepertoryItemSkuGroup::query()->where("sku_id", $repertoryItemSku->id)->get();
-                        foreach ($repertoryItemSkuGroups as $repertoryItemSkuGroup) {
-                            $repertoryItemSkuGroup->stock_price = (clone $profitRatio)->mul($repertoryItemSkuGroup->stock_price)->getAmount($keepDecimals);
-                            $repertoryItemSkuGroup->save();
-                        }
-
-                        /**
-                         * 同步商家私密进货价
-                         * @var RepertoryItemSkuUser[] $repertoryItemSkuUsers
-                         */
-                        $repertoryItemSkuUsers = RepertoryItemSkuUser::query()->where("sku_id", $repertoryItemSku->id)->get();
-                        foreach ($repertoryItemSkuUsers as $repertoryItemSkuUser) {
-                            $repertoryItemSkuUser->stock_price = (clone $profitRatio)->mul($repertoryItemSkuUser->stock_price)->getAmount($keepDecimals);
-                            $repertoryItemSkuUser->save();
-                        }
-
-                        /**
-                         * 同步批发进货价
-                         * @var RepertoryItemSkuWholesale[] $repertoryItemSkuWholesales
-                         */
-                        $repertoryItemSkuWholesales = RepertoryItemSkuWholesale::query()->where("sku_id", $repertoryItemSku->id)->get();
-                        foreach ($repertoryItemSkuWholesales as $repertoryItemSkuWholesale) {
-                            $repertoryItemSkuWholesale->stock_price = (clone $profitRatio)->mul($repertoryItemSkuWholesale->stock_price)->getAmount($keepDecimals);
-                            $repertoryItemSkuWholesale->save();
-
-                            $repertoryItemSkuWholesaleGroups = RepertoryItemSkuWholesaleGroup::query()->where("wholesale_id", $repertoryItemSkuWholesale->id)->get();
-                            foreach ($repertoryItemSkuWholesaleGroups as $repertoryItemSkuWholesaleGroup) {
-                                $repertoryItemSkuWholesaleGroup->stock_price = (clone $profitRatio)->mul($repertoryItemSkuWholesaleGroup->stock_price)->getAmount($keepDecimals);
-                                $repertoryItemSkuWholesaleGroup->save();
+                            if ($repertoryItem->user_id > 0) {
+                                $originalSupplyPrice = $repertoryItemSku->supply_price;
+                                $repertoryItemSku->supply_price = $price;
+                                $repertoryItemSku->stock_price = (new Decimal($repertoryItemSku->supply_price, 6))->div($originalSupplyPrice)->mul($repertoryItemSku->stock_price)->getAmount($keepDecimals); //增加进货价格
+                                $profitRatio = (new Decimal($repertoryItemSku->supply_price, 6))->div($originalSupplyPrice);
+                            } else {
+                                $originalStockPrice = $repertoryItemSku->stock_price;
+                                $repertoryItemSku->stock_price = $price;
+                                $profitRatio = (new Decimal($repertoryItemSku->stock_price, 6))->div($originalStockPrice);
                             }
 
-                            $repertoryItemSkuWholesaleUsers = RepertoryItemSkuWholesaleUser::query()->where("wholesale_id", $repertoryItemSkuWholesale->id)->get();
-                            foreach ($repertoryItemSkuWholesaleUsers as $repertoryItemSkuWholesaleUser) {
-                                $repertoryItemSkuWholesaleUser->stock_price = (clone $profitRatio)->mul($repertoryItemSkuWholesaleUser->stock_price)->getAmount($keepDecimals);
-                                $repertoryItemSkuWholesaleUser->save();
+                            $repertoryItemSku->cost = $this->getPercentageAmount($sku->cost ?? $sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, "0");
+
+                            /**
+                             * 同步用户组进货价
+                             * @var RepertoryItemSkuGroup[] $repertoryItemSkuGroups
+                             */
+                            $repertoryItemSkuGroups = RepertoryItemSkuGroup::query()->where("sku_id", $repertoryItemSku->id)->get();
+                            foreach ($repertoryItemSkuGroups as $repertoryItemSkuGroup) {
+                                $repertoryItemSkuGroup->stock_price = (clone $profitRatio)->mul($repertoryItemSkuGroup->stock_price)->getAmount($keepDecimals);
+                                $repertoryItemSkuGroup->save();
+                            }
+
+                            /**
+                             * 同步商家私密进货价
+                             * @var RepertoryItemSkuUser[] $repertoryItemSkuUsers
+                             */
+                            $repertoryItemSkuUsers = RepertoryItemSkuUser::query()->where("sku_id", $repertoryItemSku->id)->get();
+                            foreach ($repertoryItemSkuUsers as $repertoryItemSkuUser) {
+                                $repertoryItemSkuUser->stock_price = (clone $profitRatio)->mul($repertoryItemSkuUser->stock_price)->getAmount($keepDecimals);
+                                $repertoryItemSkuUser->save();
+                            }
+
+                            /**
+                             * 同步批发进货价
+                             * @var RepertoryItemSkuWholesale[] $repertoryItemSkuWholesales
+                             */
+                            $repertoryItemSkuWholesales = RepertoryItemSkuWholesale::query()->where("sku_id", $repertoryItemSku->id)->get();
+                            foreach ($repertoryItemSkuWholesales as $repertoryItemSkuWholesale) {
+                                $repertoryItemSkuWholesale->stock_price = (clone $profitRatio)->mul($repertoryItemSkuWholesale->stock_price)->getAmount($keepDecimals);
+                                $repertoryItemSkuWholesale->save();
+
+                                $repertoryItemSkuWholesaleGroups = RepertoryItemSkuWholesaleGroup::query()->where("wholesale_id", $repertoryItemSkuWholesale->id)->get();
+                                foreach ($repertoryItemSkuWholesaleGroups as $repertoryItemSkuWholesaleGroup) {
+                                    $repertoryItemSkuWholesaleGroup->stock_price = (clone $profitRatio)->mul($repertoryItemSkuWholesaleGroup->stock_price)->getAmount($keepDecimals);
+                                    $repertoryItemSkuWholesaleGroup->save();
+                                }
+
+                                $repertoryItemSkuWholesaleUsers = RepertoryItemSkuWholesaleUser::query()->where("wholesale_id", $repertoryItemSkuWholesale->id)->get();
+                                foreach ($repertoryItemSkuWholesaleUsers as $repertoryItemSkuWholesaleUser) {
+                                    $repertoryItemSkuWholesaleUser->stock_price = (clone $profitRatio)->mul($repertoryItemSkuWholesaleUser->stock_price)->getAmount($keepDecimals);
+                                    $repertoryItemSkuWholesaleUser->save();
+                                }
                             }
                         }
                     }
-
 
                     //同步结束
                     $repertoryItemSku->version = $sku->versions;

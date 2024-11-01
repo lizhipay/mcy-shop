@@ -8,12 +8,14 @@ const _Dict = new class _Dict extends _DictUtil {
                 {id: 1, name: format.danger('私有域名')}
             ],
             markup_mode: [
-                {id: 0, name: format.danger('独立配置')},
+                {id: 0, name: format.danger('自定义配置')},
                 {id: 1, name: format.success('模板配置')}
             ],
             markup_type: [
-                {id: 0, name: format.danger('比例向上浮动')},
-                {id: 1, name: format.success('固定金额向上浮动')}
+                {id: 0, name: format.success('比例向上浮动')},
+                {id: 1, name: format.success('固定金额向上浮动')},
+                {id: 2, name: format.danger('比例向下浮动')},
+                {id: 3, name: format.danger('固定金额向下浮动')}
             ],
             shop_item_status: [
                 {id: 0, name: format.danger('未上架')},
@@ -54,7 +56,8 @@ const _Dict = new class _Dict extends _DictUtil {
             pay_equipment: [
                 {id: 0, name: format.info(util.icon('icon-shangyehuaquanqiu') + " " + "通用")},
                 {id: 1, name: format.success(util.icon('icon-shouji3') + " " + "手机")},
-                {id: 2, name: format.cambridgeBlue(util.icon('icon-diannao') + " " + "电脑")}
+                {id: 2, name: format.cambridgeBlue(util.icon('icon-diannao') + " " + "电脑")},
+                {id: 3, name: format.success(util.icon('icon-weixin') + " " + "微信")}
             ],
             pay_scope: [
                 {id: "product", name: "购物"},

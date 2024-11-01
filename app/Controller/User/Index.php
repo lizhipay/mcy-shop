@@ -111,10 +111,7 @@ class Index extends Base
         if ($order->status == 1) {
             return $this->response->redirect("/pay/sync." . $tradeNo);
         }
-
-        $equipment = UserAgent::isMobile((string)$this->request->header("UserAgent")) ? 1 : 2;
-
-        $pay = $this->pay->getList($equipment, "product", $this->getSiteOwner(), $order->totalAmount);
+        $pay = $this->pay->getList(UserAgent::getEquipment($this->request->header("UserAgent")), "product", $this->getSiteOwner(), $order->totalAmount);
         return $this->theme(Theme::CHECKOUT, "Index/Checkout.html", "结账", ["category" => $this->getCategory(), "order" => $order->toArray(), 'pay' => $pay]);
     }
 

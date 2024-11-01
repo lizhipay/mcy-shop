@@ -42,7 +42,7 @@ class RepertoryItemSku
         $this->pictureUrl = $repertoryItemSku->picture_url;
         $this->pictureThumbUrl = $repertoryItemSku->picture_thumb_url;
         $this->stockPrice = (string)$repertoryItemSku->stock_price;
-        $this->marketControlStatus = $repertoryItemSku->market_control_status;
+        $this->marketControlStatus = (int)$repertoryItemSku->market_control_status;
         $this->marketControlMaxPrice = (string)$repertoryItemSku->market_control_max_price;
         $this->marketControlMinPrice = (string)$repertoryItemSku->market_control_min_price;
     }
