@@ -41,13 +41,13 @@ class Composer
         if (App::$cli) {
             switch ($option['command']) {
                 case 'require':
-                    Shell::inst()->exec("{$this->composer} require {$option['packages'][0]} --no-interaction --prefer-source --working-dir={$this->workingDir}");
+                    Shell::inst()->exec("sudo {$this->composer} require {$option['packages'][0]} --no-interaction --prefer-source --working-dir={$this->workingDir}");
                     break;
                 case 'remove':
-                    Shell::inst()->exec("{$this->composer} remove {$option['packages'][0]} --no-interaction --working-dir={$this->workingDir}");
+                    Shell::inst()->exec("sudo {$this->composer} remove {$option['packages'][0]} --no-interaction --working-dir={$this->workingDir}");
                     break;
                 case 'config':
-                    Shell::inst()->exec("{$this->composer} config repo.packagist composer {$option['value']} --no-interaction --working-dir={$this->workingDir}");
+                    Shell::inst()->exec("sudo {$this->composer} config repo.packagist composer {$option['value']} --no-interaction --working-dir={$this->workingDir}");
                     break;
             }
             return;
