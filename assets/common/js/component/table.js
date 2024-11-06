@@ -171,16 +171,17 @@ class Table {
 
 
     /**
-     * 添加搜索工具栏
+     *
      * @param search
+     * @param button
      */
-    setSearch(search) {
+    setSearch(search, button = true) {
         this.isShowToolbar = true;
         this.search = new Search(this.$toolbar, search, data => {
             this.$table.bootstrapTable('refresh', {
                 silent: false, pageNumber: 1, query: data
             });
-        });
+        }, button);
     }
 
 
@@ -194,6 +195,13 @@ class Table {
             list.push(item.id);
         });
         return list;
+    }
+
+    fullTextSearch(keywords) {
+        this.$table.find("tbody").find("tr").each(function () {
+            const text = $(this).text().toLowerCase();
+            $(this).toggle(text.includes(keywords));
+        });
     }
 
 
@@ -712,11 +720,11 @@ class Table {
                                 }
                             });
 
-                            _this.floatMessageMap[item.id] = layer.tips(html.replaceAll("\n", "<br>"), this, {
+                            item?.id && (_this.floatMessageMap[item?.id] = layer.tips(html.replaceAll("\n", "<br>"), this, {
                                 tips: 1,
                                 time: 0,
                                 maxWidth: 920
-                            });
+                            }));
                         },
                         function () {
                             if (isCtrlPressed) {
@@ -724,8 +732,8 @@ class Table {
                             }
                             const index = $(this).data('index');
                             const item = _this.$table.bootstrapTable('getData')[index];
-                            layer.close(_this.floatMessageMap[item.id]);
-                            delete _this.floatMessageMap[item.id];
+                            item?.id && layer.close(_this.floatMessageMap[item?.id]);
+                            item?.id && (delete _this.floatMessageMap[item?.id]);
                         }
                     );
                 }

@@ -59,6 +59,14 @@ interface RepertoryItemSku
      */
     public function getCache(int $repertoryItemSkuId, int $type): ?string;
 
+
+    /**
+     * @param int $repertoryItemSkuId
+     * @return bool
+     */
+    public function existCache(int $repertoryItemSkuId): bool;
+
+
     /**
      * @param int $repertoryItemSkuId
      * @param bool $force
@@ -82,6 +90,14 @@ interface RepertoryItemSku
 
 
     /**
+     * @param int $repertoryItemId
+     * @return void
+     */
+    public function checkSyncCacheForItem(int $repertoryItemId): void;
+
+
+    /**
+     * 废弃，禁止调用
      * @param int $repertoryItemId
      * @return void
      */

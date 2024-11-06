@@ -47,5 +47,7 @@
 
 
 {{ ready("/assets/user/controller/global.js")|raw }}
+
+{{ hook(env() , point("USER_COMMON_FOOTER") , 1)|raw }}
 </body>
 </html>

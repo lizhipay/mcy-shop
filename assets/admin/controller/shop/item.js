@@ -946,7 +946,7 @@
                         layer.close(startLoadIndex);
                         resolve(false);
                     });
-                }, 300, true);
+                }, 30, true);
             },
             tab: [
                 {

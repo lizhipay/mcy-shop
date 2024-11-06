@@ -184,4 +184,9 @@ interface Point
 
 
     public const MODEL_REPERTORY_ORDER_SAVE = 0x9048;
+
+
+    //用户中心全局header
+    public const USER_COMMON_HEADER = 0x9049;
+    public const USER_COMMON_FOOTER = 0x9050;
 }

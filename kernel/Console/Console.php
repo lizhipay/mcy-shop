@@ -32,6 +32,7 @@ class Console
     /**
      * @param array $arg
      * @return void
+     * @throws \ReflectionException
      */
     public function execute(array $arg): void
     {

@@ -477,6 +477,30 @@
                                 tips: "请指出1元人民币对应的外币金额。例如，若1美元等于7.23元人民币，则此处填写7.23。同理，可按此方式计算其他币种的兑换比例。"
                             }
                         ]
+                    },
+                    {
+                        name: util.icon('icon-shouyintai-copy') + ' 收银台',
+                        form: [
+                            {
+                                title: false,
+                                name: "checkout_counter_tips",
+                                type: "custom",
+                                complete: (form, dom) => {
+                                    dom.html(`
+<div class="block-tips">
+<p>收银台功能是指在支付过程中，避免跳转至外部支付平台网站的情况下，系统通过本地化处理直接提供支付二维码或相关支付场景的渲染。启用此功能后，用户能够在本地完成支付操作，无需跳转至第三方网站，提升支付体验的流畅度与安全性。</p>
+</div>
+                                    `);
+
+                                }
+                            },
+                            {
+                                title: "启用收银台",
+                                name: "checkout_counter",
+                                type: "switch",
+                                default: 0
+                            }
+                        ]
                     }
                 ],
                 autoPosition: true,

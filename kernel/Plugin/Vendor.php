@@ -73,6 +73,7 @@ class Vendor
 
     /**
      * @return void
+     * @throws \ReflectionException
      */
     public function load(): void
     {

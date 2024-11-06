@@ -88,9 +88,11 @@ class Ship extends Base
         $autoReceiptTime = (int)$this->request->post("auto_receipt_time");
         $markupTemplateId = (int)$this->request->post("markup_template_id");
         $imageDownloadLocal = (bool)$this->request->post("image_download_local", Filter::BOOLEAN);
-        $items = $this->request->post("items", Filter::NORMAL);
+        $checkRepeat = (bool)$this->request->post("check_repeat", Filter::BOOLEAN);
 
-        if (!is_array($items) || empty($items)) {
+        $item = $this->request->post("item", Filter::NORMAL);
+
+        if (!is_array($item) || empty($item)) {
             throw new JSONException("请选择要导入的商品");
         }
 
@@ -98,8 +100,8 @@ class Ship extends Base
             throw new JSONException("远程同步模板不存在");
         }
 
-        $data = $this->repertoryItem->import($this->getUser()->id, $markupTemplateId, $categoryId, $configId, $refundMode, $autoReceiptTime, $items, $imageDownloadLocal);
-        return $this->json(data: $data);
+        $this->repertoryItem->import($this->getUser()->id, $markupTemplateId, $categoryId, $configId, $refundMode, $autoReceiptTime, $item, $imageDownloadLocal, $checkRepeat);
+        return $this->json();
     }
 
 

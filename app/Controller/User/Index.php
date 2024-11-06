@@ -89,10 +89,9 @@ class Index extends Base
     {
         try {
             $item = $this->item->getItem($this->getUser(), $id, $this->getSiteOwner());
-        } catch (JSONException $e) {
+        } catch (\Throwable $e) {
             throw new ViewException($e->getMessage(), $e->getCode());
         }
-
         return $this->theme(Theme::ITEM, "Index/Item.html", "商品详细页", ["category" => $this->getCategory(), "item" => $item->toArray()]);
     }
 

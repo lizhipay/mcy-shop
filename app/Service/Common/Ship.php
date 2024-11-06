@@ -3,6 +3,7 @@ declare (strict_types=1);
 
 namespace App\Service\Common;
 
+use App\Const\RepertoryItemSkuCache;
 use App\Model\RepertoryOrder;
 use Kernel\Annotation\Bind;
 
@@ -21,9 +22,10 @@ interface Ship
     /**
      * 获取库存
      * @param int $repertoryItemSkuId
+     * @param int $action
      * @return string
      */
-    public function stock(int $repertoryItemSkuId): string;
+    public function stock(int $repertoryItemSkuId, int $action = RepertoryItemSkuCache::ACTION_READ_CACHE): string;
 
 
     /**
@@ -37,7 +39,8 @@ interface Ship
      * 库存是否充足
      * @param int $repertoryItemSkuId
      * @param int $quantity
+     * @param int $action
      * @return bool
      */
-    public function hasEnoughStock(int $repertoryItemSkuId, int $quantity = 1): bool;
+    public function hasEnoughStock(int $repertoryItemSkuId, int $quantity = 1, int $action = RepertoryItemSkuCache::ACTION_READ_CACHE): bool;
 }

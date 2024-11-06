@@ -22,11 +22,12 @@ interface RepertoryItem
      * @param int $configId
      * @param int $refundMode
      * @param int $autoReceiptTime
-     * @param array $items
+     * @param array $item
      * @param bool $imageDownloadLocal
-     * @return array
+     * @param bool $checkRepeat
+     * @return void
      */
-    public function import(?int $userId, int $markupTemplateId, int $categoryId, int $configId, int $refundMode, int $autoReceiptTime, array $items, bool $imageDownloadLocal): array;
+    public function import(?int $userId, int $markupTemplateId, int $categoryId, int $configId, int $refundMode, int $autoReceiptTime, array $item, bool $imageDownloadLocal, bool $checkRepeat = false): void;
 
     /**
      * @param CreateItem $createItem

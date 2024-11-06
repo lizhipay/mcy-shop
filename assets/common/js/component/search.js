@@ -1,6 +1,6 @@
 class Search {
 
-    constructor(elm, opt, click = null) {
+    constructor(elm, opt, click = null, button = true) {
         this.unique = util.generateRandStr(8);
         this.opt = opt;
         this.item = {};
@@ -35,7 +35,7 @@ class Search {
             }
         });
 
-        this.registerButton(instance, click);
+        button && this.registerButton(instance, click);
     }
 
 
@@ -43,9 +43,17 @@ class Search {
         return item.hasOwnProperty('width') ? 'style="width:' + (util.isPc() ? item.width + "px" : "100%") + ';"' : '';
     }
 
+    getClass(item) {
+        let classes = '';
+        if (item?.align) {
+            classes += ` text-${item.align} `;
+        }
+        return classes.trim();
+    }
+
     inputHtml(item) {
         return `<div class="layui-input-inline ${(item.hide ? 'hide' : '')} e-${item.name}" ${this.getWidth(item)}>
-                    <input type="text" class="layui-input" placeholder="${item.title}" name="${item.name}" value="${item.default ?? ''}">
+                    <input type="text" class="layui-input ${this.getClass(item)}" ${this.getWidth(item)} placeholder="${item.title}" name="${item.name}" value="${item.default ?? ''}">
                 </div>`;
     }
 
@@ -55,7 +63,7 @@ class Search {
             item.change && item.change(_this, this.value);
         }).on('keydown', function (event) {
             if (event.keyCode === 13) {
-                $(".query-button").click();
+                $(this).parent().parent().find('.query-button').click();
             }
         });
     }

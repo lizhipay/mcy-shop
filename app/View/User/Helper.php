@@ -7,13 +7,18 @@ use App\Model\Site;
 use App\Model\User;
 use App\Service\User\Item;
 use App\View\Helper as H;
+use Kernel\Annotation\Inject;
 use Kernel\Component\Singleton;
 use Kernel\Container\Di;
+use Kernel\Context\App;
 use Kernel\Context\Interface\Request;
 use Kernel\Context\Interface\Route;
 use Kernel\Exception\NotFoundException;
 use Kernel\Language\Language;
+use Kernel\Plugin\Const\Point;
 use Kernel\Plugin\Menu;
+use Kernel\Plugin\Plugin;
+use Kernel\Plugin\Usr;
 use Kernel\Util\Config;
 use Kernel\Util\Context;
 use Kernel\Waf\Filter;
@@ -23,6 +28,9 @@ use Twig\TwigFunction;
 class Helper extends AbstractExtension
 {
     use Singleton;
+
+    #[Inject]
+    private \App\Service\Common\Config $config;
 
     /**
      * @return TwigFunction[]
@@ -42,16 +50,54 @@ class Helper extends AbstractExtension
             new TwigFunction('plugin_menus', [$this, 'getPluginMenus']),
             new TwigFunction('view_languages', [$this, 'getViewLanguages']),
             new TwigFunction('items', [$this, 'getItems']),
+            new TwigFunction('user_var', [$this, 'getUserVar']),
+            new TwigFunction('index_var', [$this, 'getIndexVar']),
         ];
     }
 
 
     /**
+     * @return string
+     * @throws \ReflectionException
+     */
+    public function getUserVar(): string
+    {
+        $user = Context::get(User::class);
+        $env = Usr::inst()->userToEnv($user?->id);
+        return H::inst()->setScriptVar([
+            "language" => strtolower(Context::get(\Kernel\Language\Entity\Language::class)->preferred),
+            "DEBUG" => App::$debug,
+            "CCY" => $this->config->getCurrency()->symbol,
+            "HACK_ROUTE_TABLE_COLUMNS" => Plugin::inst()->hook($env, Point::HACK_ROUTE_TABLE_COLUMNS),
+            "HACK_SUBMIT_FORM" => Plugin::inst()->hook($env, Point::HACK_SUBMIT_FORM),
+            "HACK_SUBMIT_TAB" => Plugin::inst()->hook($env, Point::HACK_SUBMIT_TAB),
+            "group" => $user?->group?->toArray() ?? [],
+            "PAY_CONFIG_CHECKOUT_COUNTER" => $this->config->getMainConfig("pay.checkout_counter") ?? 0
+        ]);
+    }
+
+    /**
+     * @return string
+     * @throws \ReflectionException
+     */
+    public function getIndexVar(): string
+    {
+        return H::inst()->setScriptVar([
+            "language" => strtolower(Context::get(\Kernel\Language\Entity\Language::class)->preferred),
+            "DEBUG" => App::$debug,
+            "CCY" => $this->config->getCurrency()->symbol,
+            "PAY_CONFIG_CHECKOUT_COUNTER" => $this->config->getMainConfig("pay.checkout_counter") ?? 0
+        ]);
+    }
+
+    /**
+     * @param int|null $page
+     * @param int|null $size
      * @return array
      * @throws NotFoundException
      * @throws \ReflectionException
      */
-    public function getItems(): array
+    public function getItems(?int $page = null, ?int $size = null): array
     {
         /**
          * @var Request $request
@@ -66,7 +112,9 @@ class Helper extends AbstractExtension
             customer: Context::get(User::class),
             categoryId: $request->get("cid", Filter::INTEGER),
             merchant: $siteOwner,
-            keywords: $request->get("keywords")
+            keywords: $request->get("keywords"),
+            page: $page,
+            size: $size
         );
     }
 

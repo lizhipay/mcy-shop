@@ -69,8 +69,20 @@ class Item extends Base
         $get->setOrderBy(...$this->query->getOrderBy($map, "sort", "asc"));
         $raw = [];
 
-        $data = $this->query->get($get, function (Builder $builder) use (&$raw) {
+        $data = $this->query->get($get, function (Builder $builder) use (&$raw, $map) {
             $builder = $builder->where("user_id", $this->getUser()->id);
+
+            if (isset($map['direct_status']) && $map['direct_status'] !== "") {
+                if ($map['direct_status'] == 1) {
+                    $builder = $builder->whereHas("userItem", function (Builder $b) use ($map) {
+                        $b->where("user_id", $this->getUser()->id);
+                    });
+                } else {
+                    $builder = $builder->whereDoesntHave("userItem", function (Builder $b) use ($map) {
+                        $b->where("user_id", $this->getUser()->id);
+                    });
+                }
+            }
 
             $raw['under_review_count'] = (clone $builder)->where("status", 0)->count();
             $raw['shelves_not_count'] = (clone $builder)->where("status", 1)->count();
@@ -176,7 +188,7 @@ class Item extends Base
 
         try {
             if ($origin && ((isset($map['plugin']) && $origin->plugin != $map['plugin']) || (isset($map['status']) && $origin->status != $map['status']))) {
-                $this->sku->syncCacheForItem($origin->id);
+                $this->sku->checkSyncCacheForItem($origin->id);
             }
 
             $saved = $this->query->save($save);
@@ -220,13 +232,13 @@ class Item extends Base
      * @throws RuntimeException
      */
     #[Validator([
-        [Common::class, ["status", "list"]]
+        [Common::class, ["status", "id"]]
     ])]
     public function updateStatus(): Response
     {
-        $list = (array)$this->request->post("list", Filter::INTEGER);
+        $id = $this->request->post("id", Filter::INTEGER);
         $status = $this->request->post("status", Filter::INTEGER);
-        Model::query()->where("user_id", $this->getUser()->id)->whereIn("id", $list)->update(["status" => $status == 1 ? 2 : 1]);
+        Model::query()->where("user_id", $this->getUser()->id)->where("id", $id)->update(["status" => $status == 1 ? 2 : 1]);
         return $this->json();
     }
 

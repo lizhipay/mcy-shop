@@ -45,14 +45,16 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
      * @param int $configId
      * @param int $refundMode
      * @param int $autoReceiptTime
-     * @param array $items
+     * @param array $item
      * @param bool $imageDownloadLocal
-     * @return array
+     * @param bool $checkRepeat
+     * @return void
      * @throws JSONException
      * @throws ServiceException
      * @throws \ReflectionException
+     * @throws \Throwable
      */
-    public function import(?int $userId, int $markupTemplateId, int $categoryId, int $configId, int $refundMode, int $autoReceiptTime, array $items, bool $imageDownloadLocal): array
+    public function import(?int $userId, int $markupTemplateId, int $categoryId, int $configId, int $refundMode, int $autoReceiptTime, array $item, bool $imageDownloadLocal, bool $checkRepeat = false): void
     {
         if (!RepertoryCategory::where("id", $categoryId)->exists()) {
             throw new JSONException("仓库不存在");
@@ -75,88 +77,89 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
             throw new ServiceException("插件未启动");
         }
 
-        $count = count($items);
-        $success = 0;
+        //$count = count($items);
+        //$success = 0;
 
-        foreach ($items as $item) {
-            try {
-                /*      移除重复货源检测        if (!isset($item['unique_id']) || \App\Model\RepertoryItem::query()->where("unique_id", $item['unique_id'])->exists()) {
-                                 $plugin->log("[{$item['name']}]->失败：已经存在此货源：{$item['unique_id']}", true);
-                                 continue;
-                             }*/
-
-                $itemPictureUrl = $item['picture_url'];
-                $itemPictureThumbUrl = $itemPictureUrl;
-                if ($imageDownloadLocal) {
-                    list($itemPictureUrl, $itemPictureThumbUrl) = $this->image->downloadRemoteImage($itemPictureUrl, true, $userId);
-                }
-
-                $skus = [];
-                //sku
-                foreach ($item['skus'] as $sku) {
-                    $skuPictureUrl = $sku['picture_url'];
-                    $skuPictureThumbUrl = $skuPictureUrl;
-                    if ($imageDownloadLocal) {
-                        list($skuPictureUrl, $skuPictureThumbUrl) = $this->image->downloadRemoteImage($skuPictureUrl, true, $userId);
-                    }
-
-                    $createSku = new CreateSku((isset($sku['versions']) && is_array($sku['versions'])) ? $sku['versions'] : [], $sku['name'], $skuPictureUrl, $skuPictureThumbUrl, $sku['price']);
-
-                    if ($sku['market_control']) {
-                        $createSku->setMarketControl(true);
-                        $createSku->setMarketControlMinPrice($sku['market_control_min_price'] ?? "0");
-                        $createSku->setMarketControlMaxPrice($sku['market_control_max_price'] ?? "0");
-                        $createSku->setMarketControlLevelMinPrice($sku['market_control_level_min_price'] ?? "0");
-                        $createSku->setMarketControlLevelMaxPrice($sku['market_control_level_max_price'] ?? "0");
-                        $createSku->setMarketControlUserMinPrice($sku['market_control_user_min_price'] ?? "0");
-                        $createSku->setMarketControlUserMinPrice($sku['market_control_user_max_price'] ?? "0");
-                        $createSku->setMarketControlMinNum((int)$sku['market_control_min_num']);
-                        $createSku->setMarketControlMaxNum((int)$sku['market_control_max_num']);
-                        $createSku->setMarketControlOnlyNum((int)$sku['market_control_only_num']);
-                    }
-
-                    $createSku->setPluginData($sku['options'] ?: []);
-                    $createSku->setUniqueId($sku['unique_id']);
-                    isset($sku['message']) && $createSku->setMessage($sku['message']);
-                    isset($sku['cost']) && $createSku->setCost($sku['cost']);
-
-                    $skus[] = $createSku;
-                }
-
-                $introduce = (string)$item['introduce'];
-
-                if ($imageDownloadLocal) {
-                    $introduce = preg_replace_callback('/<img[^>]+src=["\']?([^"\'>]+)["\']?[^>]*>/i', function ($matches) use ($userId) {
-                        $originalSrc = $matches[1];
-                        if (!preg_match('/^(http:\/\/|https:\/\/)/i', $originalSrc)) {
-                            return $matches[0];
-                        }
-                        //下载
-                        $downloadRemoteImage = $this->image->downloadRemoteImage($originalSrc, false, $userId);
-                        return str_replace($originalSrc, $downloadRemoteImage[0], $matches[0]);
-                    }, $introduce);
-                }
-
-                $createItem = new CreateItem($markupTemplateId, (isset($item['versions']) && is_array($item['versions'])) ? $item['versions'] : [], $categoryId, $item['name'], $introduce, $itemPictureUrl, $itemPictureThumbUrl, $config->plugin, $skus);
-                $createItem->setWidget($item['widgets']);
-                $createItem->setAttr($item['attr']);
-                $createItem->setRefundMode($refundMode);
-                $createItem->setAutoReceiptTime($autoReceiptTime);
-                $createItem->setShipConfigId($configId);
-                $createItem->setUniqueId($item['unique_id']);
-                $createItem->setUserId($userId);
-                $createItem->setPluginData($item['options'] ?: []);
-
-                //导入
-                $this->create($createItem);
-                $plugin->log("[{$item['name']}]->成功!", true);
-                $success++;
-            } catch (\Throwable $e) {
-                $plugin->log("[{$item['name']}]->" . $e->getMessage(), true);
-            }
+        // foreach ($items as $item) {
+        // try {
+        if ($checkRepeat && isset($item['unique_id']) && \App\Model\RepertoryItem::query()->where("unique_id", $item['unique_id'])->exists()) {
+            /*    $plugin->log("[{$item['name']}]->重复检测：已经存在此货源：{$item['unique_id']}", true);
+                continue;*/
+            throw new ServiceException("[{$item['name']}]->重复检测：已经存在此货源：{$item['unique_id']}");
         }
 
-        return ["total" => $count, "success" => $success];
+        $itemPictureUrl = $item['picture_url'];
+        $itemPictureThumbUrl = $itemPictureUrl;
+        if ($imageDownloadLocal) {
+            list($itemPictureUrl, $itemPictureThumbUrl) = $this->image->downloadRemoteImage($itemPictureUrl, true, $userId);
+        }
+
+        $skus = [];
+        //sku
+        foreach ($item['skus'] as $sku) {
+            $skuPictureUrl = $sku['picture_url'];
+            $skuPictureThumbUrl = $skuPictureUrl;
+            if ($imageDownloadLocal) {
+                list($skuPictureUrl, $skuPictureThumbUrl) = $this->image->downloadRemoteImage($skuPictureUrl, true, $userId);
+            }
+
+            $createSku = new CreateSku((isset($sku['versions']) && is_array($sku['versions'])) ? $sku['versions'] : [], $sku['name'], $skuPictureUrl, $skuPictureThumbUrl, $sku['price']);
+
+            if ($sku['market_control']) {
+                $createSku->setMarketControl(true);
+                $createSku->setMarketControlMinPrice($sku['market_control_min_price'] ?? "0");
+                $createSku->setMarketControlMaxPrice($sku['market_control_max_price'] ?? "0");
+                $createSku->setMarketControlLevelMinPrice($sku['market_control_level_min_price'] ?? "0");
+                $createSku->setMarketControlLevelMaxPrice($sku['market_control_level_max_price'] ?? "0");
+                $createSku->setMarketControlUserMinPrice($sku['market_control_user_min_price'] ?? "0");
+                $createSku->setMarketControlUserMinPrice($sku['market_control_user_max_price'] ?? "0");
+                $createSku->setMarketControlMinNum((int)$sku['market_control_min_num']);
+                $createSku->setMarketControlMaxNum((int)$sku['market_control_max_num']);
+                $createSku->setMarketControlOnlyNum((int)$sku['market_control_only_num']);
+            }
+
+            $createSku->setPluginData($sku['options'] ?: []);
+            $createSku->setUniqueId($sku['unique_id']);
+            isset($sku['message']) && $createSku->setMessage($sku['message']);
+            isset($sku['cost']) && $createSku->setCost($sku['cost']);
+
+            $skus[] = $createSku;
+        }
+
+        $introduce = (string)$item['introduce'];
+
+        if ($imageDownloadLocal) {
+            $introduce = preg_replace_callback('/<img[^>]+src=["\']?([^"\'>]+)["\']?[^>]*>/i', function ($matches) use ($userId) {
+                $originalSrc = $matches[1];
+                if (!preg_match('/^(http:\/\/|https:\/\/)/i', $originalSrc)) {
+                    return $matches[0];
+                }
+                //下载
+                $downloadRemoteImage = $this->image->downloadRemoteImage($originalSrc, false, $userId);
+                return str_replace($originalSrc, $downloadRemoteImage[0], $matches[0]);
+            }, $introduce);
+        }
+
+        $createItem = new CreateItem($markupTemplateId, (isset($item['versions']) && is_array($item['versions'])) ? $item['versions'] : [], $categoryId, $item['name'], $introduce, $itemPictureUrl, $itemPictureThumbUrl, $config->plugin, $skus);
+        $createItem->setWidget($item['widgets']);
+        $createItem->setAttr($item['attr']);
+        $createItem->setRefundMode($refundMode);
+        $createItem->setAutoReceiptTime($autoReceiptTime);
+        $createItem->setShipConfigId($configId);
+        $createItem->setUniqueId($item['unique_id']);
+        $createItem->setUserId($userId);
+        $createItem->setPluginData($item['options'] ?: []);
+
+        //导入
+        $repertoryItem = $this->create($createItem);
+        // $plugin->log("[{$item['name']}]->成功!", true);
+        // $success++;
+        /*            } catch (\Throwable $e) {
+                        $plugin->log("[{$item['name']}]->" . $e->getMessage(), true);
+                    }*/
+        //  }
+
+        $this->syncRemoteItem(\App\Model\RepertoryItem::find($repertoryItem->id));
     }
 
     /**
@@ -535,6 +538,9 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                     }
 
 
+                    ## 成本实时同步
+                    $repertoryItemSku->cost = $this->getPercentageAmount($sku->cost ?? $sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, "0");
+
                     ##3 SKU价格同步
                     if ($markup->syncAmount) {
                         $repertoryItemSku->market_control_min_num = $sku->marketControlMinNum;
@@ -562,8 +568,6 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                                 $repertoryItemSku->stock_price = $price;
                                 $profitRatio = (new Decimal($repertoryItemSku->stock_price, 6))->div($originalStockPrice);
                             }
-
-                            $repertoryItemSku->cost = $this->getPercentageAmount($sku->cost ?? $sku->price, $markup->exchangeRate, (int)$markup->keepDecimals, "0");
 
                             /**
                              * 同步用户组进货价
@@ -618,7 +622,7 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
             $plugin->log("[{$repertoryItem->name}]SKU同步失败：{$e->getMessage()}", true);
         }
 
-        #5 缓存同步
+        #5 强制缓存库存同步
         $this->repertoryItemSku->syncCacheForItem($repertoryItem->id);
     }
 

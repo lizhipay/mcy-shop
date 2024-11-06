@@ -83,6 +83,10 @@ const _Dict = new class _Dict extends _DictUtil {
                 {id: 2, name: format.success('已上架')},
                 {id: 3, name: format.dark('被封禁')},
             ],
+            repertory_item_direct_status: [
+                {id: 0, name: format.danger('未接入')},
+                {id: 1, name: format.success('已经接入')},
+            ],
             repertory_order_status: [
                 {id: 0, name: format.danger('等待发货')},
                 {id: 1, name: format.success('已发货')},

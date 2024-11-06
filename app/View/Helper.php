@@ -5,6 +5,7 @@ namespace App\View;
 
 use App\Model\User;
 use App\Service\Common\Config;
+use Kernel\Annotation\Inject;
 use Kernel\Component\Singleton;
 use Kernel\Container\Di;
 use Kernel\Context\App;
@@ -22,6 +23,9 @@ class Helper extends AbstractExtension
 {
 
     use Singleton;
+
+    #[Inject]
+    private Config $config;
 
 
     /**
@@ -44,7 +48,18 @@ class Helper extends AbstractExtension
             new TwigFunction('point', [$this, 'point']),
             new TwigFunction('ccy', [$this, 'currency']),
             new TwigFunction('plugin_backstage_route', [$this, 'getPluginBackstageRoute']),
+            new TwigFunction('m_config', [$this, 'getMainConfig']),
         ];
+    }
+
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function getMainConfig(string $key): mixed
+    {
+        return $this->config->getMainConfig($key);
     }
 
     /**

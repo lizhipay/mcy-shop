@@ -20,9 +20,11 @@ interface Item
      * @param int|null $categoryId
      * @param User|null $merchant
      * @param string|null $keywords
+     * @param int|null $page
+     * @param int|null $size
      * @return array
      */
-    public function list(?User $customer, ?int $categoryId, ?User $merchant, ?string $keywords = null): array;
+    public function list(?User $customer, ?int $categoryId, ?User $merchant, ?string $keywords = null, ?int $page = null, ?int $size = null): array;
 
     /**
      * @param User|null $customer

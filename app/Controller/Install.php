@@ -73,7 +73,7 @@ class Install
 
 
         $data['install'] = false;
-        $checkCount = count($data['depend']) + 3 + (!App::$cli ? 1 : 0);
+        $checkCount = count($data['depend']) + 3;
         $check = 0;
         foreach ($data['depend'] as $ext) {
             if ($ext) {
@@ -83,10 +83,6 @@ class Install
 
         if (version_compare(phpversion(), "8.1.0", ">=") && $data['writable'] && $data['readable']) {
             $check += 3;
-        }
-
-        if (!App::$cli && $data['shell_exec']) {
-            $check++;
         }
 
         if ($check >= $checkCount) {

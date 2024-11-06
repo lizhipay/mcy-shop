@@ -301,6 +301,8 @@
                                                                 class: 'acg-badge-h-green',
                                                                 title: '拉取货源',
                                                                 click: (event, value, row, index) => {
+                                                                    const cfgId = row.id;
+
                                                                     component.popup({
                                                                         tab: [
                                                                             {
@@ -314,9 +316,20 @@
 <button type="button" class="btn btn-outline-success btn-sm transfer-repertory-item">${util.icon("icon-daochu2")} ${i18n("将货源接入至")} ${util.icon("icon-shuangyoujiantou")}${i18n("货源仓库")}</button>
 </div><div class="block-content pt-0"><table id="plugin-ship-table"></table></div></div>`);
 
-                                                                                            const shipTable = new Table(`/user/plugin/ship/items?configId=${row.id}`, dom.find("#plugin-ship-table"));
+                                                                                            const shipTable = new Table(`/user/plugin/ship/items?configId=${cfgId}`, dom.find("#plugin-ship-table"));
                                                                                             shipTable.setTree(1);
-
+                                                                                            shipTable.setSearch([
+                                                                                                {
+                                                                                                    title: "商品/SKU关键词搜索",
+                                                                                                    name: "keyword",
+                                                                                                    type: "input",
+                                                                                                    width: 320,
+                                                                                                    align: 'center',
+                                                                                                    change: (search, val) => {
+                                                                                                        shipTable.fullTextSearch(val.toLowerCase());
+                                                                                                    }
+                                                                                                }
+                                                                                            ], false);
                                                                                             shipTable.setColumns([
                                                                                                 {checkbox: true},
                                                                                                 {
@@ -326,7 +339,7 @@
                                                                                                 },
                                                                                                 {
                                                                                                     field: 'skus',
-                                                                                                    title: 'SKU/市场价/进货价/预估盈利',
+                                                                                                    title: 'SKU/上游零售价/上游拿货价',
                                                                                                     class: "nowrap",
                                                                                                     formatter: skus => {
                                                                                                         if (!skus || skus?.length <= 0) {
@@ -334,7 +347,7 @@
                                                                                                         }
                                                                                                         let html = "";
                                                                                                         skus.forEach(sku => {
-                                                                                                            html += `<span type="button" class="acg-badge-h acg-badge-h-dodgerblue me-1 mb-1">${sku.name} / ${format.bold(format.color(format.amountRemoveTrailingZeros(sku.price), "#81cc5b"))}</span>`;
+                                                                                                            html += `<span type="button" class="acg-badge-h acg-badge-h-dodgerblue me-1 mb-1">${sku.name} / ${format.bold(format.color(format.amountRemoveTrailingZeros(sku.price), "#f3235a"))} / ${format.bold(format.color(format.amountRemoveTrailingZeros(sku?.cost > 0 ? sku.cost : sku.price), "#81cc5b"))}</span>`;
                                                                                                         });
                                                                                                         return html;
                                                                                                     }
@@ -358,11 +371,71 @@
                                                                                                     return;
                                                                                                 }
 
+                                                                                                const uuid = util.generateRandStr();
                                                                                                 component.popup({
-                                                                                                    submit: (res, index) => {
-                                                                                                        res.items = items;
-                                                                                                        util.post(`/user/plugin/ship/import?configId=${row.id}`, res, res => {
-                                                                                                            message.alert(`接入执行完成，您总共提交：${res?.data?.total}件商品，成功入库：${res?.data?.success}件，如有失败，请查看插件日志`);
+                                                                                                    submit: (post) => {
+                                                                                                        component.popup({
+                                                                                                            tab: [
+                                                                                                                {
+                                                                                                                    name: ` <span class="${uuid}">${util.icon('icon-loading', 'icon-spin icon-18px')}正在导入中..</span>`,
+                                                                                                                    form: [
+                                                                                                                        {
+                                                                                                                            name: "logs",
+                                                                                                                            type: "textarea",
+                                                                                                                            placeholder: "正在准备中..",
+                                                                                                                            default: "",
+                                                                                                                            height: "720px",
+                                                                                                                            disabled: true,
+                                                                                                                            complete: (popup, val, dom) => {
+                                                                                                                                dom.parent().parent().parent().parent().css("padding", "0px");
+                                                                                                                                dom.get(0).style.setProperty("border-radius", "0px", "important");
+                                                                                                                                let index = 0;
+                                                                                                                                const startLoadIndex = layer.load(2, {shade: ['0.3', '#fff']});
+
+                                                                                                                                util.timer(() => {
+                                                                                                                                    return new Promise(resolve => {
+                                                                                                                                        const item = items[index];
+                                                                                                                                        index++;
+                                                                                                                                        if (item) {
+                                                                                                                                            post.item = item;
+                                                                                                                                            const itemName = util.plainText(item.name);
+                                                                                                                                            popup.appendTextarea("logs", `【${itemName}】开始入库..`);
+                                                                                                                                            dom.scrollTop(dom.prop("scrollHeight"));
+                                                                                                                                            util.post({
+                                                                                                                                                url: `/user/plugin/ship/import?configId=${cfgId}`,
+                                                                                                                                                data: post,
+                                                                                                                                                loader: false,
+                                                                                                                                                done: (response, index) => {
+                                                                                                                                                    popup.appendTextarea("logs", `【${itemName}】已入库`);
+                                                                                                                                                    dom.scrollTop(dom.prop("scrollHeight"));
+                                                                                                                                                    resolve(true);
+                                                                                                                                                },
+                                                                                                                                                error: (res) => {
+                                                                                                                                                    popup.appendTextarea("logs", `【${itemName}】${res?.msg}`);
+                                                                                                                                                    dom.scrollTop(dom.prop("scrollHeight"));
+                                                                                                                                                    resolve(true);
+                                                                                                                                                },
+                                                                                                                                                fail: () => {
+                                                                                                                                                    popup.appendTextarea("logs", `【${itemName}】网络错误!`);
+                                                                                                                                                    dom.scrollTop(dom.prop("scrollHeight"));
+                                                                                                                                                    resolve(true);
+                                                                                                                                                }
+                                                                                                                                            });
+                                                                                                                                            return;
+                                                                                                                                        }
+                                                                                                                                        $(`.${uuid}`).html(`${util.icon('icon-jinduquerentubiao')} 任务完成`);
+                                                                                                                                        popup.appendTextarea("logs", `全部任务已完成!`);
+                                                                                                                                        dom.scrollTop(dom.prop("scrollHeight"));
+                                                                                                                                        layer.close(startLoadIndex);
+                                                                                                                                        resolve(false);
+                                                                                                                                    });
+                                                                                                                                }, 30, true);
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ],
+                                                                                                            width: "720px"
                                                                                                         });
                                                                                                     },
                                                                                                     confirmText: util.icon("icon-yunxiazai") + " 立即导入",
@@ -422,6 +495,12 @@
                                                                                                                     placeholder: "自动收货时效",
                                                                                                                     default: 5040,
                                                                                                                     tips: "自动收货时效，单位/分钟，如果为'0'的情况下，货物会发货并且立即收货，不需要经过顾客同意"
+                                                                                                                },
+                                                                                                                {
+                                                                                                                    title: "重复检测",
+                                                                                                                    name: "check_repeat",
+                                                                                                                    type: "switch",
+                                                                                                                    tips: "检测仓库是否存在此货源，如果存在，则不跳过导入"
                                                                                                                 },
                                                                                                             ]
                                                                                                         }

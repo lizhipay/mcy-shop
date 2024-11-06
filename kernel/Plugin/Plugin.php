@@ -501,7 +501,8 @@ class Plugin
         $lines = explode(PHP_EOL, trim($data));
         $lines = array_slice($lines, -2000);
 
-        return new UpdateLog($hash, implode(PHP_EOL, $lines));
+        $data = iconv('UTF-8', 'UTF-8//IGNORE', implode(PHP_EOL, $lines));
+        return new UpdateLog($hash, $data);
     }
 
     /**

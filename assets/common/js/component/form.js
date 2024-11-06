@@ -233,6 +233,12 @@ class Form {
         this.triggerOtherPopupChange(name, val);
     }
 
+    appendTextarea(name, val) {
+        name = util.replaceDotWithHyphen(name);
+        $(`.${this.unique} textarea[name=${name}]`).append(val + "\n");
+        this.triggerOtherPopupChange(name, val);
+    }
+
     clearComponent(name) {
         name = util.replaceDotWithHyphen(name);
         let instance = $('.' + this.unique + " .component-" + name);

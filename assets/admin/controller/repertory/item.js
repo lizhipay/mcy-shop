@@ -139,8 +139,7 @@
                         photoAlbumUrl: '/admin/upload/get',
                         type: "editor",
                         placeholder: "介绍一下你的商品信息吧",
-                        height: 660,
-                        required: true
+                        height: 660
                     },
                 ]
             },
@@ -1503,6 +1502,7 @@
         },
         {title: "货源插件", name: "equal-plugin", type: "select", dict: "ship", hide: true},
         {title: "货源状态", name: "equal-status", type: "select", dict: "repertory_item_status"},
+        {title: "直营店状态", name: "direct_status", type: "select", dict: "repertory_item_direct_status"},
         {title: "货源关键词", name: "search-name", type: "input"},
         {title: "分类", name: "equal-repertory_category_id", type: "treeSelect", dict: "repertoryCategory"},
         {title: "对接权限", name: "equal-privacy", type: "select", dict: "repertory_item_privacy"}
@@ -1583,34 +1583,88 @@
 
     $('.item-up').click(() => {
         let selections = table.getSelections();
-        let data = table.getSelectionIds();
-
-        if (data.length == 0) {
+        if (selections.length == 0) {
             layer.msg(i18n("请勾选要操作的货源 (·•᷄ࡇ•᷅ ）"));
             return;
         }
 
-        util.post("/admin/repertory/item/updateStatus", {list: data, status: 1}, res => {
-            table.refresh();
-            selections.forEach(item => {
-                message.success(`「${item.name}」已上架`);
+        let index = 0;
+        const startLoadIndex = layer.load(2, {shade: ['0.3', '#fff']});
+        util.timer(() => {
+            return new Promise(resolve => {
+                const row = selections[index];
+                index++;
+                if (row) {
+                    util.post({
+                        url: "/admin/repertory/item/updateStatus",
+                        data: {
+                            id: row.id,
+                            status: 1
+                        },
+                        loader: false,
+                        done: (response, index) => {
+                            message.success(`(⁎⁍̴̛ᴗ⁍̴̛⁎)‼ [${row?.name}] 已上架!`);
+                            resolve(true);
+                        },
+                        error: (res) => {
+                            message.error(`ヽ( ^ω^ ゞ ) [${row?.name}] ${res?.msg}`);
+                            resolve(true);
+                        },
+                        fail: () => {
+                            message.error(`ヽ( ^ω^ ゞ ) [${row?.name}] 网络错误!`);
+                            resolve(true);
+                        }
+                    });
+                    return;
+                }
+                table.refresh();
+                layer.close(startLoadIndex);
+                resolve(false);
             });
-        });
+        }, 30, true);
     });
 
     $('.item-down').click(() => {
         let selections = table.getSelections();
-        let data = table.getSelectionIds();
-        if (data.length == 0) {
+        if (selections.length == 0) {
             layer.msg(i18n("请勾选要操作的货源 (·•᷄ࡇ•᷅ ）"));
             return;
         }
-        util.post("/admin/repertory/item/updateStatus", {list: data, status: 0}, res => {
-            table.refresh();
-            selections.forEach(item => {
-                message.success(`「${item.name}」已下架`);
+
+        let index = 0;
+        const startLoadIndex = layer.load(2, {shade: ['0.3', '#fff']});
+        util.timer(() => {
+            return new Promise(resolve => {
+                const row = selections[index];
+                index++;
+                if (row) {
+                    util.post({
+                        url: "/admin/repertory/item/updateStatus",
+                        data: {
+                            id: row.id,
+                            status: 0
+                        },
+                        loader: false,
+                        done: (response, index) => {
+                            message.success(`(⁎⁍̴̛ᴗ⁍̴̛⁎)‼ [${row?.name}] 已下架!`);
+                            resolve(true);
+                        },
+                        error: (res) => {
+                            message.error(`ヽ( ^ω^ ゞ ) [${row?.name}] ${res?.msg}`);
+                            resolve(true);
+                        },
+                        fail: () => {
+                            message.error(`ヽ( ^ω^ ゞ ) [${row?.name}] 网络错误!`);
+                            resolve(true);
+                        }
+                    });
+                    return;
+                }
+                table.refresh();
+                layer.close(startLoadIndex);
+                resolve(false);
             });
-        });
+        }, 30, true);
     });
 
     $('.item-local').click(() => {

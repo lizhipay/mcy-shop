@@ -28,7 +28,51 @@ class Composer
     public function __construct()
     {
         $this->workingDir = realpath(BASE_PATH);
-        $this->composer = (App::$cli ? "COMPOSER_ALLOW_SUPERUSER=1 " : "") . realpath(BASE_PATH . "bin") . " " . realpath(BASE_PATH . "composer");
+        $this->composer = (App::$cli ? "COMPOSER_ALLOW_SUPERUSER=1 " : "") . realpath(BASE_PATH . "bin") . " " . realpath(BASE_PATH . "composer.phar");
+    }
+
+    /**
+     * @param array $option
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function exec(array $option): void
+    {
+        if (App::$cli) {
+            switch ($option['command']) {
+                case 'require':
+                    Shell::inst()->exec("{$this->composer} require {$option['packages'][0]} --no-interaction --prefer-source --working-dir={$this->workingDir}");
+                    break;
+                case 'remove':
+                    Shell::inst()->exec("{$this->composer} remove {$option['packages'][0]} --no-interaction --working-dir={$this->workingDir}");
+                    break;
+                case 'config':
+                    Shell::inst()->exec("{$this->composer} config repo.packagist composer {$option['value']} --no-interaction --working-dir={$this->workingDir}");
+                    break;
+            }
+            return;
+        }
+
+        if (!class_exists('\Symfony\Component\Console\Input\ArrayInput')) {
+            require("phar://{$this->workingDir}/composer.phar/src/bootstrap.php");
+        }
+
+        //@\putenv('COMPOSER_ALLOW_SUPERUSER=1');
+        //@\putenv('COMPOSER_HOME=' . $this->workingDir . '/vendor/bin/composer');
+
+        $_ENV['COMPOSER_ALLOW_SUPERUSER'] = 1;
+        $_ENV['COMPOSER_HOME'] = $this->workingDir . '/vendor/bin/composer';
+
+        $output = new \Symfony\Component\Console\Output\ConsoleOutput(\Symfony\Component\Console\Output\ConsoleOutput::VERBOSITY_QUIET);
+        $input = new \Symfony\Component\Console\Input\ArrayInput(array_merge([
+            '--no-interaction' => true,
+            '--working-dir' => $this->workingDir,
+            '--no-progress' => true,
+            '--quiet' => true
+        ], $option));
+        $application = new \Composer\Console\Application();
+        $application->setAutoExit(false);
+        $application->run($input, $output);
     }
 
 
@@ -55,7 +99,14 @@ class Composer
             default => "https://packagist.org"
         };
 
-        Shell::inst()->exec("sudo {$this->composer} config repo.packagist composer {$packagist} --no-interaction --working-dir={$this->workingDir}");
+        //Shell::inst()->exec("sudo {$this->composer} config repo.packagist composer {$packagist} --no-interaction --working-dir={$this->workingDir}");
+
+        $this->exec([
+            'command' => 'config',
+            'setting-key' => 'repo.packagist',
+            'setting-type' => 'composer',
+            'value' => $packagist
+        ]);
     }
 
     /**
@@ -91,8 +142,14 @@ class Composer
             foreach ($require as $package => $version) {
                 if (!isset($systemComposerList['require'][$package])) {
                     //安装依赖
-                    $result = Shell::inst()->exec("sudo {$this->composer} require {$package}:{$version} --no-interaction --prefer-source --working-dir={$this->workingDir}");
-                    $plugin->log($result, true);
+                    //$result = Shell::inst()->exec("sudo {$this->composer} require {$package}:{$version} --no-interaction --prefer-source --working-dir={$this->workingDir}");
+                    //$plugin->log($result, true);
+
+                    $this->exec([
+                        'command' => 'require',
+                        'packages' => ["{$package}:{$version}"]
+                    ]);
+
                     //安装后重新检查
                     $systemComposerList = json_decode(file_get_contents($systemComposer), true);
                     if (!isset($systemComposerList['require'][$package])) {
@@ -157,7 +214,12 @@ class Composer
 
                 if (isset($systemComposerList['require'][$package]) && $isDelete) {
                     //移除依赖
-                    Shell::inst()->exec("sudo {$this->composer} remove {$package} --no-interaction --working-dir={$this->workingDir}");
+                    // Shell::inst()->exec("sudo {$this->composer} remove {$package} --no-interaction --working-dir={$this->workingDir}");
+                    $this->exec([
+                        'command' => 'remove',
+                        'packages' => [$package]
+                    ]);
+
                     //移除后重新检查
                     $systemComposerList = json_decode(file_get_contents($systemComposer), true);
                     if (isset($systemComposerList['require'][$package])) {

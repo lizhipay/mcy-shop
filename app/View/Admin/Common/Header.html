@@ -20,15 +20,7 @@
 
     {{ js("/assets/common/js/ready.js")|raw }}
 
-    {{ var({
-        "language" : language ,
-        "DEBUG" : app.debug,
-        "version" : app.version,
-        "CCY" : ccy_symbol,
-        "HACK_ROUTE_TABLE_COLUMNS" : hook(env(true), point("HACK_ROUTE_TABLE_COLUMNS")),
-        "HACK_SUBMIT_FORM" : hook(env(true), point("HACK_SUBMIT_FORM")),
-        "HACK_SUBMIT_TAB" : hook(env(true), point("HACK_SUBMIT_TAB")),
-    })|raw }}
+    {{ admin_var()|raw }}
 </head>
 <body style="background: url('{{ site.bg_image }}') fixed no-repeat;background-size: cover;">
 

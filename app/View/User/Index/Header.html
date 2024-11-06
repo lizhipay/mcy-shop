@@ -34,7 +34,7 @@
 
     {{ js(["/assets/common/js/ready.js"])|raw }}
 
-    {{ var({"language" : language , "DEBUG" : app.debug , "CCY" : ccy_symbol})|raw }}
+    {{ index_var()|raw }}
     <!-- END Stylesheets -->
 
     {{ hook(env() , point("INDEX_HEADER") , 1)|raw }}

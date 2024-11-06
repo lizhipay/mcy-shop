@@ -20,18 +20,12 @@
         "/assets/common/js/table/bootstrap-table.css",
         "/assets/common/js/layer/theme/default/layer.css",
     ])|raw }}
-    
+
     {{ js(["/assets/common/js/ready.js"])|raw }}
 
-    {{ var({
-        "language" : language ,
-        "DEBUG" : app.debug,
-        "CCY" : ccy_symbol,
-        "HACK_ROUTE_TABLE_COLUMNS" : hook(user_env(user.id), point("HACK_ROUTE_TABLE_COLUMNS")),
-        "HACK_SUBMIT_FORM" : hook(user_env(user.id), point("HACK_SUBMIT_FORM")),
-        "HACK_SUBMIT_TAB" : hook(user_env(user.id), point("HACK_SUBMIT_TAB")),
-        "group" : group
-    })|raw }}
+    {{ user_var()|raw }}
+
+    {{ hook(env() , point("USER_COMMON_HEADER") , 1)|raw }}
 </head>
 
 <body style="background: url('{{ site.bg_image }}') fixed no-repeat;background-size: cover;">
@@ -43,8 +37,9 @@
         <div class="content-header">
             <!-- Logo -->
             <a class="fw-semibold text-dual" href="/" target="_blank">
-            <span class="smini-visible"><img src="{{ site.logo }}" class="shop-logo"></span>
-                <span class="shop-name smini-hidden"><img src="{{ site.logo }}" class="shop-logo"> <span class="shop-title">{{ site.title }}</span></span>
+                <span class="smini-visible"><img src="{{ site.logo }}" class="shop-logo"></span>
+                <span class="shop-name smini-hidden"><img src="{{ site.logo }}" class="shop-logo"> <span
+                            class="shop-title">{{ site.title }}</span></span>
             </a>
             <!-- END Logo -->
 
@@ -53,7 +48,8 @@
 
                 <!-- Close Sidebar, Visible only on mobile screens -->
                 <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
-                <a class="d-lg-none btn btn-sm btn-alt-secondary ms-1" data-toggle="layout" data-action="sidebar_close" href="javascript:void(0)">
+                <a class="d-lg-none btn btn-sm btn-alt-secondary ms-1" data-toggle="layout" data-action="sidebar_close"
+                   href="javascript:void(0)">
                     <i class="fa fa-fw fa-times"></i>
                 </a>
                 <!-- END Close Sidebar -->
@@ -62,7 +58,7 @@
         </div>
         <!-- END Side Header -->
 
-        {{include ("Common/Sidebar.html")}}
+        {{ include ("Common/Sidebar.html") }}
     </nav>
     <!-- END Sidebar -->
 
@@ -74,22 +70,24 @@
             <div class="d-flex align-items-center">
                 <!-- Toggle Sidebar -->
                 <!-- Layout API, functionality initialized in Template._uiApiLayout()-->
-                <button type="button" class="btn btn-sm btn-alt-secondary me-2 d-lg-none" data-toggle="layout" data-action="sidebar_toggle">
+                <button type="button" class="btn btn-sm btn-alt-secondary me-2 d-lg-none" data-toggle="layout"
+                        data-action="sidebar_toggle">
                     <i class="fa fa-fw fa-bars"></i>
                 </button>
                 <!-- END Toggle Sidebar -->
 
                 <!-- Toggle Mini Sidebar -->
                 <!-- Layout API, functionality initialized in Template._uiApiLayout()-->
-                <button type="button" class="btn btn-sm btn-alt-secondary me-2 d-none d-lg-inline-block" data-toggle="layout" data-action="sidebar_mini_toggle">
+                <button type="button" class="btn btn-sm btn-alt-secondary me-2 d-none d-lg-inline-block"
+                        data-toggle="layout" data-action="sidebar_mini_toggle">
                     <i class="fa fa-fw fa-ellipsis-v"></i>
                 </button>
                 <!-- END Toggle Mini Sidebar -->
 
                 {% if user.group.is_merchant == 1 or user.group.is_supplier == 1 %}
-                <a class="btn btn-sm btn-success fw-bold store-button" href="/user/store">
-                    <i class="fab fa-app-store"></i> {{ i18n("应用商店")|raw }}
-                </a>
+                    <a class="btn btn-sm btn-success fw-bold store-button" href="/user/store">
+                        <i class="fab fa-app-store"></i> {{ i18n("应用商店")|raw }}
+                    </a>
                 {% endif %}
                 <div class="store-user d-inline-block ms-2"></div>
             </div>
@@ -99,34 +97,46 @@
             <div class="d-flex align-items-center">
                 <!-- User Dropdown -->
                 <div class="dropdown d-inline-block ms-2">
-                    <button type="button" class="btn btn-sm btn-alt-secondary d-flex align-items-center" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img class="rounded-circle" src="{{ user.avatar is not null ? user.avatar : '/favicon.ico' }}" alt="Header Avatar" style="width: 21px;">
-                        <span class="d-none d-sm-inline-block ms-2"><a class="bg-primary-light text-white px-1 me-1" href="/user/level" style="cursor: pointer;">{{ user.level.name }}</a> {{ user.username }}</span>
+                    <button type="button" class="btn btn-sm btn-alt-secondary d-flex align-items-center"
+                            id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                        <img class="rounded-circle" src="{{ user.avatar is not null ? user.avatar : '/favicon.ico' }}"
+                             alt="Header Avatar" style="width: 21px;">
+                        <span class="d-none d-sm-inline-block ms-2"><a class="bg-primary-light text-white px-1 me-1"
+                                                                       href="/user/level"
+                                                                       style="cursor: pointer;">{{ user.level.name }}</a> {{ user.username }}</span>
                         <i class="fa fa-fw fa-angle-down d-none d-sm-inline-block opacity-50 ms-1 mt-1"></i>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-md dropdown-menu-end p-0 border-0" aria-labelledby="page-header-user-dropdown">
+                    <div class="dropdown-menu dropdown-menu-md dropdown-menu-end p-0 border-0"
+                         aria-labelledby="page-header-user-dropdown">
                         <div class="p-3 text-center bg-body-light border-bottom rounded-top">
-                            <img class="img-avatar img-avatar48 img-avatar-thumb" src="{{ user.avatar is not null ? user.avatar : '/favicon.ico' }}" alt="">
+                            <img class="img-avatar img-avatar48 img-avatar-thumb"
+                                 src="{{ user.avatar is not null ? user.avatar : '/favicon.ico' }}" alt="">
                             <p class="mt-2 mb-0 fw-medium text-success">{{ user.username }}</p>
 
                             {% if user.group.name is not null %}
-                            <a class="mb-0 text-white fs-sm fw-medium bg-success px-1" href="/user/merchant/open" style="cursor:pointer;">{{ user.group.name }}</a>
+                                <a class="mb-0 text-white fs-sm fw-medium bg-success px-1" href="/user/merchant/open"
+                                   style="cursor:pointer;">{{ user.group.name }}</a>
                             {% endif %}
                         </div>
                         <div class="p-2">
-                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="/user/security/login/log">
+                            <a class="dropdown-item d-flex align-items-center justify-content-between"
+                               href="/user/security/login/log">
                                 <span class="fs-sm fw-medium">{{ icon("icon-rizhi")|raw }} {{ i18n("登录日志")|raw }}</span>
                             </a>
-                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="/user/personal">
+                            <a class="dropdown-item d-flex align-items-center justify-content-between"
+                               href="/user/personal">
                                 <span class="fs-sm fw-medium">{{ icon("icon-gerenshezhi")|raw }} {{ i18n("我的资料")|raw }}</span>
                             </a>
-                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="/user/security">
+                            <a class="dropdown-item d-flex align-items-center justify-content-between"
+                               href="/user/security">
                                 <span class="fs-sm fw-medium">{{ icon("icon-anquan3")|raw }} {{ i18n("安全中心")|raw }}</span>
                             </a>
                         </div>
                         <div role="separator" class="dropdown-divider m-0"></div>
                         <div class="p-2">
-                            <a class="dropdown-item d-flex align-items-center justify-content-between" href="javascript:window.location.href='/user/logout';">
+                            <a class="dropdown-item d-flex align-items-center justify-content-between"
+                               href="javascript:window.location.href='/user/logout';">
                                 <span class="fs-sm fw-medium">{{ icon("icon-logout")|raw }} {{ i18n("注销登录")|raw }}</span>
                             </a>
                         </div>

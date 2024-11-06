@@ -63,8 +63,22 @@ class Item extends Base
         $get->setPaginate((int)$this->request->post("page"), (int)$this->request->post("limit"));
         $get->setOrderBy(...$this->query->getOrderBy($map, "sort", "asc"));
         $raw = [];
+        $get->setColumn("repertory_item.*");
 
         $data = $this->query->get($get, function (Builder $builder) use ($map, &$raw) {
+
+            if (isset($map['direct_status']) && $map['direct_status'] !== "") {
+                if ($map['direct_status'] == 1) {
+                    $builder = $builder->whereHas("userItem", function (Builder $b) use ($map) {
+                        $b->whereNull("user_id");
+                    });
+                } else {
+                    $builder = $builder->whereDoesntHave("userItem", function (Builder $b) use ($map) {
+                        $b->whereNull("user_id");
+                    });
+                }
+            }
+
             if (isset($map['display_scope'])) {
                 if ($map['display_scope'] == 1) {
                     $builder = $builder->whereNull("user_id");
@@ -162,7 +176,7 @@ class Item extends Base
 
             //刷新缓存
             if ($origin && ((isset($map['plugin']) && $origin->plugin != $map['plugin']) || (isset($map['status']) && $origin->status != $map['status']))) {
-                $this->sku->syncCacheForItem($origin->id);
+                $this->sku->checkSyncCacheForItem($origin->id);
             }
 
             $saved = $this->query->save($save);
@@ -224,28 +238,20 @@ class Item extends Base
 
     /**
      * @return Response
-     * @throws JSONException
      * @throws RuntimeException
      */
     #[Validator([
-        [Common::class, ["status", "list"]]
+        [Common::class, ["status", "id"]]
     ])]
     public function updateStatus(): Response
     {
-        $list = (array)$this->request->post("list", Filter::INTEGER);
+        $id = $this->request->post("id", Filter::INTEGER);
         $status = $this->request->post("status", Filter::INTEGER);
-
-        if (count($list) == 0) {
-            throw new JSONException("操作列表不能为空");
-        }
-
-        if ($status) {
-            foreach ($list as $item) {
-                $this->sku->syncCacheForItem((int)$item);
-            }
-        }
-
-        Model::query()->whereIn("id", $list)->update(["status" => $status == 1 ? 2 : 1]);
+//        if (count($list) == 0) {
+//            throw new JSONException("操作列表不能为空");
+//        }
+        $this->sku->checkSyncCacheForItem($id);
+        Model::query()->where("id", $id)->update(["status" => $status == 1 ? 2 : 1]);
         return $this->json();
     }
 

@@ -4,11 +4,20 @@ declare (strict_types=1);
 namespace App\View\Admin;
 
 use App\Const\Memory as MemoryConst;
+use App\Model\User;
+use App\Service\Common\Config;
+use App\View\Helper as H;
+use Kernel\Annotation\Inject;
 use Kernel\Component\Singleton;
 use Kernel\Container\Memory;
+use Kernel\Context\App;
 use Kernel\Context\Interface\Route;
 use Kernel\Language\Language;
+use Kernel\Plugin\Const\Point;
 use Kernel\Plugin\Menu;
+use Kernel\Plugin\Plugin;
+use Kernel\Plugin\Usr;
+use Kernel\Util\Context;
 use Kernel\Util\Route as R;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -19,6 +28,10 @@ class Helper extends AbstractExtension
     use Singleton;
 
 
+    #[Inject]
+    private Config $config;
+
+
     /**
      * @return TwigFunction[]
      */
@@ -26,8 +39,27 @@ class Helper extends AbstractExtension
     {
         return [
             new TwigFunction('sku_main_img', [$this, 'getSkuMainImg']),
-            new TwigFunction('menus', [$this, 'getMenus'])
+            new TwigFunction('menus', [$this, 'getMenus']),
+            new TwigFunction('admin_var', [$this, 'getAdminVar'])
         ];
+    }
+
+
+    /**
+     * @return string
+     * @throws \ReflectionException
+     */
+    public function getAdminVar(): string
+    {
+        return H::inst()->setScriptVar([
+            "language" => strtolower(Context::get(\Kernel\Language\Entity\Language::class)->preferred),
+            "DEBUG" => App::$debug,
+            "version" => App::$version,
+            "CCY" => $this->config->getCurrency()->symbol,
+            "HACK_ROUTE_TABLE_COLUMNS" => Plugin::inst()->hook(Usr::MAIN, Point::HACK_ROUTE_TABLE_COLUMNS),
+            "HACK_SUBMIT_FORM" => Plugin::inst()->hook(Usr::MAIN, Point::HACK_SUBMIT_FORM),
+            "HACK_SUBMIT_TAB" => Plugin::inst()->hook(Usr::MAIN, Point::HACK_SUBMIT_TAB),
+        ]);
     }
 
 

@@ -27,7 +27,7 @@ class Migration extends Command
     public function v3_user(string $name): void
     {
         $sql = file_get_contents(BASE_PATH . "/{$name}");
-        preg_match_all("/\((\d+),\s*'([^']*)',\s*(NULL|'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'),\s*(NULL|'1[3-9]\d{9}'),\s*(NULL|\d+),\s*('[a-zA-Z0-9]{40}'),\s*('[a-zA-Z0-9]{32}'),\s*('[a-zA-Z0-9]{16}'),.*/", $sql, $matches);
+        preg_match_all("/\((\d+),\s*'([^']*)',\s*(NULL|'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'),\s*(NULL|'1[3-9]\d{9}'),.*/", $sql, $matches);
 
         if (empty($matches[0])) {
             $this->error("没有找到用户数据");
@@ -72,7 +72,6 @@ class Migration extends Command
                     $user->save();
                     $this->lifetime->create($user->id, "127.0.0.1", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36");
                     $this->lifetime->update($user->id, "register_time", $createTime);
-
                     $this->success("会员:[{$username}] 迁移完成，资产：{$balance}，可提现：{$coin}");
                     $success++;
                 } catch (\Throwable $e) {

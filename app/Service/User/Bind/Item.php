@@ -60,13 +60,16 @@ class Item implements \App\Service\User\Item
      * @param int|null $categoryId
      * @param User|null $merchant
      * @param string|null $keywords
+     * @param int|null $page
+     * @param int|null $size
      * @return array
      * @throws NotFoundException
      * @throws \ReflectionException
      */
-    public function list(?User $customer, ?int $categoryId, ?User $merchant, ?string $keywords = null): array
+    public function list(?User $customer, ?int $categoryId, ?User $merchant, ?string $keywords = null, ?int $page = null, ?int $size = null): array
     {
-        $query = Model::query()->leftJoin("repertory_item", "item.repertory_item_id", "=", "repertory_item.id")
+        $query = Model::query()
+            ->leftJoin("repertory_item", "item.repertory_item_id", "=", "repertory_item.id")
             ->where("item.status", 1)
             ->where("repertory_item.status", 2);
 
@@ -86,12 +89,17 @@ class Item implements \App\Service\User\Item
             $query = $query->where("item.name", "like", "%{$keywords}%");
         }
 
-        $data = $query->orderBy("item.sort", "asc")->with(["category", "sku" => function (Relation $relation) {
+        $query = $query->orderBy("item.sort", "asc")->with(["category", "sku" => function (Relation $relation) {
             $relation->orderBy("sort", "asc");
-        }])->get(["item.*", "repertory_item.status as repertory_status"]);
+        }]);
+
+        if ($page > 0 && $size > 0) {
+            $data = $query->paginate($size, ["item.*", "repertory_item.status as repertory_status"], '', $page)->items();
+        } else {
+            $data = $query->get(["item.*", "repertory_item.status as repertory_status"]);
+        }
 
         $list = [];
-
 
         foreach ($data as $d) {
             $item = $this->getItemEntity($customer, $d, $d->sku)?->toArray();
@@ -127,8 +135,6 @@ class Item implements \App\Service\User\Item
 
         foreach ($itemSku as $sku) {
             $skuEntity = new Sku($sku);
-
-
             if ($customer) {
                 $skuEntity->setPrice(Str::getAmountStr($this->tradeOrder->getAmount($customer, $sku, 1)));
                 if ($sku->private_display == 0 || $skuEntity->price != $sku->price) {
@@ -145,8 +151,8 @@ class Item implements \App\Service\User\Item
             } else {
                 if ($sku->private_display == 0) {
                     $skuEntity->setStock($this->ship->stock($sku->repertory_item_sku_id));
-                    $skuEntity->setPrice(Str::getAmountStr($sku->price));
                     $skuEntity->setStockAvailable($this->ship->hasEnoughStock($sku->repertory_item_sku_id));
+                    $skuEntity->setPrice(Str::getAmountStr($sku->price));
                     $skuEntity->setQuantityRestriction($this->getQuantityRestriction($item->user_id, $sku->repertoryItemSku));
                     $skuEntity->setWholesale($this->getWholesale($customer, $sku->id));
                     $skuEntity->haveWholesale === true && $itemEntity->setHaveWholesale(true);
@@ -206,7 +212,7 @@ class Item implements \App\Service\User\Item
             throw new JSONException("该商品未上架");
         }
 
-        $this->repertoryItemSku->delCacheForItem($item->repertory_item_id); //删除缓存
+        $this->repertoryItemSku->syncCacheForItem($item->repertory_item_id); //同步缓存
 
         $itemSku = ItemSku::query()->where("item_id", $itemId)->orderBy("sort")->get();
 

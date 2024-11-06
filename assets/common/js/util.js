@@ -146,7 +146,7 @@ const util = new class Util {
                     if (typeof error === 'function') {
                         error(res, loaderIndex);
                     } else if (error !== false) {
-                        util.stdout(`POST(致命异常): ${url} | 请将下面信息截图反馈给维护人员:\n` , "red", res);
+                        util.stdout(`POST(致命异常): ${url} | 请将下面信息截图反馈给维护人员:\n`, "red", res);
                         message.error("服务器数据返回错误，可通过F12查看浏览器错误并且反馈给维护人员");
                     }
                 }
@@ -731,6 +731,11 @@ const util = new class Util {
 
 
     openCheckoutWindowUrl(url) {
+        if (getVar("PAY_CONFIG_CHECKOUT_COUNTER") != 1) {
+            window.location.href = url;
+            return;
+        }
+
         layer.open({
             type: 2,
             title: util.icon("icon-shouyintai-copy") + " 收银台",
@@ -738,6 +743,29 @@ const util = new class Util {
             maxmin: util.isPc(),
             area: util.isPc() ? ['80%', '80%'] : ['100%', '100%'],
             content: url
+        });
+    }
+
+    onScrollToBottom(callback) {
+        // PC端滚动事件
+        window.addEventListener('scroll', function () {
+            if (document.documentElement.scrollTop + window.innerHeight >= document.documentElement.scrollHeight) {
+                callback();  // 到底部时触发回调
+            }
+        });
+
+        // 手机端触摸事件
+        let lastTouchY = 0;
+        window.addEventListener('touchstart', function (event) {
+            lastTouchY = event.touches[0].pageY;
+        });
+
+        window.addEventListener('touchmove', function (event) {
+            if (lastTouchY < event.touches[0].pageY) {
+                if (document.documentElement.scrollTop + window.innerHeight >= document.documentElement.scrollHeight) {
+                    callback();  // 到底部时触发回调
+                }
+            }
         });
     }
 

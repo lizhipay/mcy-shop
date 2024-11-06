@@ -60,14 +60,15 @@ class Ship implements \App\Service\Common\Ship
 
     /**
      * @param int $repertoryItemSkuId
+     * @param int $action
      * @return string
      * @throws \ReflectionException
      */
-    public function stock(int $repertoryItemSkuId): string
+    public function stock(int $repertoryItemSkuId, int $action = RepertoryItemSkuCache::ACTION_READ_CACHE): string
     {
         $repertoryItemSku = $this->getRepertoryItemSkuService();
         $cache = $repertoryItemSku->getCache($repertoryItemSkuId, RepertoryItemSkuCache::TYPE_STOCK);
-        if ($cache !== null) {
+        if ($cache !== null && $action === RepertoryItemSkuCache::ACTION_READ_CACHE) {
             return $cache;
         }
 
@@ -103,15 +104,15 @@ class Ship implements \App\Service\Common\Ship
     /**
      * @param int $repertoryItemSkuId
      * @param int $quantity
+     * @param int $action
      * @return bool
      * @throws \ReflectionException
      */
-    public function hasEnoughStock(int $repertoryItemSkuId, int $quantity = 1): bool
+    public function hasEnoughStock(int $repertoryItemSkuId, int $quantity = 1, int $action = RepertoryItemSkuCache::ACTION_READ_CACHE): bool
     {
         $repertoryItemSku = $this->getRepertoryItemSkuService();
-
         $cache = $repertoryItemSku->getCache($repertoryItemSkuId, RepertoryItemSkuCache::TYPE_HAS_ENOUGH_STOCK);
-        if ($cache !== null) {
+        if ($cache !== null && $action === RepertoryItemSkuCache::ACTION_READ_CACHE) {
             return (bool)$cache;
         }
         $ship = $this->getShip($repertoryItemSkuId);

@@ -269,6 +269,17 @@ class RepertoryItemSku implements \App\Service\Common\RepertoryItemSku
         return $cache?->value;
     }
 
+    /**
+     * @param int $repertoryItemSkuId
+     * @return bool
+     */
+    public function existCache(int $repertoryItemSkuId): bool
+    {
+        $a = RepertoryItemSkuCache::query()->where("sku_id", $repertoryItemSkuId)->where("type", \App\Const\RepertoryItemSkuCache::TYPE_STOCK)->exists();
+        $b = RepertoryItemSkuCache::query()->where("sku_id", $repertoryItemSkuId)->where("type", \App\Const\RepertoryItemSkuCache::TYPE_HAS_ENOUGH_STOCK)->exists();
+        return $a && $b;
+    }
+
 
     /**
      * @param int $repertoryItemSkuId
@@ -292,11 +303,9 @@ class RepertoryItemSku implements \App\Service\Common\RepertoryItemSku
     public function syncCache(int $repertoryItemSkuId): void
     {
         try {
-            //删除sku缓存
-            $this->delCache($repertoryItemSkuId);
             //同步缓存
-            $this->ship->stock($repertoryItemSkuId);
-            $this->ship->hasEnoughStock($repertoryItemSkuId);
+            $this->ship->stock($repertoryItemSkuId, \App\Const\RepertoryItemSkuCache::ACTION_READ_SOURCE);
+            $this->ship->hasEnoughStock($repertoryItemSkuId, 1, \App\Const\RepertoryItemSkuCache::ACTION_READ_SOURCE);
         } catch (\Throwable $e) {
             Log::inst()->error("缓存刷新错误：" . $e->getMessage());
         }
@@ -309,6 +318,7 @@ class RepertoryItemSku implements \App\Service\Common\RepertoryItemSku
      */
     public function syncCacheForItem(int $repertoryItemId): void
     {
+
         $skus = \App\Model\RepertoryItemSku::query()->where("repertory_item_id", $repertoryItemId)->get();
         foreach ($skus as $sku) {
             $this->syncCache($sku->id);
@@ -318,16 +328,32 @@ class RepertoryItemSku implements \App\Service\Common\RepertoryItemSku
     /**
      * @param int $repertoryItemId
      * @return void
+     * @throws \ReflectionException
+     */
+    public function checkSyncCacheForItem(int $repertoryItemId): void
+    {
+        $skus = \App\Model\RepertoryItemSku::query()->where("repertory_item_id", $repertoryItemId)->get();
+        foreach ($skus as $sku) {
+            if (!$this->existCache($sku->id)) {
+                $this->syncCache($sku->id);
+            }
+        }
+    }
+
+    /**
+     * @param int $repertoryItemId
+     * @return void
      */
     public function delCacheForItem(int $repertoryItemId): void
     {
-        $ids = \App\Model\RepertoryItemSku::query()
-            ->where("repertory_item_id", $repertoryItemId)
-            ->pluck('id')
-            ->toArray();
+        /*        $ids = \App\Model\RepertoryItemSku::query()
+                    ->where("repertory_item_id", $repertoryItemId)
+                    ->pluck('id')
+                    ->toArray();
 
-        if (!empty($ids)) {
-            RepertoryItemSkuCache::query()->whereIn("sku_id", $ids)->where("create_time", "<", \date("Y-m-d H:i:s", time() - 60))->delete();
-        }
+                if (!empty($ids)) {
+                    //->where("create_time", "<", \date("Y-m-d H:i:s", time() - 60))
+                    RepertoryItemSkuCache::query()->whereIn("sku_id", $ids)->delete();
+                }*/
     }
 }
