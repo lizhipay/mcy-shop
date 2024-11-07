@@ -212,11 +212,15 @@ class RepertoryOrder implements \App\Service\Common\RepertoryOrder
             $ship = \Kernel\Plugin\Ship::instance()->getShipHandle($repertoryItem->plugin, $env, $repertoryItem, $repertoryItemSku, $repertoryOrder);
 
             if ($ship) {
-                //检查库存
-                if ($ship->hasEnoughStock()) {
-                    $repertoryOrder->contents = $ship->delivery();
-                } else {
-                    $repertoryOrder->contents = "库存不足，请申请售后";
+                try {
+                    //检查库存
+                    if ($ship->hasEnoughStock()) {
+                        $repertoryOrder->contents = $ship->delivery();
+                    } else {
+                        $repertoryOrder->contents = "库存不足，请申请售后";
+                    }
+                } catch (\Throwable $e) {
+                    $repertoryOrder->contents = "发货失败，请直接申请售后，失败原因：" . $e->getMessage();
                 }
             } else {
                 $repertoryOrder->contents = "发货插件未启用，请申请售后";
