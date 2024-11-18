@@ -33,6 +33,7 @@ use Kernel\Log\Log;
 use Kernel\Plugin\Const\Point;
 use Kernel\Plugin\Plugin;
 use Kernel\Plugin\Usr;
+use Kernel\Util\Call;
 use Kernel\Util\Date;
 use Kernel\Util\Decimal;
 use Kernel\Util\Str;
@@ -212,7 +213,10 @@ class Item implements \App\Service\User\Item
             throw new JSONException("该商品未上架");
         }
 
-        $this->repertoryItemSku->syncCacheForItem($item->repertory_item_id); //同步缓存
+        //自动同步缓存
+        Call::defer(function () use ($item) {
+            $this->repertoryItemSku->syncCacheForItem($item->repertory_item_id); //同步缓存
+        });
 
         $itemSku = ItemSku::query()->where("item_id", $itemId)->orderBy("sort")->get();
 
@@ -221,7 +225,6 @@ class Item implements \App\Service\User\Item
         if (!$itemEntity) {
             throw new JSONException("该商品对你完全隐藏");
         }
-
 
         return $itemEntity;
     }

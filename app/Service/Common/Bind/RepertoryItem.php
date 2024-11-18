@@ -15,6 +15,7 @@ use App\Model\RepertoryItemSkuUser;
 use App\Model\RepertoryItemSkuWholesale;
 use App\Model\RepertoryItemSkuWholesaleGroup;
 use App\Model\RepertoryItemSkuWholesaleUser;
+use Hyperf\Database\Model\Builder;
 use Hyperf\Database\Model\Collection;
 use Kernel\Annotation\Inject;
 use Kernel\Database\Db;
@@ -665,7 +666,13 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
      */
     public function getSyncRemoteItems(bool $isOnlyId = true, ?int $userId = null, int $second = 120): array|Collection
     {
-        $items = \App\Model\RepertoryItem::query()->where("status", 2)->whereNotNull("unique_id")->where("update_time", "<", \date("Y-m-d H:i:s", time() - $second));
+        $items = \App\Model\RepertoryItem::query()
+            ->where("status", 2)->whereNotNull("unique_id")
+            ->whereHas('userItem', function (Builder $b) {
+                $b->where("status", 1);
+            })
+            ->where("update_time", "<", \date("Y-m-d H:i:s", time() - $second));
+
         if ($userId > 0) {
             $items = $items->where("user_id", $userId);
         } else {

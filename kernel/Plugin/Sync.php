@@ -96,7 +96,7 @@ class Sync
         while (true) {
             $waits = Sync::inst()->list();
             $lastRequestTime = (int)Cache::inst()->get(Constant::CLI_LAST_REQUEST_TIME);
-            if (count($waits) > 0 && (time() - $lastRequestTime) > 3) {
+            if ($init || (count($waits) > 0 && (time() - $lastRequestTime) > 3)) {
                 foreach ($waits as $wait) {
                     $wait[2] != 2 && Plugin::inst()->setState($wait[0], (int)$wait[2], $wait[1]);
                 }
@@ -105,7 +105,7 @@ class Sync
                 !$init && Di::inst()->make(Service::class)->restart();
             }
             Coroutine::sleep(1);
-            $init && ($init = null);
+            $init && ($init = false);
         }
     }
 }

@@ -153,7 +153,7 @@ class Supply extends Base
         $trade->setTradeNo(Str::generateTradeNo());
         $trade->setMainTradeNo($trade->tradeNo);
         $trade->setWidget($map);
-        $order = $this->order->trade($trade, $this->request->clientIp());
+        $order = $this->order->trade($trade, $this->request->clientIp(), true);
         return $this->json(data: ["contents" => $order->contents]);
     }
 

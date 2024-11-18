@@ -15,7 +15,6 @@ use Kernel\Annotation\Inject;
 use Kernel\Annotation\Interceptor;
 use Kernel\Annotation\Validator;
 use Kernel\Context\Interface\Response;
-use Kernel\Exception\JSONException;
 use Kernel\Exception\NotFoundException;
 use Kernel\Exception\ViewException;
 use Kernel\Plugin\Const\Theme;

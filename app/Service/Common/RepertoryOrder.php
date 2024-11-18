@@ -16,9 +16,10 @@ interface RepertoryOrder
     /**
      * @param Trade $trade
      * @param string $tradeIp
+     * @param bool $direct
      * @return Deliver
      */
-    public function trade(Trade $trade, string $tradeIp): Deliver;
+    public function trade(Trade $trade, string $tradeIp, bool $direct = false): Deliver;
 
 
     /**

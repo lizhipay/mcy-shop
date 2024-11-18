@@ -318,7 +318,6 @@ class RepertoryItemSku implements \App\Service\Common\RepertoryItemSku
      */
     public function syncCacheForItem(int $repertoryItemId): void
     {
-
         $skus = \App\Model\RepertoryItemSku::query()->where("repertory_item_id", $repertoryItemId)->get();
         foreach ($skus as $sku) {
             $this->syncCache($sku->id);

@@ -81,11 +81,11 @@
                                 <td class="d-none d-lg-table-cell font-size-xl text-center fw-semibold">{{ ccy() }}{{ item.amount }}</td>
                                 <td  class="d-none d-lg-table-cell font-size-xl text-center fw-semibold">
                                     {% if item.status == 0 or item.status == 1 or item.status == 2 %}
-                                        <a href="/user/trade/order" type="button" class="btn btn-sm btn-primary"><i class="fa fa-fw fa-xmark me-1"></i>{{ i18n("申请退款")|raw }}</a>
+                                        <a href="/user/trade/order" type="button" class="btn btn-sm btn-primary"><i class="fa fa-fw fa-xmark me-1"></i>{{ i18n("申请售后")|raw }}</a>
                                     {% else %} - {% endif %}
                                 </td>
                                 <td  style="text-align: right;padding-right: 0;" data-tradeNo="{{ order.trade_no }}" data-id="{{ item.id }}">
-                                    {% if item.status == 1 or item.status == 3 or item.status == 4 %}
+                                    {% if order.status == 1 and item.status != 5 %}
                                     <button type="button" class="btn btn-sm btn-success  btn-treasure-show"><i class="fa fa-fw fa-hand me-1"></i>{{ i18n("查看")|raw }}</button>
                                         {% if item.render is same as(false) %}
                                             <button type="button" class="btn btn-sm btn-warning btn-treasure-copy"><i class="fa fa-fw fa-copy me-1"></i>{{ i18n("复制")|raw }}</button>

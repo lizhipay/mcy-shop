@@ -22,6 +22,7 @@ use App\Service\User\Balance;
 use Kernel\Annotation\Inject;
 use Kernel\Database\Db;
 use Kernel\Exception\JSONException;
+use Kernel\Exception\ServiceException;
 use Kernel\Log\Log;
 use Kernel\Plugin\Const\Point;
 use Kernel\Plugin\Handle\Ship;
@@ -42,11 +43,13 @@ class RepertoryOrder implements \App\Service\Common\RepertoryOrder
     /**
      * @param Trade $trade
      * @param string $tradeIp
+     * @param bool $direct
      * @return Deliver
      * @throws JSONException
+     * @throws \ReflectionException
      * @throws \Throwable
      */
-    public function trade(Trade $trade, string $tradeIp): Deliver
+    public function trade(Trade $trade, string $tradeIp, bool $direct = false): Deliver
     {
         if (strlen($trade->tradeNo) != 24) {
             throw new JSONException("订单号不能低于24位");
@@ -116,7 +119,7 @@ class RepertoryOrder implements \App\Service\Common\RepertoryOrder
         $totalAmount = (new Decimal($amount, 6))->mul((string)$trade->quantity)->getAmount(2);
 
         Log::inst()->debug(sprintf("事物准备就绪，当前订单号：%s，订单金额：%s", $trade->tradeNo, $totalAmount));
-        return Db::transaction(function () use ($customer, $widgetJson, $trade, $repertoryItemSku, $repertoryItem, $tradeIp, $totalAmount) {
+        return Db::transaction(function () use ($direct, $customer, $widgetJson, $trade, $repertoryItemSku, $repertoryItem, $tradeIp, $totalAmount) {
 
             $repertoryOrder = new Order();
             $repertoryOrder->supply_profit = 0;
@@ -218,12 +221,15 @@ class RepertoryOrder implements \App\Service\Common\RepertoryOrder
                         $repertoryOrder->contents = $ship->delivery();
                     } else {
                         $repertoryOrder->contents = "库存不足，请申请售后";
+                        $direct && throw new ServiceException("库存不足");
                     }
                 } catch (\Throwable $e) {
                     $repertoryOrder->contents = "发货失败，请直接申请售后，失败原因：" . $e->getMessage();
+                    $direct && throw new ServiceException($e->getMessage());
                 }
             } else {
                 $repertoryOrder->contents = "发货插件未启用，请申请售后";
+                $direct && throw new ServiceException("发货插件未启用");
             }
 
             //发货

@@ -972,7 +972,7 @@ class Order implements \App\Service\User\Order
 
         $orderItem = new \App\Entity\Shop\OrderItem($item);
 
-        if (in_array($item->status, [1, 3, 4])) {
+        if ($item?->order?->status == 1 && $item->status != 5) {
             $ship = $this->getOrderItemShip($item);
             if ($ship) {
                 $orderItem->setRender($ship->isCustomRender());
