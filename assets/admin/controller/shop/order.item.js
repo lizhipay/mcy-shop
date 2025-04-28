@@ -235,6 +235,18 @@
         {field: 'order.create_ip', title: '下单IP'},
         {field: 'order.create_browser', title: '浏览器'},
         {field: 'order.create_device', title: '设备型号'},
+        {
+            field: 'widget', title: '控件内容', formatter: (widget) => {
+                if (typeof widget != "object"){
+                    return '';
+                }
+                let items = '';
+                for (const key in widget) {
+                    items += `<br><span class="text-primary">${widget[key].title}</span>：<span class="text-success fw-bold">${widget[key].value}</span>`;
+                }
+                return items;
+            }
+        },
     ]);
     table.onResponse(data => {
         $('.data-count .order-count').html(data.order_count);
