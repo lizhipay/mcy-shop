@@ -25,6 +25,7 @@
                         default: 1,
                         tips: "开启此选项后，商品将直接入库至直营店，并在网站首页以可购买状态展示",
                         change: (form, val) => {
+                            form.form.direct_category_id.required = val == 1;
                             if (val == 1) {
                                 form.show('direct_category_id');
                             } else {
@@ -40,7 +41,8 @@
                         placeholder: "请选择直营店的商品分类",
                         dict: 'shopCategory?userId=',
                         parent: false,
-                        hide: assign?.id > 0
+                        hide: assign?.id > 0,
+                        required: !assign?.id > 0
                     },
                     {
                         title: "仓库分类",
