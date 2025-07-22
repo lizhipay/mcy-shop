@@ -49,7 +49,7 @@
                             hide: true
                         },
                         {
-                            title: "用户组",
+                            title: "商家权限",
                             name: "group_id",
                             type: "select",
                             placeholder: "未开通",

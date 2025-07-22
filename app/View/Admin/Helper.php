@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\View\Admin;
 
 use App\Const\Memory as MemoryConst;
+use App\Model\Manage;
 use App\Model\User;
 use App\Service\Common\Config;
 use App\View\Helper as H;
@@ -51,6 +52,7 @@ class Helper extends AbstractExtension
      */
     public function getAdminVar(): string
     {
+        $manage = Context::get(Manage::class);
         return H::inst()->setScriptVar([
             "language" => strtolower(Context::get(\Kernel\Language\Entity\Language::class)->preferred),
             "DEBUG" => App::$debug,
@@ -59,6 +61,10 @@ class Helper extends AbstractExtension
             "HACK_ROUTE_TABLE_COLUMNS" => Plugin::inst()->hook(Usr::MAIN, Point::HACK_ROUTE_TABLE_COLUMNS),
             "HACK_SUBMIT_FORM" => Plugin::inst()->hook(Usr::MAIN, Point::HACK_SUBMIT_FORM),
             "HACK_SUBMIT_TAB" => Plugin::inst()->hook(Usr::MAIN, Point::HACK_SUBMIT_TAB),
+            "MANAGE_INFO" => [
+                "email" => $manage->email,
+                "type" => $manage->type
+            ]
         ]);
     }
 

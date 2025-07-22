@@ -389,14 +389,21 @@
         });
     }
 
+    function handLoadChat(username, email, link) {
+        window.Tawk_API=window.Tawk_API||{};window.Tawk_API.visitor={name:username,email:email};new MutationObserver(muts=>{muts.forEach(m=>{m.addedNodes.forEach(node=>{if(node.tagName==='IFRAME'&&node.title==='chat widget'&&node.src==='about:blank'){try{var doc=node.contentDocument;var style=doc.createElement('style');style.textContent=`.tawk-text-center.tawk-padding-small,.tawk-dropdown.tawk-toolbar-menu{display:none!important}`;doc.head.appendChild(style);doc.querySelectorAll('.tawk-bottom-navbar.tawk-bottom-navbar-offset').forEach(el=>el.classList.remove('tawk-bottom-navbar-offset'));new node.contentWindow.MutationObserver(innerMuts=>{innerMuts.forEach(im=>{if(im.type==='childList'){im.addedNodes.forEach(n=>{if(n.nodeType===1&&n.classList.contains('tawk-bottom-navbar-offset')){n.classList.remove('tawk-bottom-navbar-offset')}n.querySelectorAll&&n.querySelectorAll('.tawk-bottom-navbar.tawk-bottom-navbar-offset').forEach(el=>el.classList.remove('tawk-bottom-navbar-offset'))})}else if(im.type==='attributes'&&im.attributeName==='class'){var tgt=im.target;if(tgt.classList&&tgt.classList.contains('tawk-bottom-navbar-offset')){tgt.classList.remove('tawk-bottom-navbar-offset')}}})}).observe(doc.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']})}catch(e){}}})})}).observe(document,{childList:true,subtree:true});(function(){const origFetch=window.fetch;window.fetch=function(resource,init){if(typeof resource==='string'&&resource.includes('/v1/session/start')&&init&&init.method==='POST'&&init.body){try{const data=JSON.parse(init.body);if(data.url!==undefined)data.url='';if(data.referrer!==undefined)data.referrer='';init.body=JSON.stringify(data)}catch(e){}}return origFetch.call(this,resource,init)}})();(function(){const origSend=WebSocket.prototype.send;WebSocket.prototype.send=function(data){let payload=data;try{if(typeof payload==='string'&&payload.startsWith('4{')){const msg=JSON.parse(payload.slice(1));if(msg.c==='nav'&&Array.isArray(msg.p)&&msg.p[0]){return}}}catch(e){}return origSend.call(this,payload)}})();(function(){let s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];s1.async=true;s1.src=link;s1.charset='UTF-8';s1.setAttribute('crossorigin','*');s0.parentNode.insertBefore(s1,s0)})();
+    }
+
     function handLoadStoreUser() {
         const $storeUser = $(".store-user");
+        const $manage = getVar("MANAGE_INFO");
 
         util.post({
             url: "/admin/store/personal/info",
             loader: false,
             done: res => {
-
+                if ($manage?.type === 0 && res.data?.chat) {
+                    handLoadChat(res.data.username, $manage?.email, res.data.chat)
+                }
                 /* <img class="d-sm-inline-block  rounded-circle me-1" src="${res.data.avatar}" style="width: 21px;">*/
 
                 $storeUser.append(`<button class="btn btn-sm btn-outline-dark me-1 d-none d-sm-inline-block store-username"><div class="d-flex align-items-center">
