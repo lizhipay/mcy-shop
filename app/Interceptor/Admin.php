@@ -13,12 +13,14 @@ use Kernel\Annotation\Interface\Interceptor;
 use Kernel\Context\App;
 use Kernel\Context\Interface\Request;
 use Kernel\Context\Interface\Response;
+use Kernel\Exception\JSONException;
 use Kernel\Exception\NotFoundException;
 use Kernel\Language\Language;
 use Kernel\Plugin\Const\Plugin as PGI;
 use Kernel\Plugin\Const\Point;
 use Kernel\Plugin\Plugin;
 use Kernel\Util\Context;
+use Kernel\Util\Date;
 
 class Admin implements Interceptor
 {
@@ -75,6 +77,15 @@ class Admin implements Interceptor
         $hook = Plugin::instance()->hook(App::env(), Point::ADMIN_INTERCEPTOR_SESSION_ONLINE, PGI::HOOK_TYPE_HTTP, $request, $response, $type, $manage);
         if ($hook instanceof Response) return $hook;
 
+
+        if (!file_exists(BASE_PATH . "/config/terms")) {
+            if ($router === "admin/dashboard@GET" && $request->get("agree") == 1) {
+                file_put_contents(BASE_PATH . "/config/terms", "用户同意协议，时间：" . Date::current());
+                return $response->end()->json(200, "success");
+            }
+            return $response->end()->render("LegalTerms.html");
+        }
+
         Context::set(Manage::class, $manage);
         return $response;
     }
@@ -104,7 +115,7 @@ class Admin implements Interceptor
             );
         }
     }
-    
+
 
     /**
      * @param Request $request
