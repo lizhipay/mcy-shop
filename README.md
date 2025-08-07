@@ -55,5 +55,5 @@
 ## 更多
 
 - QQ群：941616478 - 广告：🈲
-- [Telegram](https://t.me/acgshop) - 广告：🈲
+- [Telegram](http://t.me/mcyofficial) - 广告：🈲
 - [Discord](https://discord.gg/MAduAfBvCK) - 广告：🉑
