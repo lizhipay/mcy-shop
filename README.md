@@ -21,9 +21,6 @@
 >
 > 使用本程序即表示您已充分理解并同意本法律声明的所有内容。
 
-## 广告
-- 1年SSL证书申请：[点击申请](https://store.acgshop.cn/item?id=93)
-
 ## 安装文档
 - 官方文档：[https://wiki.mcy.im](https://wiki.mcy.im)
 
