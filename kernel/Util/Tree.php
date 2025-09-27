@@ -2,10 +2,6 @@
 declare(strict_types=1);
 
 namespace Kernel\Util;
-
-
-use function App\Controller\Admin\API\Shop\sortItems;
-
 class Tree
 {
     /**

@@ -30,7 +30,7 @@ class Request extends \Kernel\Context\Abstract\Request
         }
 
         if (str_contains((string)$this->header("ContentType"), "application/json")) {
-            $this->json = (array)json_decode($this->raw);
+            $this->json = (array)json_decode($this->raw, true);
         }
 
         if (isset($_SERVER["HTTPS"]) && strtolower((string)$_SERVER["HTTPS"]) == "on") {

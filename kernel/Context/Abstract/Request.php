@@ -40,6 +40,7 @@ abstract class Request implements \Kernel\Context\Interface\Request
         $this->get = Firewall::instance()->xssKiller($this->get);
         $this->json = Firewall::instance()->xssKiller($this->json);
         $this->cookie = Firewall::instance()->xssKiller($this->cookie);
+        $this->header = Firewall::instance()->xssKiller($this->header);
     }
 
     /**
@@ -190,10 +191,11 @@ abstract class Request implements \Kernel\Context\Interface\Request
      */
     public function clientIp(bool $secure = true): string
     {
+        $address = $this->clientIp;
         if ($secure && ($ip = Ip::get($this))) {
-            return $ip;
+            $address = $ip;
         }
-        return $this->clientIp;
+        return Ip::getType((string)$address) ? $address : "unknown";
     }
 
 

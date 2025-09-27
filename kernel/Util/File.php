@@ -73,7 +73,7 @@ class File
             return "";
         }
 
-        if (isset(self::$files[$path]) && filectime($path) == self::$files[$path]["time"]) {
+        if (isset(self::$files[$path]) && filemtime($path) == self::$files[$path]["time"]) {
             return self::$files[$path]['data'];
         }
 
@@ -84,7 +84,7 @@ class File
         }
 
         self::$files[$path] = [
-            "time" => filectime($path),
+            "time" => filemtime($path),
             "data" => $contents
         ];
         return self::$files[$path]['data'];

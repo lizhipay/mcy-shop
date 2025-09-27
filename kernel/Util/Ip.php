@@ -41,4 +41,18 @@ class Ip
     {
         File::write(self::MODE_FILE, $header);
     }
+
+    /**
+     * @param string $ip
+     * @return string|false
+     */
+    public static function getType(string $ip): string|false
+    {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return 'ipv4';
+        } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            return 'ipv6';
+        }
+        return false;
+    }
 }
