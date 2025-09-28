@@ -495,6 +495,20 @@
                                                     });
                                                 },
                                                 show: item => item.subscription != 4
+                                            },
+                                            {
+                                                class: 'btn-outline-success',
+                                                icon: 'icon-xiazai',
+                                                title: "安装",
+                                                click: (event, value, row, index) => {
+                                                    message.ask(`您正在安装插件(${row.name})，是否继续？`, () => {
+                                                        util.post("/admin/store/install", {key: row.key}, res => {
+                                                            message.success("[" + row.name + "] 已安装!");
+                                                            subscriptionTable.refresh();
+                                                        });
+                                                    });
+                                                },
+                                                show: item => item?.key && !item?.installed && item?.is_local_machine === true && format.expireTime(item?.expire_time) !== false
                                             }
                                         ]
                                     }

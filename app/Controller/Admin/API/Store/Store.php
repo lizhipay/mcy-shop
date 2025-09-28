@@ -151,7 +151,19 @@ class Store extends Base
      */
     public function powers(): Response
     {
-        return $this->json(data: ["list" => $this->store->powers($this->getStoreAuth())]);
+        $powers = $this->store->powers($this->getStoreAuth());
+
+        foreach ($powers as &$item) {
+            if (isset($item['key'])) {
+                if (Plugin::inst()->exist($item['key'], App::$mEnv)) {
+                    $item['installed'] = true;
+                } else {
+                    $item['installed'] = false;
+                }
+            }
+        }
+
+        return $this->json(data: ["list" => $powers]);
     }
 
     /**
