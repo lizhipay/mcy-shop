@@ -51,6 +51,6 @@
 
 ## 更多
 
-- QQ群：941616478 - 广告：🈲
+- QQ群：317898299 - 广告：🈲
 - [Telegram](http://t.me/mcyofficial) - 广告：🈲
 - [Discord](https://discord.gg/MAduAfBvCK) - 广告：🉑
