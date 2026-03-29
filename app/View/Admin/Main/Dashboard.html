@@ -191,6 +191,60 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-12 mb-3">
+                        <div class="block block-rounded h-100 mb-0">
+                            <div class="block-header block-header-default">
+                                <h4 class="block-title" style="color: #28a745;">{{ icon("icon-dengdai1")|raw}} {{ i18n("销售统计")|raw }}</h4>
+                            </div>
+
+                            <div class="block-content">
+                                <div class="row">
+                                    <div class="col-md-6 col-xl-6">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <i class="fa fa-money-bill-wave" style="font-size: 32px; color: #28a745;"></i>
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("销售总金额")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center sales-total-amount">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6 col-xl-6">
+                                        <a class="block block-shadow block-rounded block-link-shadow text-end" href="javascript:void(0)">
+                                            <div class="block-content block-content-full d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <i class="fa fa-file-invoice" style="font-size: 32px; color: #17a2b8;"></i>
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fs-sm text-uppercase text-muted mb-1">{{ i18n("销售订单数")|raw }}</div>
+                                                    <div class="fs-3 fw-semibold text-center sales-total-count">{{ icon("icon-loading" , "icon-spin")|raw }}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <h6 class="text-muted mb-2">{{ i18n("销售人TOP5")|raw }}</h6>
+                                        <table class="table table-borderless table-striped table-vcenter sales-top5-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ i18n("排名")|raw }}</th>
+                                                    <th>{{ i18n("销售人")|raw }}</th>
+                                                    <th>{{ i18n("订单数")|raw }}</th>
+                                                    <th>{{ i18n("总金额")|raw }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-12">
                         <div class="block block-rounded h-100 mb-0">
                             <div class="block-header block-header-default">
