@@ -50,8 +50,13 @@ class Developer extends Base
         $data = $this->request->post();
 
         if (!isset($data['id'])) {
+            //路径白名单：icon 必须是 /assets/ 下的上传图片，杜绝 icon=/config/database.php 等任意文件读取(LFI)
+            $icon = (string)($data['icon'] ?? "");
+            if (str_contains($icon, "..") || !preg_match('#^/assets/[A-Za-z0-9_\-./]+\.(jpe?g|png|gif|webp|bmp|ico)$#i', $icon)) {
+                throw new JSONException("图标不合法");
+            }
             //上传文件
-            $http = $this->http->upload("image", BASE_PATH . $data['icon'], $this->getStoreAuth());
+            $http = $this->http->upload("image", BASE_PATH . $icon, $this->getStoreAuth());
             $data['icon'] = $http->data['url'];
         }
 

@@ -92,7 +92,7 @@ class Site implements \App\Service\User\Site
             if ($themeEntity && key_exists($themePage, $themeEntity->theme)) {
                 $templatePath = BASE_PATH . "{$env}/{$theme}/Theme/";
                 $template = $themeEntity->theme[$themePage];
-                $data['plugin'] = Variable::inst()->getOrNotCallback(\Kernel\Plugin\Entity\Plugin::class, function () use ($env, $theme) {
+                $data['plugin'] = Variable::inst()->getOrNotCallback(\Kernel\Plugin\Entity\Plugin::class . ":{$env}:{$theme}", function () use ($env, $theme) {
                     return Plugin::inst()->getPlugin($theme, $env);
                 });
                 if (file_exists($templatePath . "/Helper.php")) {
@@ -240,10 +240,26 @@ class Site implements \App\Service\User\Site
             if (strtotime($certInfo['expire']) < time()) {
                 throw new JSONException("您的SSL证书已过期");
             }
+
+            //证书 SAN 必须实际覆盖待绑定域名，杜绝用任意有效证书宣称他人/平台域名
+            if (!$this->certCoversDomain((string)$certInfo['domain'], $domain)) {
+                throw new JSONException("您提供的SSL证书与该独立域名不匹配");
+            }
         }
 
         if (!filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) && !preg_match("/^(\*\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/", $domain)) {
             throw new JSONException("该域名无效");
+        }
+
+        //禁止占用平台自有主域名 / 支付异步回调域名：否则 Site::getUser(host) 会把主站请求解析成该商家，
+        //在应用层劫持主站路由(渲染其店铺、加载其插件环境)，甚至覆盖主站 nginx 配置。
+        $reservedDomains = $this->getMainDomains();
+        $payCfg = $this->config->getMainConfig("pay");
+        if (!empty($payCfg['async_host'])) {
+            $reservedDomains[] = (string)$payCfg['async_host'];
+        }
+        if (in_array($domain, $reservedDomains, true) || in_array(Url::getWildcard($domain), $reservedDomains, true)) {
+            throw new JSONException("该域名为系统保留域名，无法绑定");
         }
 
         if (\App\Model\Site::where("host", $domain)->orWhere("host", Url::getWildcard($domain))->exists()) {
@@ -478,5 +494,34 @@ class Site implements \App\Service\User\Site
         $nginxConf = str_replace('${ssl_certificate_key}', $nginxInfo->key, $nginxConf); //秘钥
         //反向代理地址
         return str_replace('${proxy_pass}', $proxyPass, $nginxConf);
+    }
+
+    /**
+     * 校验 SSL 证书(SAN)是否覆盖待绑定的域名，支持多 SAN 与单层通配符
+     * @param string $san openssl subjectAltName(已去除 "DNS:")，多个以逗号分隔
+     * @param string $domain 待绑定域名
+     * @return bool
+     */
+    private function certCoversDomain(string $san, string $domain): bool
+    {
+        $domain = strtolower(trim($domain));
+        foreach (explode(",", $san) as $entry) {
+            $entry = strtolower(trim($entry));
+            if ($entry === "") {
+                continue;
+            }
+            if ($entry === $domain) {
+                return true;
+            }
+            //通配符仅覆盖同级单层子域：*.example.com 覆盖 a.example.com，不覆盖 example.com 或 a.b.example.com
+            if (str_starts_with($entry, "*.")) {
+                $base = substr($entry, 2);
+                if (str_ends_with($domain, "." . $base)
+                    && substr_count($domain, ".") === substr_count($base, ".") + 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

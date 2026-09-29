@@ -49,8 +49,10 @@ class Firewall
         $config = \HTMLPurifier_Config::createDefault();
         // 自定义 HTML 定义
         $config->set('HTML.DefinitionID', 'firewall.html');
-        $config->set('HTML.DefinitionRev', 15);
-        $config->set('Filter.Custom', [IgnoreStyleTagFilter::make()]);
+        $config->set('HTML.DefinitionRev', 16);
+        //移除 <style> 原样放行的过滤器：其内容此前完全绕过 HTMLPurifier，导致存储型 CSS 注入
+        //（@import 外链、属性选择器窃取输入/令牌、position:fixed 覆盖钓鱼）。改为交由 HTMLPurifier 默认剥离 <style>。
+        $config->set('Filter.Custom', []);
 
         $config->getDefinition('URI')->addFilter(URISchemeFilter::make(), $config);
 
@@ -91,8 +93,8 @@ class Firewall
                     'loop' => 'Number',
                     'bgcolor' => 'Text',
                     'width' => 'Text',
-                    'height' => 'Text',
-                    'style' => 'Text'
+                    'height' => 'Text'
+                    //移除 'style' => 'Text'：该声明使 style 属性绕过 CSS 净化，可注入任意 CSS
                 )
             );
             $def->addElement(

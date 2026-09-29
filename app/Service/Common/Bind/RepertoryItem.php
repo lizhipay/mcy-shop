@@ -433,7 +433,8 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
 
         #1 商品名称同步
         if ($markup->syncName && $item->versions['name'] != $repertoryItem->version['name']) {
-            $repertoryItem->name = $item->name;
+            //上游同步的名称未经请求管线的 xssKiller，此处补净化，防止被入侵/恶意上游注入存储型 XSS
+            $repertoryItem->name = \Kernel\Waf\Firewall::inst()->xssKiller((string)$item->name);
         }
 
         #2 商品图片同步
@@ -471,7 +472,8 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                 }, $introduce);
             }
 
-            $repertoryItem->introduce = $introduce;
+            //上游同步的富文本说明未经 xssKiller，此处补净化（保留安全 HTML、移除脚本/事件）
+            $repertoryItem->introduce = \Kernel\Waf\Firewall::inst()->xssKiller($introduce);
         }
 
         $repertoryItem->version = $item->versions;
@@ -509,7 +511,7 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
                         list($skuPictureUrl, $skuPictureThumbUrl) = $this->image->downloadRemoteImage($skuPictureUrl, true, $repertoryItem->user_id);
                     }
                     //创建新的SKU
-                    $createSku = new CreateSku($sku->versions, $sku->name, $skuPictureUrl, $skuPictureThumbUrl, $sku->price);
+                    $createSku = new CreateSku($sku->versions, \Kernel\Waf\Firewall::inst()->xssKiller((string)$sku->name), $skuPictureUrl, $skuPictureThumbUrl, $sku->price);
                     $sku->marketControlOnlyNum > 0 && $createSku->setMarketControlOnlyNum($sku->marketControlOnlyNum);
                     $sku->marketControlMaxNum > 0 && $createSku->setMarketControlMaxNum($sku->marketControlMaxNum);
                     $sku->marketControlMinNum > 0 && $createSku->setMarketControlMinNum($sku->marketControlMinNum);
@@ -523,7 +525,7 @@ class RepertoryItem implements \App\Service\Common\RepertoryItem
 
                     ##1 SKU名称同步
                     if ($markup->syncSkuName && $sku->versions['name'] != $repertoryItemSku->version['name']) {
-                        $repertoryItemSku->name = $sku->name;
+                        $repertoryItemSku->name = \Kernel\Waf\Firewall::inst()->xssKiller((string)$sku->name);
                     }
 
                     ##2 SKU图片同步

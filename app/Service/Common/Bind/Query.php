@@ -92,9 +92,10 @@ class Query implements \App\Service\Common\Query
         }
 
         foreach ($get->where as $key => $val) {
-            if (is_scalar($val)) {
-                $val = urldecode((string)$val);
+            if (!is_scalar($val)) {
+                continue; //跳过非标量 where 值（如 status[]=1），避免下游 setWhere(string) 触发 TypeError 造成 500 DoS
             }
+            $val = urldecode((string)$val);
             $key = urldecode($key);
             $args = explode('-', $key);
             if ($val === '') {
@@ -306,8 +307,16 @@ class Query implements \App\Service\Common\Query
      */
     public function getOrderBy(array $map, string $field, string $rule = 'desc'): array
     {
-        if (isset($map['sort_field']) && isset($map['sort_rule'])) {
-            return [$map['sort_field'], $map['sort_rule']];
+        if (isset($map['sort_field']) && isset($map['sort_rule'])
+            && is_string($map['sort_field']) && is_string($map['sort_rule'])) {
+            $sortField = $map['sort_field'];
+            $sortRule = strtolower($map['sort_rule']);
+            //排序字段同样施加列名白名单 + 敏感列(password/salt)拦截，杜绝按敏感列排序造成的信息泄漏
+            if (preg_match('/^[A-Za-z0-9_]+$/', $sortField)
+                && !in_array(strtolower($sortField), self::SENSITIVE_COLUMNS, true)
+                && in_array($sortRule, ['asc', 'desc'], true)) {
+                return [$sortField, $sortRule];
+            }
         }
         return [$field, $rule];
     }

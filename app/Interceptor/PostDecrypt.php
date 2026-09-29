@@ -35,6 +35,11 @@ class PostDecrypt implements Interceptor
         $data = $request->raw();
 
         if (!$data) {
+            //POST 却无加密 body = 缺少 Secret/Signature 的伪造请求(空 body 可绕过下方签名校验 → CSRF)，一律拒绝；
+            //GET 等无 body 方法合法放行(其签名以请求头形式携带，不经此处)
+            if (strtoupper($request->method()) === "POST") {
+                throw new JSONException("signature failure");
+            }
             return $response;
         }
 

@@ -36,6 +36,8 @@ class Personal extends Base
     public function logout(): Response
     {
         $this->lifetime->update($this->getUser()->id, "login_status", 0);
+        //使旧 token 的 loginTime 失配，令 Visitor/UserContext/User 三个拦截器全部拒绝已登出的 token
+        $this->lifetime->update($this->getUser()->id, "last_login_time", \Kernel\Util\Date::current());
         return $this->response->withCookie(Cookie::USER_TOKEN, "", 0)->redirect("/");
     }
 }

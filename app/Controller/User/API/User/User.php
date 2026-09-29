@@ -80,8 +80,16 @@ class User extends Base
         $id = $this->request->post('id', Filter::INTEGER);
         $amount = $this->request->post('amount');
 
-        //禁止向自己转账（否则净额不变却虚增自己的累计充值 total_recharge_amount）
-        if ($id <= 0 || $id === $this->getUser()->id) {
+        //实名/支付密码门槛：比照个人转账(Identity 拦截器)，未实名认证不得转账
+        $identity = \App\Model\UserIdentity::query()->where("user_id", $this->getUser()->id)->first();
+        if (!$identity || $identity->status != 1) {
+            throw new \Kernel\Exception\JSONException("请先实名认证");
+        }
+
+        //归属校验：只能给自己的下线转账/充值；杜绝转给任意用户并虚增其累计充值(total_recharge_amount)、
+        //以及两商家互刷累计充值。收款人必须 pid==自己
+        $payee = Model::query()->where("id", $id)->where("pid", $this->getUser()->id)->first();
+        if ($id <= 0 || $id === $this->getUser()->id || !$payee) {
             throw new \Kernel\Exception\JSONException("转账对象不存在");
         }
 

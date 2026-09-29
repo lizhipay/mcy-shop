@@ -23,7 +23,7 @@ class Common
     }
 
     #[Required("分页数量不能为空")]
-    #[Regex("/^[1-9]\d*$/", "分页数量错误")]
+    #[Regex("/^[1-9]\d{0,3}$/", "分页数量错误")] //上限 9999，防止超大 limit 一次性拉取全表撑爆内存(DoS)
     public function limit(): bool
     {
         return true;

@@ -16,7 +16,10 @@ class ItemSku
 
     public function supplyPrice(mixed $value): bool|string
     {
-        if ($value !== null && $value <= 0) {
+        if ($value === null || $value === "") {
+            return true;
+        }
+        if (!is_numeric($value) || (float)$value <= 0) {
             return '供货价，必须大于0';
         }
 

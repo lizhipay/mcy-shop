@@ -132,6 +132,7 @@ class Level extends Base
         }
 
         $delete = new Delete(Model::class, [$id]);
+        $delete->setWhere("user_id", $this->getUser()->id); //归属校验：仅允许删除属于自己的等级（纵深防御，不单靠 validator）
         $this->query->delete($delete);
         return $this->response->json(message: "删除成功");
     }

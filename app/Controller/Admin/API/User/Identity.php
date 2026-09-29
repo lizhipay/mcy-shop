@@ -63,12 +63,16 @@ class Identity extends Base
      * @throws JSONException
      * @throws RuntimeException
      */
-    #[Validator([
-        [\App\Validator\Admin\Level::class, "name"]
-    ])]
     public function save(): Response
     {
         $map = $this->request->post();
+        //原 #[Validator] 误接 Level 的 name(Identity 从不传 name)导致 status 零校验，改为直接校验
+        if (!isset($map['id']) || !preg_match('/^[1-9]\d*$/', (string)$map['id'])) {
+            throw new JSONException("参数错误");
+        }
+        if (!in_array((int)($map['status'] ?? -1), [0, 1, 2], true)) {
+            throw new JSONException("状态错误");
+        }
         $save = new Save(Model::class);
         $save->setMap($map, ["status"]);
         $save->disableAddable();

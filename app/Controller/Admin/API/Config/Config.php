@@ -49,6 +49,10 @@ class Config extends Base
      */
     public function get(string $key): Response
     {
+        //含密钥/危险操作的配置(SMTP、短信、支付回调、nginx)仅超级管理员可读，杜绝子管理员凭 config/get 读取凭据
+        if (in_array($key, ["email", "sms", "pay", "subdomain"], true) && $this->getManage()?->type != 0) {
+            throw new JSONException("无权限查看该配置");
+        }
         $config = Model::query()->where("key", $key)->whereNull("user_id")->first();
         if (!$config) {
             throw new JSONException("配置不存在");
@@ -121,6 +125,11 @@ class Config extends Base
      */
     public function save(string $key): Response
     {
+        //含密钥/危险操作的配置(SMTP、短信、支付回调 async_host、nginx 写入)仅超级管理员可改，
+        //杜绝子管理员劫持支付回调、写入 nginx、篡改密钥
+        if (in_array($key, ["email", "sms", "pay", "subdomain"], true) && $this->getManage()?->type != 0) {
+            throw new JSONException("无权限修改该配置");
+        }
         $config = \App\Model\Config::query()->where("key", $key)->whereNull("user_id")->first();
         if (!$config) {
             throw new JSONException("当前提交的配置不存在，无法保存");

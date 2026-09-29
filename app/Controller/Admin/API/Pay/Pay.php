@@ -91,6 +91,10 @@ class Pay extends Base
             if (!$item['pid'] && isset($item['config'])) {
                 $item['plugin'] = Plugin::instance()->getPlugin($item['config']['plugin'], Usr::inst()->userToEnv($item['user_id']));
             }
+            //不在列表返回支付通道明文配置(商户私钥/API 密钥)，杜绝仅有 pay/get 的子管理员批量窃取密钥
+            if (isset($item['config']['config'])) {
+                unset($item['config']['config']);
+            }
             $item['scope'] = is_array($item['scope']) ? $item['scope'] : (array)json_decode((string)$item['scope'], true);
         }
 

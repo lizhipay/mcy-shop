@@ -130,6 +130,13 @@ class Config extends Base
         (isset($post['pc_theme']) && $post['pc_theme'] === "") && ($post['pc_theme'] = "default");
         (isset($post['mobile_theme']) && $post['mobile_theme'] === "") && ($post['mobile_theme'] = "default");
 
+        //主题标识白名单：该值后续会拼进模板/插件路径与 require()，禁止 ../ 路径穿越
+        foreach (["pc_theme", "mobile_theme"] as $themeKey) {
+            if (isset($post[$themeKey]) && !preg_match('/^[A-Za-z0-9_]+$/', (string)$post[$themeKey])) {
+                throw new JSONException("主题标识错误");
+            }
+        }
+
         $keys = [
             "site" => ["网站设置", "icon-wangzhanshezhi", "/assets/admin/image/config/site.jpg"],
             "email" => ["邮件配置", "icon-a-kl_e10", "/assets/admin/image/config/email.jpg"],

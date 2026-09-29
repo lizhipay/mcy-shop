@@ -69,7 +69,7 @@ class Pay extends Base
          * @var \App\Model\Pay $pay
          */
         $pay = \App\Model\Pay::query()->find($value);
-        if ($pay->user_id != $this->getUser()->id) {
+        if (!$pay || $pay->user_id != $this->getUser()->id) {
             return "支付通道不存在";
         }
         return true;

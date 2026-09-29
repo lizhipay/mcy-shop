@@ -143,7 +143,7 @@ const format = new class Format {
             return "-";
         }
 
-        return `<span class="table-item"><img src="${item.picture_thumb_url}" class="table-item-icon"><span class="table-item-name">${item.name}</span></span>`;
+        return `<span class="table-item"><img src="${util.escape(item.picture_thumb_url)}" class="table-item-icon"><span class="table-item-name">${util.escape(item.name)}</span></span>`;
     }
 
     category(item, obj = null) {
@@ -155,14 +155,14 @@ const format = new class Format {
             return "-";
         }
 
-        return `<span class="table-item table-item-cate"><img src="${item?.icon}" class="table-item-icon"><span class="table-item-name">${item?.name}</span></span>`;
+        return `<span class="table-item table-item-cate"><img src="${util.escape(item?.icon)}" class="table-item-icon"><span class="table-item-name">${util.escape(item?.name)}</span></span>`;
     }
 
     group(group) {
         if (!group) {
             return '-';
         }
-        return `<span class="table-item table-item-cate"><img src="${group.icon}" class="table-item-icon"><span class="table-item-name">${group.name}</span></span>`;
+        return `<span class="table-item table-item-cate"><img src="${util.escape(group.icon)}" class="table-item-icon"><span class="table-item-name">${util.escape(group.name)}</span></span>`;
     }
 
 
@@ -170,57 +170,57 @@ const format = new class Format {
         if (!item) {
             return util.icon('icon-guanfang');
         }
-        return `<span class="table-item table-item-user"><img src="${item.avatar}" class="table-item-icon"><span class="table-item-name">${item.username}</span></span>`;
+        return `<span class="table-item table-item-user"><img src="${util.escape(item.avatar)}" class="table-item-icon"><span class="table-item-name">${util.escape(item.username)}</span></span>`;
     }
 
     bank(item) {
         if (!item) {
             return '-';
         }
-        return `<span class="table-item"><img src="${item.icon}" class="table-item-icon"><span class="table-item-name">${item.name}</span></span>`;
+        return `<span class="table-item"><img src="${util.escape(item.icon)}" class="table-item-icon"><span class="table-item-name">${util.escape(item.name)}</span></span>`;
     }
 
     invite(item) {
         if (!item) {
             return '-';
         }
-        return `<span class="table-item table-item-user"><img src="${item.avatar}" class="table-item-icon"><span class="table-item-name">${item.username}</span></span>`;
+        return `<span class="table-item table-item-user"><img src="${util.escape(item.avatar)}" class="table-item-icon"><span class="table-item-name">${util.escape(item.username)}</span></span>`;
     }
 
     site(item) {
         if (!item) {
             return '-';
         }
-        return `<span class="table-item"><img src="${item.logo}" class="table-item-icon"><span class="table-item-name">${item.title}</span></span>`;
+        return `<span class="table-item"><img src="${util.escape(item.logo)}" class="table-item-icon"><span class="table-item-name">${util.escape(item.title)}</span></span>`;
     }
 
     pay(item) {
         if (!item) {
             return '-';
         }
-        return `<span class="pay-item"><img src="${item.icon}" class="item-icon"><span class="item-name">${item.name}</span></span>`;
+        return `<span class="pay-item"><img src="${util.escape(item.icon)}" class="item-icon"><span class="item-name">${util.escape(item.name)}</span></span>`;
     }
 
     customer(item, all) {
         if (!item) {
             return `<svg style="height: 21px;width: 40px;" aria-hidden="true"><use xlink:href="#icon-youke"></use></svg>`;
         }
-        return `<span class="table-item table-item-user"><img src="${item.avatar}" class="table-item-icon"><span class="table-item-name">${item.username}</span></span>`;
+        return `<span class="table-item table-item-user"><img src="${util.escape(item.avatar)}" class="table-item-icon"><span class="table-item-name">${util.escape(item.username)}</span></span>`;
     }
 
     bankCard(item) {
         if (!item) {
             return '-';
         }
-        return `<span class="table-item"><img src="${item?.bank?.icon}" class="table-item-icon"><span class="table-item-name">${item?.bank?.name}(${item.card_no})</span></span>`;
+        return `<span class="table-item"><img src="${util.escape(item?.bank?.icon)}" class="table-item-icon"><span class="table-item-name">${util.escape(item?.bank?.name)}(${util.escape(item.card_no)})</span></span>`;
     }
 
     client(item) {
-        return `<span class="table-item table-item-user"><img src="${item.avatar}" class="table-item-icon"><span class="table-item-name">${item.username}</span></span>`;
+        return `<span class="table-item table-item-user"><img src="${util.escape(item.avatar)}" class="table-item-icon"><span class="table-item-name">${util.escape(item.username)}</span></span>`;
     }
 
     blockItems(items) {
-        const html = items.map(item => `<div class="b-item"><span class="b-title">${item.title}</span><span class="b-content">${item.content}</span></div>`).join('');
+        const html = items.map(item => `<div class="b-item"><span class="b-title">${util.escape(item.title)}</span><span class="b-content">${util.escape(item.content)}</span></div>`).join('');
         return `<div class="table-block-items">${html}</div>`;
     }
 
@@ -229,13 +229,13 @@ const format = new class Format {
             return state.text;
         }
         var $state = $(
-            `<span class="select2-item"><img src="${state.element.getAttribute('data-icon')}" class="table-item-icon"><span class="table-item-name">${state.text}</span></span>`
+            `<span class="select2-item"><img src="${util.escape(state.element.getAttribute('data-icon'))}" class="table-item-icon"><span class="table-item-name">${util.escape(state.text)}</span></span>`
         );
         return $state;
     }
 
     plugin(item) {
-        return `<span class="table-item"><img src="${item.icon}" class="table-item-icon"><span class="table-item-name">${item.name}</span></span>`;
+        return `<span class="table-item"><img src="${util.escape(item.icon)}" class="table-item-icon"><span class="table-item-name">${util.escape(item.name)}</span></span>`;
     }
 
     pastTime(date) {

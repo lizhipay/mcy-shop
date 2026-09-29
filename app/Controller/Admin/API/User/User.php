@@ -110,14 +110,18 @@ class User extends Base
         $isWithdraw = $this->request->post('is_withdraw') == 1;
         $isLifetime = $this->request->post('is_lifetime') == 1;
 
-        if ($type == 0) {
-            $this->balance->add(userId: $id, amount: $amount, type: \App\Const\Balance::TYPE_MANUAL, isWithdraw: $isWithdraw, remark: $remark);
-            if ($isLifetime) {
-                $this->lifetime->increment($id, "total_recharge_amount", $amount);
+        //整段包进事务：Balance::add/deduct 内的 lock() 行锁只在事务内才持续到 UPDATE，
+        //否则(autocommit)读-改-写非原子，管理员调额与用户消费/另一后台请求并发会丢失更新
+        \Kernel\Database\Db::transaction(function () use ($type, $id, $amount, $remark, $isWithdraw, $isLifetime) {
+            if ($type == 0) {
+                $this->balance->add(userId: $id, amount: $amount, type: \App\Const\Balance::TYPE_MANUAL, isWithdraw: $isWithdraw, remark: $remark);
+                if ($isLifetime) {
+                    $this->lifetime->increment($id, "total_recharge_amount", $amount);
+                }
+            } else {
+                $this->balance->deduct(userId: $id, amount: $amount, type: \App\Const\Balance::TYPE_MANUAL, remark: $remark);
             }
-        } else {
-            $this->balance->deduct(userId: $id, amount: $amount, type: \App\Const\Balance::TYPE_MANUAL, remark: $remark);
-        }
+        }, \Kernel\Database\Const\Db::ISOLATION_SERIALIZABLE);
 
         return $this->response->json();
     }
@@ -133,7 +137,8 @@ class User extends Base
     {
         $post = $this->request->post();
         $save = new Save(Model::class);
-        $save->setMap($post, ['username', 'email', 'avatar', 'status', 'note', 'group_id', 'level_id', 'withdraw_amount']);
+        //移除 withdraw_amount：直接改可提现额度会绕过 UserBill 审计、把不可提现余额静默转为可提现；应走 balanceChange
+        $save->setMap($post, ['username', 'email', 'avatar', 'status', 'note', 'group_id', 'level_id']);
         try {
             //重置密码
             if (isset($post['password']) && $post['password'] != "") {

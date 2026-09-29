@@ -42,6 +42,9 @@ class Withdraw extends Base
     #[Regex("/^[0-9]+(\.[0-9]{1,2})?$/", "提现金额错误")]
     public function amount(mixed $value): bool|string
     {
+        if (!is_numeric($value) || (float)$value <= 0) {
+            return "提现金额必须大于0";
+        }
         if ($value > $this->getUser()->withdraw_amount) {
             return "提现额度不足";
         }

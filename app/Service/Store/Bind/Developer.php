@@ -159,6 +159,11 @@ class Developer implements \App\Service\Store\Developer
             throw new ServiceException("插件不存在");
         }
 
+        //版本号必须为严格 semver，杜绝 version="9.9.9/../.." 经更新包/解压目标路径穿越覆盖核心文件
+        if (!preg_match('/^\d+\.\d+\.\d+$/', (string)($plugin->info['version'] ?? ""))) {
+            throw new ServiceException("插件版本号格式非法");
+        }
+
         $files = $this->getPluginTrackedFiles($name);
         if (empty($files)) {
             throw new JSONException("插件没有任何变动");

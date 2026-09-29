@@ -27,7 +27,8 @@ class Request extends \Kernel\Context\Abstract\Request
 
         //仅在直连对端属于可信代理时才采纳 X-Forwarded-For / X-Real-IP，否则一律使用对端真实 IP，
         //杜绝任意客户端通过伪造转发头污染登录/注册日志、绕过自推风控、伪造支付回调来源与后台会话 IP 绑定。
-        $this->clientIp = $this->resolveClientIp((string)($request->server['remote_addr'] ?? ""));
+        $this->remoteAddr = (string)($request->server['remote_addr'] ?? "");
+        $this->clientIp = $this->resolveClientIp($this->remoteAddr);
 
         if (str_contains((string)$this->header("ContentType"), "application/json")) {
             $this->json = (array)json_decode($this->raw, true);
@@ -59,6 +60,15 @@ class Request extends \Kernel\Context\Abstract\Request
             $array[str_replace(" ", "", ucwords(str_replace("-", " ", $key)))] = $val;
         }
         return $array;
+    }
+
+    /**
+     * 直连对端是否为可信代理；只有可信时才采纳按模式读取的转发头（如 CF-Connecting-IP）。
+     * @return bool
+     */
+    protected function isTrustedPeer(): bool
+    {
+        return $this->ipInList($this->remoteAddr, $this->getTrustedProxies());
     }
 
     /**

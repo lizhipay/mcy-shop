@@ -154,7 +154,7 @@ class Form {
     }
 
     inputHtml(form, type = "text") {
-        return this.getBlockHtml(form, `<input ${form.disabled ? "disabled" : ""} name="${form.name}" placeholder="${form.placeholder}" type="${type}" class="layui-input" value="${(form.default ?? "")}">`);
+        return this.getBlockHtml(form, `<input ${form.disabled ? "disabled" : ""} name="${form.name}" placeholder="${form.placeholder}" type="${type}" class="layui-input" value="${util.escape(form.default ?? "")}">`);
     }
 
     selectHtml(form) {
@@ -166,7 +166,7 @@ class Form {
     }
 
     textareaHtml(form) {
-        return this.getBlockHtml(form, `<textarea ${form.disabled ? "disabled" : ""} ${form.hasOwnProperty('height') ? 'style="height:' + (Number.isInteger(form.height) ? form.height + "px" : form.height) + '"' : ''} name="${form.name}" placeholder="${form.placeholder}" class="layui-textarea">${form.default ?? ""}</textarea>`);
+        return this.getBlockHtml(form, `<textarea ${form.disabled ? "disabled" : ""} ${form.hasOwnProperty('height') ? 'style="height:' + (Number.isInteger(form.height) ? form.height + "px" : form.height) + '"' : ''} name="${form.name}" placeholder="${form.placeholder}" class="layui-textarea">${util.escape(form.default ?? "")}</textarea>`);
     }
 
     editorHtml(form) {

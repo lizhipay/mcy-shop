@@ -219,7 +219,7 @@ class Auth implements \App\Service\User\Auth
         $user = User::query()->where("username", $map['username'])->first() ?? User::query()->where("email", $map['username'])->first();
 
         //统一失败提示，避免区分“用户不存在/密码错误”造成用户枚举
-        if (!$user || $user->password != Str::generatePassword(trim((string)$map['password']), $user->salt)) {
+        if (!$user || !hash_equals((string)$user->password, Str::generatePassword(trim((string)$map['password']), $user->salt))) {
             $this->bumpLoginFail($lockKey, $fail);
             throw new JSONException("用户名或密码错误");
         }
@@ -312,12 +312,10 @@ class Auth implements \App\Service\User\Auth
          * @var User $user
          */
         $user = User::query()->where("email", $map['email'])->first();
-        if (!$user) {
-            throw new JSONException("该邮箱未注册");
-        }
 
-        if (!$this->code->verify(sprintf(Session::EMAIL_CODE, "reset", $user->email), (int)$map['email_code'], 300)) {
-            throw new JSONException("邮箱验证码错误");
+        //统一错误提示：避免用“该邮箱未注册”与“验证码错误”区分邮箱是否存在，杜绝会员枚举
+        if (!$user || !$this->code->verify(sprintf(Session::EMAIL_CODE, "reset", (string)$map['email']), (int)$map['email_code'], 300)) {
+            throw new JSONException("邮箱或验证码错误");
         }
         $user->password = Str::generatePassword(trim((string)$map['password']), $user->salt);
         $user->save();

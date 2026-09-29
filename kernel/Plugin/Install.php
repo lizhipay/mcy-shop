@@ -53,7 +53,10 @@ class Install
 
                     //替换 Database
                     $raw = preg_replace_callback('/(protected\s+\?string\s+\$table\s*=\s*(?:\'|"))([^\'"]+)/', function ($matches) use ($userId) {
-                        if (str_contains($matches[2], "{$userId}_")) {
+                        //幂等判断必须用 str_starts_with：前缀一律前置。旧代码用 str_contains 会把
+                        //表名中"含有"{userId}_ 子串的当成已前缀而跳过(如 userId=20 时 'trc20_usdt' 含 '20_')，
+                        //导致该分站 Model 落到未前缀的共用/主站表 → 跨租户数据泄露与资金安全问题。
+                        if (str_starts_with($matches[2], "{$userId}_")) {
                             return $matches[1] . $matches[2];
                         }
                         return $matches[1] . "{$userId}_" . $matches[2];

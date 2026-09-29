@@ -110,7 +110,9 @@ class Resolver
             $handler = $this->errorCodeHandlers[$errorCode];
             return $handler($this->exception);
         }
-        return '数据库发生错误：' . $this->exception->getMessage();
+        //不向调用方回显原始异常(含 SQL 片段/表名/列名等)，仅记录到服务器日志
+        \Kernel\Log\Log::inst()->error("DB error: " . $this->exception->getMessage());
+        return '数据库发生错误，请稍后重试';
     }
 
 

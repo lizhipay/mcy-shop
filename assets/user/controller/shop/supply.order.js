@@ -56,7 +56,7 @@
         {
             field: 'contents', title: '发货内容', formatter: (val, item) => {
                 if (item.render === false) {
-                    return `<div class="ship-contents order-contents-${item.id}">${val.replaceAll("\n", "<br>")}</div>`;
+                    return `<div class="ship-contents order-contents-${item.id}">${util.escape(val).replaceAll("\n", "<br>")}</div>`;
                 }
                 util.timer(() => {
                     return new Promise(resolve => {

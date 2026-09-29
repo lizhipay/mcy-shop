@@ -121,10 +121,10 @@ class WidgetUtil {
 
 
         map.dict.forEach(item => {
-            option += `<option value="${item.id}" ${item.id === map.default ? "selected" : ""}>${item.name}</option>`;
+            option += `<option value="${util.escape(item.id)}" ${item.id === map.default ? "selected" : ""}>${util.escape(item.name)}</option>`;
         });
 
-        return `<tr class="item-widget"><td class="sku-cate-td"><span class="cate-name">${widget.title}:</span></td><td> <select class="form-select" name="` + widget.name + `"><option>${widget.placeholder}</option>${option}</select></td></tr>`;
+        return `<tr class="item-widget"><td class="sku-cate-td"><span class="cate-name">${util.escape(widget.title)}:</span></td><td> <select class="form-select" name="` + util.escape(widget.name) + `"><option>${util.escape(widget.placeholder)}</option>${option}</select></td></tr>`;
 
     }
 
@@ -144,12 +144,12 @@ class WidgetUtil {
 
         map.dict.forEach((item, index) => {
             option += `<div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" id="${widget.name}-${index}" name="${widget.name}" value="${item.id}" ` + (item.id === map.default ? "checked" : "") + `>
-                          <label class="form-check-label" for="${widget.name}-${index}">${item.name}</label>
+                          <input class="form-check-input" type="radio" id="${util.escape(widget.name)}-${index}" name="${util.escape(widget.name)}" value="${util.escape(item.id)}" ` + (item.id === map.default ? "checked" : "") + `>
+                          <label class="form-check-label" for="${util.escape(widget.name)}-${index}">${util.escape(item.name)}</label>
                         </div>`;
         });
 
-        return `<tr class="item-widget"><td class="sku-cate-td"><span class="cate-name">${widget.title}:</span></td><td>${option}</td></tr>`;
+        return `<tr class="item-widget"><td class="sku-cate-td"><span class="cate-name">${util.escape(widget.title)}:</span></td><td>${option}</td></tr>`;
     }
 
     /**
@@ -158,11 +158,11 @@ class WidgetUtil {
      * @returns {string}
      */
     static createTextBox(widget) {
-        let text = `<input type="${widget.type}" class="form-control" name="${widget.name}" placeholder="${widget.placeholder}">`;
+        let text = `<input type="${util.escape(widget.type)}" class="form-control" name="${util.escape(widget.name)}" placeholder="${util.escape(widget.placeholder)}">`;
         if (widget.type === 'textarea') {
-            text = `<textarea class="form-control form-control-alt" name="${widget.name}" rows="5" placeholder="${widget.placeholder}"></textarea>`;
+            text = `<textarea class="form-control form-control-alt" name="${util.escape(widget.name)}" rows="5" placeholder="${util.escape(widget.placeholder)}"></textarea>`;
         }
-        return `<tr class="item-widget"><td class="sku-cate-td"><span class="cate-name">${widget.title}:</span></td><td>${text}</td></tr>`;
+        return `<tr class="item-widget"><td class="sku-cate-td"><span class="cate-name">${util.escape(widget.title)}:</span></td><td>${text}</td></tr>`;
     }
 
     /**
@@ -181,10 +181,10 @@ class WidgetUtil {
 
         map.dict.forEach((item, index) => {
             option += `<div class="form-check form-check-inline">
-         <input class="form-check-input" type="checkbox" id="${widget.name}-${index}" value="${item.id}"  name="${widget.name}[]" ${map.default.includes(item.id) ? "checked" : ""}>
-         <label class="form-check-label" for="${widget.name}-${index}">${item.name}</label></div>`;
+         <input class="form-check-input" type="checkbox" id="${util.escape(widget.name)}-${index}" value="${util.escape(item.id)}"  name="${util.escape(widget.name)}[]" ${map.default.includes(item.id) ? "checked" : ""}>
+         <label class="form-check-label" for="${util.escape(widget.name)}-${index}">${util.escape(item.name)}</label></div>`;
         });
 
-        return `<tr class="item-widget"><td class="sku-cate-td"><span class="cate-name">${widget.title}:</span></td><td>${option}</td></tr>`;
+        return `<tr class="item-widget"><td class="sku-cate-td"><span class="cate-name">${util.escape(widget.title)}:</span></td><td>${option}</td></tr>`;
     }
 }

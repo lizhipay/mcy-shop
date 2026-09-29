@@ -248,6 +248,13 @@ class Supply extends Base
         $data = (array)$this->request->post("data");
         $categoryId = (int)$this->request->post("category_id");
         $markupId = (int)$this->request->post("markup_id");
+        //归属校验：分类与加价模板必须属于当前商家，杜绝跨租户引用他人分类/模板
+        if (!\App\Model\Category::query()->where("user_id", $this->getUser()->id)->where("id", $categoryId)->exists()) {
+            throw new \Kernel\Exception\JSONException("分类不存在");
+        }
+        if (!\App\Model\ItemMarkupTemplate::query()->where("user_id", $this->getUser()->id)->where("id", $markupId)->exists()) {
+            throw new \Kernel\Exception\JSONException("同步模版配置不存在");
+        }
         //可见性门禁：先逐个校验访问权限，防止越权导入隐藏货源
         foreach ($data as $id) {
             $this->assertSupplyAccess((int)$id);

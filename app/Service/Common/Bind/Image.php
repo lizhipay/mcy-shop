@@ -44,7 +44,7 @@ class Image implements \App\Service\Common\Image
      * @return void
      * @throws ServiceException
      */
-    private function assertSafeRemoteUrl(string $url): void
+    private function assertSafeRemoteUrl(string $url): array
     {
         $parts = parse_url($url);
         if ($parts === false || empty($parts['scheme']) || empty($parts['host'])) {
@@ -82,6 +82,31 @@ class Image implements \App\Service\Common\Image
                 throw new ServiceException("图片地址指向内网/保留地址，已拒绝(SSRF)");
             }
         }
+
+        return $ips;
+    }
+
+    /**
+     * 校验 URL 安全后，返回把连接“钉死”到已验证公网 IP 的 Guzzle/curl 选项，
+     * 杜绝校验通过后 DNS 重绑定(rebinding)在实际连线时改指内网(TOCTOU SSRF)。
+     * @param string $url
+     * @return array
+     * @throws ServiceException
+     */
+    private function pinnedHttpOptions(string $url): array
+    {
+        $ips = $this->assertSafeRemoteUrl($url);
+        $opt = $this->safeHttpOptions();
+        $parts = parse_url($url);
+        $host = trim((string)($parts['host'] ?? ""), "[]");
+        //主机为域名（非 IP 字面量）时才需要钉住解析结果
+        if ($host !== "" && !filter_var($host, FILTER_VALIDATE_IP) && !empty($ips)) {
+            $ipList = implode(",", $ips);
+            $opt['curl'] = ($opt['curl'] ?? []) + [
+                CURLOPT_RESOLVE => ["{$host}:443:{$ipList}", "{$host}:80:{$ipList}"],
+            ];
+        }
+        return $opt;
     }
 
     /**
@@ -241,8 +266,7 @@ class Image implements \App\Service\Common\Image
      */
     public function isRealImageFromURL($url): bool
     {
-        $this->assertSafeRemoteUrl((string)$url);
-        $response = Http::make()->head($url, $this->safeHttpOptions());
+        $response = Http::make()->head($url, $this->pinnedHttpOptions((string)$url));
         $mimeType = $response->getHeaderLine('Content-Type');
         $validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (in_array($mimeType, $validImageTypes)) {
@@ -279,7 +303,7 @@ class Image implements \App\Service\Common\Image
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
-        Http::make()->get($url, array_merge(["sink" => BASE_PATH . $unique], $this->safeHttpOptions()));
+        Http::make()->get($url, array_merge(["sink" => BASE_PATH . $unique], $this->pinnedHttpOptions($url)));
         if (!is_file(BASE_PATH . $unique)) {
             throw new ServiceException("图片下载失败：$url");
         }

@@ -101,7 +101,7 @@ class OrderReport implements \App\Service\User\OrderReport
                 'orderItem' => function (HasOne $one) {
                     $one->with(['order']);
                 }
-            ])->find($handle->reportId);
+            ])->lock(true)->find($handle->reportId); //对维权主记录加排他行锁：退款金流写入路径，防并发重复处理(与 apply() 一致)
 
             if (!$orderReport) {
                 throw new ServiceException("订单不存在#1");
@@ -161,8 +161,8 @@ class OrderReport implements \App\Service\User\OrderReport
                 case 2:
                     //部分退款，按照供货商自己填写的金额退款
                     (!$refundMode || $refundMode == 0) && (throw new ServiceException("该订单不支持退款"));
-                    $handle->refundAmount <= 0 && (throw new ServiceException("退款金额必须大于0"));
-                    $handle->refundMerchantAmount <= 0 && (throw new ServiceException("退款给商家的金额必须大于0"));
+                    (!is_numeric($handle->refundAmount) || (float)$handle->refundAmount <= 0) && (throw new ServiceException("退款金额必须大于0"));
+                    (!is_numeric($handle->refundMerchantAmount) || (float)$handle->refundMerchantAmount <= 0) && (throw new ServiceException("退款给商家的金额必须大于0"));
                     $orderReport->handle_type = 2;
                     $orderReport->status = 3;
                     $orderItem->status = 5;
@@ -186,10 +186,13 @@ class OrderReport implements \App\Service\User\OrderReport
                     $orderReport->status = 3;
                     $orderItem->status = 5;
                     $repertoryOrder->status = 3;
-                    //回滚资金
-                    $this->bill->rollback($orderItem->trade_no);
+                    //全额退款：对该笔发货的所有资金做双向反向记账(冻结取消、已落账加款扣回/扣款补回)，
+                    //使商家/供货商回到发货前，杜绝“垫款不回收 + refundMerchant 重复补偿”造成的凭空造币。
+                    //反向失败(余额已被花光)将抛异常回滚整笔退款，绝不放行造币。
+                    $this->bill->fullReverse($orderItem->trade_no);
                     $refundAmount = (string)$orderItem->amount;
-                    $refundMerchantAmount = (string)(RepertoryOrder::query()->where("item_trade_no", $orderItem->trade_no)->first())?->amount ?: "0";
+                    //商家净收益已由 fullReverse 撤销，不再重复补偿，仅退款给消费者
+                    $refundMerchantAmount = "0";
                     break;
             }
 

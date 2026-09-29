@@ -150,6 +150,11 @@ class Item extends Base
 
         unset($map['sku_temp_id'], $map['direct_sale'], $map['direct_category_id']);
 
+        //插件标识白名单：该值后续会拼进 getPlugin() 的 require() 路径，禁止 ../ 路径穿越（越权载入他人/主站插件）
+        if (isset($map['plugin']) && (string)$map['plugin'] !== "" && !preg_match('/^[A-Za-z0-9_]+$/', (string)$map['plugin'])) {
+            throw new JSONException("插件标识错误");
+        }
+
         if ($directSale == 1 && $directCategoryId == 0) {
             throw new JSONException("请选择直营店的商品分类");
         }
@@ -186,7 +191,7 @@ class Item extends Base
         $save->addForceMap("user_id", $this->getUser()->id);
 
         $save->addWhere("user_id", $this->getUser()->id); //归属校验：仅允许修改属于自己的记录
-        $save->setMap(map: $map, forbidden: ["user_id", "status", "sort", "create_time"]);
+        $save->setMap(map: $map, forbidden: ["user_id", "status", "sort", "create_time", "is_review"]); //is_review 为平台审核旗标，禁止会员注入自我过审
 
         try {
             if ($origin && ((isset($map['plugin']) && $origin->plugin != $map['plugin']) || (isset($map['status']) && $origin->status != $map['status']))) {

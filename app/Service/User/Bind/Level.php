@@ -122,6 +122,11 @@ class Level implements \App\Service\User\Level
          */
         $selfLevel = UserLevel::query()->find($user->level_id);
 
+        //只能升级到价格更高的等级，杜绝“升级”到更便宜等级产生 0/负金额订单
+        if ((float)$level->upgrade_price <= (float)($selfLevel?->upgrade_price ?? 0)) {
+            throw new JSONException("无法升级到该等级");
+        }
+
         return Db::transaction(function () use ($user, $level, $clientId, $userAgent, $clientIp, $orderService, $selfLevel) {
             $createOrder = new CreateOrder(\App\Const\Order::ORDER_TYPE_UPGRADE_LEVEL, $clientId, $userAgent, $clientIp);
             $createOrder->setAmount((new Decimal((string)$level->upgrade_price))->sub((string)$selfLevel?->upgrade_price)->getAmount());

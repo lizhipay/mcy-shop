@@ -70,7 +70,9 @@ class Admin implements Interceptor
         $menu = $this->manage->getMenu($manage);
         $router = trim($request->uri() . "@" . $request->method(), "/");
 
-        if (!in_array($router, $menu['route']) && Permission::isRegister("/" . $router)) {
+        //超管(type=0)放行全部；子管理员(type=1)一律按其被授权的菜单路由「默认拒绝」，
+        //杜绝未登记为权限的后台路由被任意子管理员越权访问（原逻辑仅在路由已登记为权限时才拦截 = fail-open）
+        if ($manage->type != 0 && !in_array($router, $menu['route'])) {
             return $this->notPermission($request, $response, $type);
         }
 

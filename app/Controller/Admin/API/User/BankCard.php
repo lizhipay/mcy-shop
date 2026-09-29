@@ -34,6 +34,9 @@ class BankCard extends Base
      * @return Response
      * @throws RuntimeException
      */
+    #[Validator([
+        [Common::class, ["page", "limit"]]
+    ])]
     public function get(): Response
     {
         $map = $this->request->post();

@@ -24,4 +24,12 @@ interface Bill
      * @return void
      */
     public function rollback(string $tradeNo): void;
+
+
+    /**
+     * 全额退款双向反向记账（须在事务中调用）
+     * @param string $tradeNo
+     * @return void
+     */
+    public function fullReverse(string $tradeNo): void;
 }

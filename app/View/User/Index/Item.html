@@ -60,7 +60,7 @@
                                                 {% for sku in item.sku %}
                                                     <div class="sku-item-btn{{ sku.id }} sku-item   {{ loop.first ? "sku-current" : "" }}"
                                                          data-price="{{ sku.price }}"
-                                                         data-stock="{{ i18n(sku.stock)|raw }}"
+                                                         data-stock="{{ i18n(sku.stock) }}"
                                                          data-skuId="{{ sku.id }}"
                                                          data-stock-available="{{ sku.stock_available }}">
                                                         <span class="sku-icon"><img src="{{ sku.thumb_url }}"></span>

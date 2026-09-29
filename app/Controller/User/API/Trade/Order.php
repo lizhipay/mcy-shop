@@ -83,6 +83,7 @@ class Order extends Base
         foreach ($data['list'] as $index => $item) {
             $ship = $this->order->getOrderItemShip($item['id']);
             $data['list'][$index]['render'] = $ship?->isCustomRender() ?? false;
+            unset($data['list'][$index]['dividend_amount']); //不向买家泄露商家的分红/佣金设置
         }
 
         return $this->json(data: $data);

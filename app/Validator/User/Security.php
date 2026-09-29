@@ -71,7 +71,7 @@ class Security extends Base
     #[Required("当前登录密码不能为空")]
     public function currentPassword(mixed $value): bool|string
     {
-        if (Str::generatePassword($value, $this->getUser()->salt) != $this->getUser()->password) {
+        if (!hash_equals((string)$this->getUser()->password, Str::generatePassword((string)$value, $this->getUser()->salt))) {
             return "当前登录密码错误";
         }
         return true;
@@ -87,7 +87,7 @@ class Security extends Base
     #[Required("确认密码不能为空")]
     public function reNewPassword(mixed $value): bool|string
     {
-        if ($value != $this->request->post("new_password")) {
+        if ((string)$value !== (string)$this->request->post("new_password")) {
             return "两次密码输入不一致";
         }
         return true;

@@ -67,6 +67,10 @@ class Plugin
      */
     public function getPlugin(string $name, string $env = "/app/Plugin"): ?Entity
     {
+        //插件标识白名单：仅允许字母数字下划线，杜绝 ../ 路径穿越经 require() 载入他人/主站插件（沙箱逃逸/LFI）
+        if (!preg_match('/^[A-Za-z0-9_]+$/', $name)) {
+            return null;
+        }
         $path = BASE_PATH . $env . "/{$name}";
         list($info, $submit, $route, $command, $menu, $handle, $handleSubmit, $payCode, $theme) = [$path . "/Config/Info.php", $path . "/Config/Submit.js", $path . "/Config/Route.php", $path . "/Config/Command.php", $path . "/Config/Menu.php", $path . "/Config/Handle.php", $path . "/Config/Handle.js", $path . "/Config/Pay.php", $path . "/Config/Theme.php"];
 

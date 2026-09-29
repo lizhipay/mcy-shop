@@ -106,8 +106,17 @@ class PayManager extends Base
             $post[strtolower($k)] = $v;
         }
 
-        if (isset($post['pid'])) {
-            unset($post['api_fee']);
+        //计算该通道最终的父通道ID：优先取请求值；编辑既有通道时即便请求未带 pid，也按其真实 pid 判定，
+        //杜绝"编辑绑定通道时省略 pid"绕过父通道 scope 限制（否则可把仅限 product 的绑定通道扩权到 level）。
+        $pid = $post['pid'] ?? null;
+        if ($pid === null && isset($post['id']) && is_numeric($post['id'])) {
+            $existing = Model::query()->where("user_id", $this->getUser()->id)->find((int)$post['id']);
+            $pid = $existing?->pid;
+        }
+        $isBound = ($pid !== null && (int)$pid !== 0);
+
+        if ($isBound) {
+            unset($post['api_fee']); //绑定通道的 api_fee 由父(平台)通道决定，禁止子通道写入
         }
 
         $save = new Save(Model::class);
@@ -116,11 +125,11 @@ class PayManager extends Base
         $save->addForceMap("user_id", $this->getUser()->id);
         $save->addWhere("user_id", $this->getUser()->id); //归属校验：只能修改自己的支付通道（防大小写绕过越权）
 
-        if (isset($post['pid'])) {
+        if ($isBound) {
             /**
              * @var Model $pay
              */
-            $pay = Model::query()->find($post['pid']);
+            $pay = Model::query()->find($pid);
             if (!$pay || $pay->user_id !== null) {
                 throw new JSONException("上级支付接口不存在");
             }

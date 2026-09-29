@@ -56,9 +56,9 @@ class Code implements \App\Service\Common\Code
             "time" => time()
         ]);
 
-        //记录发送时间并重置失败计数
+        //记录发送时间。注意：不在此清除失败计数，否则攻击者可用「重发验证码」重置锁定实现无限爆破；
+        //失败计数仅在验证成功(verify)或锁定窗口自然过期后重置。
         Cache::inst()->set($throttleKey, ["time" => time()]);
-        Cache::inst()->del("cc_attempt_" . md5($key));
 
         return $code;
     }

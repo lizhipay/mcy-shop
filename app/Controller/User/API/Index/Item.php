@@ -77,7 +77,13 @@ class Item extends Base
 
         $sku = ItemSku::with(["item"])->find($skuId);
 
-        if (!$sku) {
+        if (!$sku || !$sku->item) {
+            throw new JSONException("SKU不存在");
+        }
+
+        //价格必须归属当前 Host 解析出的分站商家(主站则为无归属商品)，与 list()/detail() 的归属过滤一致，杜绝跨租户价格枚举
+        $siteOwner = Site::getUser((string)$this->request->header("Host"));
+        if ((int)$sku->item->user_id !== (int)($siteOwner?->id ?? 0)) {
             throw new JSONException("SKU不存在");
         }
 

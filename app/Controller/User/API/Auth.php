@@ -59,7 +59,7 @@ class Auth extends Base
         $terms = $this->request->post("terms");
 
 
-        if ($password != $re) {
+        if ((string)$password !== (string)$re) {
             throw new JSONException("两次密码输入不一致");
         }
 

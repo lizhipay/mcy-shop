@@ -69,7 +69,7 @@ class ItemSkuWholesale extends Base
      * @throws \ReflectionException
      */
     #[Validator([
-        ['key' => 'price', 'rule' => 'notZero', 'message' => ['notZero' => '零售价，必须大于0']],
+        [\App\Validator\User\ItemSkuWholesale::class, "price"]
     ])]
     public function save(): Response
     {

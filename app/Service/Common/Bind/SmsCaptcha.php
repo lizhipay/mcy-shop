@@ -5,11 +5,14 @@ namespace App\Service\Common\Bind;
 
 use App\Model\Config;
 use Kernel\Annotation\Inject;
+use Kernel\Cache\Cache;
 use Kernel\Exception\JSONException;
 use Kernel\Session\Session;
 
 class SmsCaptcha implements \App\Service\Common\SmsCaptcha
 {
+    private const MAX_ATTEMPTS = 5;
+    private const LOCK_SECONDS = 900;
 
     #[Inject]
     private \App\Service\Common\Sms $sms;
@@ -62,21 +65,47 @@ class SmsCaptcha implements \App\Service\Common\SmsCaptcha
     public function checkCaptcha(string $key, string $phone, int $code): bool
     {
         $key = $key . "_" . $phone;
+
+        //失败计数与锁定（共享内存），杜绝对6位短信验证码的暴力枚举
+        $attemptKey = "sms_attempt_" . md5($key);
+        $attempt = Cache::inst()->get($attemptKey);
+        $attempt = is_array($attempt) ? $attempt : ["count" => 0, "time" => time()];
+        if ((int)($attempt['time'] ?? 0) + self::LOCK_SECONDS <= time()) {
+            $attempt = ["count" => 0, "time" => time()];
+        }
+        if ((int)($attempt['count'] ?? 0) >= self::MAX_ATTEMPTS) {
+            return false;
+        }
+
         if (!$this->session->has($key)) {
+            $this->bumpAttempt($attemptKey, $attempt);
             return false;
         }
 
         $data = $this->session->get($key);
 
-        if ($data['code'] != $code) {
-            return false;
-        }
-
         if ($data['time'] + 300 < time()) {
             return false;
         }
 
+        if (!hash_equals((string)$data['code'], (string)$code)) {
+            $this->bumpAttempt($attemptKey, $attempt);
+            return false;
+        }
+
+        //验证成功：移除验证码防重放并清除失败计数
+        $this->session->remove($key);
+        Cache::inst()->del($attemptKey);
         return true;
+    }
+
+    private function bumpAttempt(string $attemptKey, array $attempt): void
+    {
+        $attempt['count'] = (int)($attempt['count'] ?? 0) + 1;
+        if (!isset($attempt['time'])) {
+            $attempt['time'] = time();
+        }
+        Cache::inst()->set($attemptKey, $attempt);
     }
 
     /**

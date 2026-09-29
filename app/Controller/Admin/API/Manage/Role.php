@@ -50,6 +50,9 @@ class Role extends Base
      */
     public function save(): Response
     {
+        if ($this->getManage()?->type != 0) {
+            throw new JSONException("仅超级管理员可管理角色权限");
+        }
         $save = new Save(RoleModel::class);
         $save->enableCreateTime();
         $save->setMap($this->request->post());
@@ -69,6 +72,9 @@ class Role extends Base
      */
     public function del(): Response
     {
+        if ($this->getManage()?->type != 0) {
+            throw new JSONException("仅超级管理员可管理角色权限");
+        }
         $list = (array)$this->request->post("list");
         foreach ($list as $id) {
             if ($id == 1) {

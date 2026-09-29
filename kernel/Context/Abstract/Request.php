@@ -23,6 +23,7 @@ abstract class Request implements \Kernel\Context\Interface\Request
     protected array $files = [];
 
     protected string $clientIp;
+    protected string $remoteAddr = "";
     protected string $url;
     protected string $domain;
     protected string $raw;
@@ -192,10 +193,20 @@ abstract class Request implements \Kernel\Context\Interface\Request
     public function clientIp(bool $secure = true): string
     {
         $address = $this->clientIp;
-        if ($secure && ($ip = Ip::get($this))) {
+        //仅当直连对端为可信代理时，才采纳「按模式读取的转发头(Ip::get)」，杜绝直连伪造该头污染来源 IP
+        if ($secure && $this->isTrustedPeer() && ($ip = Ip::get($this))) {
             $address = $ip;
         }
         return Ip::getType((string)$address) ? $address : "unknown";
+    }
+
+    /**
+     * 直连对端是否为可信代理。默认维持既有行为（FPM）；CLI/Swoole 覆写为可信代理白名单校验。
+     * @return bool
+     */
+    protected function isTrustedPeer(): bool
+    {
+        return true;
     }
 
 

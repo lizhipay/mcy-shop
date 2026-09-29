@@ -45,6 +45,13 @@ class Manage extends Model
      */
     protected array $casts = ['id' => 'integer', 'status' => 'integer', 'type' => 'integer', 'login_status' => 'integer'];
 
+    /**
+     * 密码/盐/支付密码为 JWT 签名密钥与敏感凭据，禁止随 toArray/JSON 输出（比照 User model），
+     * 杜绝子管理员经 manage/get 读到其它管理员的凭据后离线破解或伪造 token
+     * @var array
+     */
+    protected array $hidden = ['password', 'salt', 'security_password'];
+
 
     /**
      * @return BelongsToMany

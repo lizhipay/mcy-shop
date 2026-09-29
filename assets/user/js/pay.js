@@ -127,7 +127,7 @@ const pay = new class Pay {
                                         $walletBalance.html(getVar("CCY") + res.balance);
                                         $balancePay.append(`<div class="pay-item pay-current wallet-balance-click"><img src="/assets/common/images/balance.png"><span>我的钱包</span></div>`);
                                         res.data.forEach((item, index) => {
-                                            $onlinePay.append(`<div data-payId="${item.id}" class="pay-item online-pay-click ${(res.is_login == false || res.balance <= amount) ? (index == 0 ? "pay-current" : "") : ""}"><img src="${item.icon}"><span>${item.name}</span></div>`);
+                                            $onlinePay.append(`<div data-payId="${util.escape(item.id)}" class="pay-item online-pay-click ${(res.is_login == false || res.balance <= amount) ? (index == 0 ? "pay-current" : "") : ""}"><img src="${util.safeUrl(item.icon)}"><span>${util.escape(item.name)}</span></div>`);
                                             if ((res.is_login == false || res.balance <= amount) && index == 0) {
                                                 payId = item.id;
                                             }

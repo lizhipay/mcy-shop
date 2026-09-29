@@ -32,6 +32,8 @@ class Personal extends Base
             }
         ])->find($this->getUser()->id);
 
-        return $this->json(data: $user->toArray());
+        $data = $user->toArray();
+        unset($data['note']); //note 是管理员对该用户的内部备注，不回传给用户本人
+        return $this->json(data: $data);
     }
 }

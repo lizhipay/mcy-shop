@@ -48,7 +48,8 @@ class Order extends Base
         $get->setWhere($map);
         $get->setPaginate((int)$this->request->post("page"), (int)$this->request->post("limit"));
         $get->setOrderBy("order_report.id", "desc");
-        $get->setColumn("order_report.*");
+        //只回买家维权所需字段，排除 supply_id/merchant_id/refund_merchant_amount 等内部字段
+        $get->setColumn("order_report.id", "order_report.order_item_id", "order_report.customer_id", "order_report.status", "order_report.type", "order_report.expect", "order_report.handle_type", "order_report.refund_amount", "order_report.create_time");
         $data = $this->query->get($get, function (Builder $builder) use ($map) {
             $builder = $builder
                 ->where("order_report.customer_id", $this->getUser()->id)

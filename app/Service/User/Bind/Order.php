@@ -129,18 +129,29 @@ class Order implements \App\Service\User\Order
             throw new JSONException("您还没有选择商品");
         }
 
+        if (count($items) > 100) {
+            throw new JSONException("单次下单商品种类过多"); //限制 line-item 数量，防止超大 items 撑爆单个 SERIALIZABLE 事务(DoS)
+        }
+
+        //聚合同一 SKU 的购买数量：限购/单笔上限按合计判断，杜绝用重复 line-item 绕过
+        $skuQtyMap = [];
+        foreach ($items as $cart) {
+            $sid = (int)($cart['sku_id'] ?? 0);
+            $sid > 0 && ($skuQtyMap[$sid] = ($skuQtyMap[$sid] ?? 0) + (int)($cart['quantity'] ?? 0));
+        }
+
         if ($exists = \App\Model\Order::query()->where("status", 0)->where("create_time", ">", \date("Y-m-d H:i:s", time() - 360))->where("client_id", $clientId)->first()) {
             throw new JSONException($exists->trade_no, 9); //订单创建频繁
         }
 
 
         Plugin::instance()->unsafeHook(Usr::inst()->userToEnv($user?->id), Point::SERVICE_ORDER_TRADE_BEFORE, \Kernel\Plugin\Const\Plugin::HOOK_TYPE_PAGE, $items, $customer, $user, $invite);
-        return Db::transaction(function () use ($createIp, $createUa, $clientId, $items, $customer, $user, $invite, $itemService) {
+        return Db::transaction(function () use ($createIp, $createUa, $clientId, $items, $customer, $user, $invite, $itemService, $skuQtyMap) {
             $createOrder = new CreateOrder(\App\Const\Order::ORDER_TYPE_PRODUCT, $clientId, $createUa, $createIp);
             $createOrder->setMerchant($user);
             $createOrder->setCustomer($customer);
             $createOrder->setInvite($invite);
-            $order = $this->create($createOrder, function (\App\Model\Order $order) use ($invite, $user, $customer, $items, $itemService, $clientId) {
+            $order = $this->create($createOrder, function (\App\Model\Order $order) use ($invite, $user, $customer, $items, $itemService, $clientId, $skuQtyMap) {
                 //创建商品
                 foreach ($items as $cart) {
 
@@ -179,6 +190,12 @@ class Order implements \App\Service\User\Order
                      */
                     $item = $itemSku->item;
 
+                    //越权校验：主站只能购买主站商品(user_id 为空)，商户店铺只能购买本店商品；
+                    //杜绝在主站下单时提交他人店铺 SKU、以攻击者自定价(可为0)提走主站库存
+                    if (!$item || (int)$item->user_id !== (int)$user?->id) {
+                        throw new JSONException("SKU不存在");
+                    }
+
                     # 判断商品是否上架
                     if ($item->status != 1) {
                         throw new JSONException(sprintf("[%s]商品还未上架", $item->name));
@@ -196,12 +213,13 @@ class Order implements \App\Service\User\Order
 
                     Plugin::instance()->unsafeMultiHook([$user?->id, $repertoryItem?->user_id], Point::SERVICE_ORDER_TRADE_CREATE_ITEM_BEFORE, \Kernel\Plugin\Const\Plugin::HOOK_TYPE_PAGE, $cart, $order, $customer, $user, $invite);
 
+                    $skuTotalQty = $skuQtyMap[$skuId] ?? $quantity; //本单同一 SKU 合计数量
                     $quantityRestriction = $itemService->getQuantityRestriction($user?->id, $itemSku->repertoryItemSku);
                     if ($quantityRestriction->min > $quantity) {
                         throw new JSONException(sprintf("[%s]购买数量不能低于 %d 件", $item->name, $quantityRestriction->min));
                     }
 
-                    if ($quantityRestriction->max < $quantity && $quantityRestriction->total != 0) {
+                    if ($quantityRestriction->max != 0 && $quantityRestriction->max < $skuTotalQty) {
                         throw new JSONException(sprintf("[%s]购买数量不能大于 %d 件", $item->name, $quantityRestriction->max));
                     }
 
@@ -219,7 +237,7 @@ class Order implements \App\Service\User\Order
 
                         $totalPurchases = $totalPurchases->sum("quantity");
 
-                        if (($totalPurchases + $quantity) > $quantityRestriction->total) {
+                        if (($totalPurchases + $skuTotalQty) > $quantityRestriction->total) {
                             throw new JSONException(sprintf("[%s]该商品最多购买 %d 件，您暂时已经无法进行购买", $item->name, $quantityRestriction->total));
                         }
                     }
@@ -239,7 +257,7 @@ class Order implements \App\Service\User\Order
                             if (!isset($cart[$wid['name']]) || $cart[$wid['name']] === "") {
                                 throw new JSONException(sprintf("%s 不能为空", $wid['title']));
                             }
-                            if (!preg_match("#{$wid['regex']}#", $cart[$wid['name']])) {
+                            if (!Str::safeRegexMatch((string)$wid['regex'], (string)$cart[$wid['name']])) {
                                 throw new JSONException((string)$wid['error']);
                             }
                         }
@@ -438,6 +456,11 @@ class Order implements \App\Service\User\Order
             }
         }
 
+        //只在有效价格(数值且非负)中取最低价，杜绝空值/负数价格层(设置端校验缺失时)被当作 0/负价选中
+        $prices = array_filter($prices, fn($p) => is_numeric($p) && (float)$p >= 0);
+        if (empty($prices)) {
+            return (string)$itemSku->price;
+        }
         sort($prices);
         return (string)array_shift($prices);
     }
@@ -514,6 +537,11 @@ class Order implements \App\Service\User\Order
             $prices[] = $itemSkuUser->dividend_amount;
         }
 
+        //只在有效(数值且非负)分红中取最低值：杜绝负数 dividend_amount 被选中后在结算处变成给商家的凭空加款(铸币)
+        $prices = array_filter($prices, fn($p) => is_numeric($p) && (float)$p >= 0);
+        if (empty($prices)) {
+            return "0";
+        }
         sort($prices);
         return (string)array_shift($prices);
     }
@@ -915,7 +943,14 @@ class Order implements \App\Service\User\Order
         $order = \App\Model\Order::with(['item'])->where("type", 0);
 
         if ($tradeNo) {
-            $order = $order->where("trade_no", $tradeNo)->first();
+            //归属校验：凭 trade_no 查询也必须限定归属(登录按 customer_id、游客按 client_id)，杜绝越权读取他人订单信息
+            $order = $order->where("trade_no", $tradeNo);
+            if ($customer) {
+                $order = $order->where("customer_id", $customer->id);
+            } else {
+                $order = $order->where("client_id", $clientId);
+            }
+            $order = $order->first();
         } elseif ($customer) {
             $order = $order->where("customer_id", $customer->id)->orderBy("id", "desc")->first();
         } else {

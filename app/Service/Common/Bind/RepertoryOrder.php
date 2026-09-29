@@ -100,7 +100,7 @@ class RepertoryOrder implements \App\Service\Common\RepertoryOrder
                 if ($value === "") {
                     throw new JSONException(sprintf("%s 不能为空", $item['title']));
                 }
-                if (!preg_match("#{$item['regex']}#", $value)) {
+                if (!Str::safeRegexMatch((string)$item['regex'], (string)$value)) {
                     throw new JSONException((string)$item['error']);
                 }
             }

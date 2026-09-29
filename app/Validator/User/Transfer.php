@@ -18,8 +18,11 @@ class Transfer extends Base
 
     #[Required("转账金额不能为空")]
     #[Regex("/^[0-9]+(\.[0-9]{1,2})?$/", "转账金额错误")]
-    public function amount(): bool
+    public function amount(mixed $value): bool|string
     {
+        if (!is_numeric($value) || (float)$value <= 0) {
+            return "转账金额必须大于0";
+        }
         return true;
     }
 }

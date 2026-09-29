@@ -105,6 +105,17 @@ class Index extends Base
     ], Method::GET, Interceptor::VIEW)]
     public function checkout(string $tradeNo): Response
     {
+        //归属校验：只能查看自己的结账单，杜绝凭 trade_no 读取他人订单信息
+        $ownQuery = \App\Model\Order::query()->where("trade_no", $tradeNo);
+        if ($u = $this->getUser()) {
+            $ownQuery = $ownQuery->where("customer_id", $u->id);
+        } else {
+            $ownQuery = $ownQuery->where("client_id", $this->getClientId());
+        }
+        if (!$ownQuery->first()) {
+            throw new \Kernel\Exception\NotFoundException("订单不存在");
+        }
+
         $order = $this->order->getCheckoutOrder($tradeNo);
         if ($order->status == 1) {
             return $this->response->redirect("/pay/sync." . $tradeNo);

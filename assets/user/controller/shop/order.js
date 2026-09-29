@@ -115,7 +115,7 @@
                 if (!url) {
                     return null;
                 }
-                return `<a href="${url}" target="_blank" class="text-primary">${url}</a>`;
+                return `<a href="${util.safeUrl(url)}" target="_blank" rel="noopener noreferrer" class="text-primary">${util.escape(url)}</a>`;
             }
         },
         {field: 'order.pay_order.pay_time', title: '支付时间'},

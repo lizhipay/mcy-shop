@@ -27,6 +27,11 @@ class BankCard implements \App\Service\User\BankCard
         $userBankCard = new UserBankCard();
 
         if ($cardImage) {
+            //路径白名单：仅允许 /assets/ 下的图片，禁止 ../ 穿越，杜绝任意文件存在探测/引用
+            if (str_contains((string)$cardImage, "..") || !preg_match('#^/assets/[A-Za-z0-9_\-./]+\.(jpe?g|png|gif|webp|bmp)$#i', (string)$cardImage)) {
+                throw new ServiceException("银行卡图片不合法");
+            }
+
             $file = BASE_PATH . $cardImage;
 
             if (!is_file($file)) {

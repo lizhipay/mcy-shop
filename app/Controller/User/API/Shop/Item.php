@@ -116,9 +116,18 @@ class Item extends Base
             $this->ownership->item($this->getUser()->id, (int)$map['id'])
         );
 
+        //归属校验：分类/加价模板若指定，必须属于当前商家，杜绝跨租户引用
+        if (isset($map['category_id']) && (int)$map['category_id'] > 0 && !\App\Model\Category::query()->where("user_id", $this->getUser()->id)->where("id", (int)$map['category_id'])->exists()) {
+            throw new JSONException("分类不存在");
+        }
+        if (isset($map['markup_template_id']) && (int)$map['markup_template_id'] > 0 && !\App\Model\ItemMarkupTemplate::query()->where("user_id", $this->getUser()->id)->where("id", (int)$map['markup_template_id'])->exists()) {
+            throw new JSONException("同步模版配置不存在");
+        }
+
         $save = new Save(Model::class);
         $save->disableAddable();
-        $save->setMap($map);
+        //字段白名单防越权改写：user_id 强制为本人，repertory_item_id(货源归属)/create_time 禁止篡改
+        $save->setMap($map, [], ["user_id", "repertory_item_id", "create_time"]);
         $save->addForceMap("user_id", $this->getUser()->id);
         $save->addWhere("user_id", $this->getUser()->id); //归属校验：仅允许修改属于自己的记录
         try {

@@ -476,7 +476,7 @@ class Table {
                     if (val === "" || val === undefined || val === null) {
                         return '-';
                     }
-                    return `<img style="${circle}" class="render-image"  src="${val}" data-id="${item.id}" alt="放大图片">`;
+                    return `<img style="${circle}" class="render-image"  src="${util.escape(val)}" data-id="${item.id}" alt="放大图片">`;
                 }
                 break;
             default:

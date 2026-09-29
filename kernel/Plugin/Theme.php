@@ -19,7 +19,7 @@ class Theme
     public function getTheme(string $name, string $env = "/app/Plugin"): ?\Kernel\Plugin\Entity\Theme
     {
         $plugin = Plugin::inst()->getPlugin($name, $env);
-        if ($plugin->state['run'] != 1) {
+        if (!$plugin || $plugin->state['run'] != 1) {
             return null;
         }
 

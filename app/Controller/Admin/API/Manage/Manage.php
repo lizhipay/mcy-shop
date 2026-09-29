@@ -60,6 +60,9 @@ class Manage extends Base
     ])]
     public function save(): Response
     {
+        if ($this->getManage()?->type != 0) {
+            throw new JSONException("仅超级管理员可管理管理员账号");
+        }
         $map = $this->request->post();
 
         if (!isset($map['id'])) {
@@ -95,6 +98,9 @@ class Manage extends Base
      */
     public function del(): Response
     {
+        if ($this->getManage()?->type != 0) {
+            throw new JSONException("仅超级管理员可管理管理员账号");
+        }
         $delete = new Delete(ManageModel::class, (array)$this->request->post("list"));
         $this->query->delete($delete);
         return $this->json();

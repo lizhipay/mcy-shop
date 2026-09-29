@@ -10,6 +10,18 @@ const util = new class Util {
         return str.replace(/\./g, '-');
     }
 
+    // HTML 转义：用于把不受信任的数据(卡密/上游内容/自定义文本)插入 HTML 字符串时防止 XSS
+    escape(str) {
+        if (str === null || str === undefined) return "";
+        return String(str).replace(/[&<>"']/g, s => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[s]));
+    }
+
+    // URL 白名单：仅允许 http(s) 与站内相对路径，杜绝 javascript:/data: 等伪协议点击型 XSS
+    safeUrl(url) {
+        url = String(url ?? "");
+        return /^(https?:\/\/|\/)/i.test(url) ? url : "#";
+    }
+
     parseStringObject(obj, str) {
         try {
             // 去除字符串两端的空格
@@ -289,21 +301,22 @@ const util = new class Util {
      * @returns {string}
      */
     generateRandStr(length = 32) {
-        let _charStr = 'abacdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789',
-            min = 0,
-            max = _charStr.length - 1,
-            _str = '';
-        for (let i = 0, index; i < length; i++) {
-            index = (function (randomIndexFunc, i) {
-                return randomIndexFunc(min, max, i, randomIndexFunc);
-            })(function (min, max, i, _self) {
-                let indexTemp = Math.floor(Math.random() * (max - min + 1) + min),
-                    numStart = _charStr.length - 10;
-                if (i === 0 && indexTemp >= numStart) {
-                    indexTemp = _self(min, max, i, _self);
-                }
-                return indexTemp;
-            }, i);
+        const _charStr = 'abacdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789';
+        const max = _charStr.length;
+        const numStart = _charStr.length - 10;
+        // 使用 CSPRNG(crypto.getRandomValues) 而非 Math.random，作为游客身份(client_id)等凭据需不可预测
+        const cryptoObj = (typeof window !== 'undefined' && (window.crypto || window.msCrypto)) || (typeof self !== 'undefined' && self.crypto) || null;
+        let bytes;
+        if (cryptoObj && cryptoObj.getRandomValues) {
+            bytes = new Uint32Array(length);
+            cryptoObj.getRandomValues(bytes);
+        }
+        let _str = '';
+        for (let i = 0; i < length; i++) {
+            let index = (bytes ? bytes[i] : Math.floor(Math.random() * 0xffffffff)) % max;
+            if (i === 0 && index >= numStart) {
+                index = index % numStart; // 首位不为数字
+            }
             _str += _charStr[index];
         }
         return _str;

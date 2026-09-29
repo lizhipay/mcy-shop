@@ -53,6 +53,8 @@ class SupplyOrder extends Base
             $ship = $this->repertoryOrder->getOrderShip($order['id']);
             $data['list'][$index]['render'] = $ship?->isCustomRender() ?? false;
             $data['list'][$index]['is_self_operated'] = (($order['user_id'] === $order['customer_id']) && $order['user_id'] > 0 && $order['customer_id'] > 0);
+            //不向下游分销商泄露供货商/平台利润与成本、来源 IP
+            unset($data['list'][$index]['supply_profit'], $data['list'][$index]['office_profit'], $data['list'][$index]['cost'], $data['list'][$index]['trade_ip']);
         }
         return $this->json(data: $data);
     }

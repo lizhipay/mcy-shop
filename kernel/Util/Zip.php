@@ -91,6 +91,16 @@ class Zip
     {
         $zip = new \ZipArchive();
         if ($zip->open($file) === true) {
+            //防 zip-slip：逐条目校验，拒绝绝对路径与 ../ 目录穿越，杜绝恶意包写出目标目录之外覆盖核心/他人文件
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $name = (string)$zip->getNameIndex($i);
+                if ($name === "" || str_starts_with($name, "/") || str_starts_with($name, "\\")
+                    || preg_match('#(^|[/\\\\])\.\.([/\\\\]|$)#', $name)) {
+                    $zip->close();
+                    return false;
+                }
+            }
+
             if (!is_dir($targetPath)) {
                 mkdir($targetPath, 0777, true);
             }

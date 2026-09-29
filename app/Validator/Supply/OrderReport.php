@@ -64,7 +64,7 @@ class OrderReport
 
     public function refundAmount(mixed $value, array $data): bool|string
     {
-        if ($data['handle_type'] == 2 && ($value <= 0)) {
+        if ($data['handle_type'] == 2 && (!is_numeric($value) || (float)$value <= 0)) {
             return "退款金额必须大于0";
         }
         return true;

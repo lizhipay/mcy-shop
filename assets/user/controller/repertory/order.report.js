@@ -123,8 +123,8 @@
                     if (item.image_url) {
                         image = `<div class="row items-push js-gallery img-fluid-100">
                       <div class="col-sm-6 col-xl-3">
-                        <a class="img-link img-link-zoom-in img-lightbox" target="_blank" href="${item.image_url}">
-                          <img class="img-fluid" style="max-height: 200px;" src="${item.image_url}" alt="">
+                        <a class="img-link img-link-zoom-in img-lightbox" target="_blank" rel="noopener noreferrer" href="${util.safeUrl(item.image_url)}">
+                          <img class="img-fluid" style="max-height: 200px;" src="${util.safeUrl(item.image_url)}" alt="">
                         </a>
                       </div>
                     </div>`;

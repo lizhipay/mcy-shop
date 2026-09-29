@@ -32,6 +32,21 @@ class Config extends Base
 
 
     /**
+     * 插件标识/handle 白名单：只允许字母数字下划线，杜绝路径穿越写入非法 plugin 值，
+     * 该值后续会拼进 getPlugin() 的 require() 路径，属文件包含风险点。
+     * @param string $name
+     * @return void
+     * @throws JSONException
+     */
+    private function assertPluginName(string $name): void
+    {
+        if ($name === "" || !preg_match('/^[A-Za-z0-9_]+$/', $name)) {
+            throw new JSONException("非法的插件标识");
+        }
+    }
+
+
+    /**
      * @param string $plugin
      * @param string $handle
      * @return Response
@@ -42,6 +57,8 @@ class Config extends Base
     ])]
     public function get(string $plugin, string $handle): Response
     {
+        $this->assertPluginName($plugin);
+        $this->assertPluginName($handle);
         $get = new Get(Model::class);
         $get->setPaginate((int)$this->request->post("page"), (int)$this->request->post("limit"));
         $get->setOrderBy("id", "desc");
@@ -63,6 +80,8 @@ class Config extends Base
     ])]
     public function save(string $plugin, string $handle): Response
     {
+        $this->assertPluginName($plugin);
+        $this->assertPluginName($handle);
         $save = new Save(Model::class);
         $save->enableCreateTime();
         $map = $this->request->post();

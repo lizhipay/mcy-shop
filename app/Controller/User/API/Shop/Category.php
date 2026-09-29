@@ -55,11 +55,12 @@ class Category extends Base
      * @return Response
      * @throws JSONException
      */
-    #[Validator([
-        ['key' => 'name', 'rule' => 'require', 'message' => ['require' => '分类名称不能为空']]
-    ])]
     public function save(): Response
     {
+        //名称必填（原 #[Validator] 采用了引擎不支持的三元格式而从未生效，改为直接校验）
+        if (trim((string)$this->request->post("name", Filter::NORMAL)) === "") {
+            throw new JSONException("分类名称不能为空");
+        }
         $whitelist = ["name", "sort", "icon", "status", "pid"];
         $save = new Save(Model::class);
         $save->enableCreateTime();

@@ -129,7 +129,10 @@ class Item implements \App\Service\User\Item
         $itemEntity = new \App\Entity\Shop\Item($item);
         $itemEntity->setCategory(new \App\Entity\Shop\Category($item->category->id, $item->category->name, $item->category->icon));
         if ($source) {
-            $itemEntity->setSource($item->toArray());
+            //source 供买家详情展示用，剔除商家内部字段(加价策略/分红/货源归属)，避免泄露给买家
+            $src = $item->toArray();
+            unset($src['markup'], $src['markup_mode'], $src['markup_template_id'], $src['dividend_amount'], $src['user_id'], $src['repertory_item_id']);
+            $itemEntity->setSource($src);
         }
 
         $itemEntity->setSupplierId($item?->repertoryItem?->user_id);

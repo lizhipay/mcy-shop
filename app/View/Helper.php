@@ -54,11 +54,23 @@ class Helper extends AbstractExtension
 
 
     /**
+     * 模板可见的主站配置组黑名单：与后台"仅超管可读"的分组一致，含 SMTP/短信密钥、内网地址与 nginx 模板、支付回调等。
+     */
+    private const TEMPLATE_FORBIDDEN_CONFIG = ['email', 'sms', 'pay', 'subdomain'];
+
+    /**
+     * 供模板使用的 m_config()。Twig 未开启 sandbox，任意主题模板都能调用本函数，
+     * 故此处按根配置组做黑名单，杜绝(被污染的)主题经 {{ m_config('email') }} / m_config('pay.async_host')
+     * 等外泄平台 SMTP/短信密钥、内网 FPM 地址等机密(绕过后台的超管专属限制)。
      * @param string $key
      * @return mixed
      */
     public function getMainConfig(string $key): mixed
     {
+        $root = strtolower(explode(".", $key)[0]);
+        if (in_array($root, self::TEMPLATE_FORBIDDEN_CONFIG, true)) {
+            return [];
+        }
         return $this->config->getMainConfig($key);
     }
 

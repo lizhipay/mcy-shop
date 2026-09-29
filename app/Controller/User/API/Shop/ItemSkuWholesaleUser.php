@@ -88,7 +88,8 @@ class ItemSkuWholesaleUser extends Base
             }
             foreach ($map as $k => $v) {
                 $k = strtolower(trim($k));
-                if (!in_array($k, ["id", "user_id"])) {
+                //字段白名单：仅允许改价/状态/分红，杜绝覆写 wholesale_id/customer_id/create_time 等归属字段
+                if (in_array($k, ["price", "status", "dividend_amount"], true)) {
                     $model->$k = $v;
                 }
             }

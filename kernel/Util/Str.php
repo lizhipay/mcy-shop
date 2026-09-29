@@ -162,4 +162,27 @@ class Str
         return preg_replace('/(\.\d*?[1-9])0+|\.0*$/', '$1', (string)$number);
     }
 
+    /**
+     * 安全执行用户/商家自定义正则匹配：限制模式与主题长度、转义 # 分隔符（杜绝分隔符/修饰符注入）、
+     * 降低回溯步数上限（缓解灾难性回溯 ReDoS，Swoole 下 preg_match 会阻塞 worker）。匹配成功返回 true。
+     * @param string $pattern 用户提供的正则（不含分隔符）
+     * @param string $subject
+     * @return bool
+     */
+    public static function safeRegexMatch(string $pattern, string $subject): bool
+    {
+        if ($pattern === "" || strlen($pattern) > 300 || strlen($subject) > 5000) {
+            return false;
+        }
+        $delimited = '#' . str_replace('#', '\#', $pattern) . '#';
+        $backup = ini_get('pcre.backtrack_limit');
+        ini_set('pcre.backtrack_limit', '200000');
+        try {
+            $r = @preg_match($delimited, $subject);
+        } finally {
+            ini_set('pcre.backtrack_limit', $backup === false ? '1000000' : (string)$backup);
+        }
+        return $r === 1;
+    }
+
 }

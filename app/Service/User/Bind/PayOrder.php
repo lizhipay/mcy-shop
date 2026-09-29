@@ -99,6 +99,40 @@ class PayOrder implements \App\Service\User\PayOrder
                 throw new JSONException("订单已超时");
             }
 
+            //限购二次校验(支付前)：杜绝“先批量建未付订单、再逐一付款”及“同一 SKU 重复 line-item”绕过总量限购
+            if ($order->type == \App\Const\Order::ORDER_TYPE_PRODUCT) {
+                $orderItems = \App\Model\OrderItem::with(["sku" => function ($q) {
+                    $q->with("repertoryItemSku");
+                }])->where("order_id", $order->id)->get();
+                //先把本单同一 SKU 的数量合并
+                $skuQtyInOrder = [];
+                $skuRef = [];
+                foreach ($orderItems as $orderItem) {
+                    $skuQtyInOrder[$orderItem->sku_id] = ($skuQtyInOrder[$orderItem->sku_id] ?? 0) + (int)$orderItem->quantity;
+                    $skuRef[$orderItem->sku_id] = $orderItem;
+                }
+                foreach ($skuQtyInOrder as $skuId => $qtyInOrder) {
+                    $rSku = $skuRef[$skuId]->sku?->repertoryItemSku;
+                    if (!$rSku || (int)$rSku->market_control_status != 1 || (int)$rSku->market_control_only_num <= 0) {
+                        continue;
+                    }
+                    //已付款(1)与付款中(3)的其它订单都计入，防止逐一在线付款绕过；排除本单
+                    $paidQuery = \App\Model\OrderItem::query()
+                        ->leftJoin("order", "order_item.order_id", "=", "order.id")
+                        ->where("order_item.sku_id", $skuId)
+                        ->whereIn("order.status", [1, 3])
+                        ->where("order.id", "!=", $order->id);
+                    if ($order->customer_id) {
+                        $paidQuery = $paidQuery->where("order.customer_id", $order->customer_id);
+                    } else {
+                        $paidQuery = $paidQuery->where("order.client_id", $order->client_id);
+                    }
+                    if (((int)$paidQuery->sum("order_item.quantity") + $qtyInOrder) > (int)$rSku->market_control_only_num) {
+                        throw new JSONException("该商品已超过限购数量");
+                    }
+                }
+            }
+
             $order->status = 3; //正在付款
             $order->save();
 
@@ -172,6 +206,11 @@ class PayOrder implements \App\Service\User\PayOrder
 
 
             if (!$isOfficial) {
+                //越权校验：自定义支付接口只能支付本商户(店铺)的订单；
+                //杜绝用自己的支付接口 + 自伪造回调，把主站/他人订单标记为已支付
+                if ((int)$payApi->user_id !== (int)$order->user_id) {
+                    throw new JSONException("该支付方式不可用");
+                }
                 if ($order->type != \App\Const\Order::ORDER_TYPE_PRODUCT && $order->type != \App\Const\Order::ORDER_TYPE_UPGRADE_LEVEL) {
                     throw new JSONException("此业务不支持自定义支付接口");
                 }
@@ -332,6 +371,12 @@ class PayOrder implements \App\Service\User\PayOrder
 
 
             $pay = $this->getPay($payOrder->pay_id);
+
+            //纵深防御：自定义支付接口(归属某商户)的异步回调，必须归属该订单的商户，
+            //防止其它入口绕过 pay() 校验后仍能用商户接口标记他人/主站订单已支付
+            if ($pay->user_id !== null && (int)$pay->user_id !== (int)$order->user_id) {
+                throw new JSONException("该支付方式不可用");
+            }
 
 
             /**

@@ -78,6 +78,11 @@ class ItemSku extends Base
         $SKUEntity = $this->repertoryItemSku->getSKUEntity($itemSku->repertory_item_sku_id, $this->getUser()->id);
 
 
+        //分红必须为非负数值：负数会绕过下面的“盈利”判断，并在结算处变成给商家的凭空加款(铸币)
+        if (isset($map['dividend_amount']) && (!is_numeric($map['dividend_amount']) || (float)$map['dividend_amount'] < 0)) {
+            throw new JSONException("分红金额错误");
+        }
+
         if (isset($map['dividend_amount']) && isset($map['price'])) {
             if ((new Decimal($map['price'], 6))->sub($SKUEntity->stockPrice)->sub($map['dividend_amount'])->getAmount(6) <= 0) {
                 throw new JSONException("分红价格太低，无法盈利");
