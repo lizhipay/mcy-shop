@@ -96,6 +96,20 @@ class Dashboard extends Base
         //提现金额
         $data['withdraw_amount'] = (clone $userWithdraw)->sum("amount");
 
+        //销售登记统计
+        $salesQuery = \App\Model\SalesRecord::query()->where("status", 1);
+        if ($time) {
+            $salesQuery = $salesQuery->whereBetween("create_time", $time);
+        }
+        $data['sales_total_amount'] = (clone $salesQuery)->sum("order_amount");
+        $data['sales_total_count'] = (clone $salesQuery)->count();
+        $data['sales_by_salesman'] = (clone $salesQuery)
+            ->selectRaw("salesman, SUM(order_amount) as total_amount, COUNT(id) as order_count")
+            ->groupBy("salesman")
+            ->orderByDesc("total_amount")
+            ->limit(5)
+            ->get()
+            ->toArray();
 
         return $this->json(data: $data);
     }

@@ -47,6 +47,15 @@
                 $(".user-active-count").html(res.data.user_active_count);
                 $(".user-new-merchant-count").html(res.data.user_new_merchant_count);
                 $(".withdraw-amount").html(getVar("CCY") + res.data.withdraw_amount);
+                //销售统计
+                $(".sales-total-amount").html(getVar("CCY") + (res.data.sales_total_amount || "0.00"));
+                $(".sales-total-count").html(res.data.sales_total_count || 0);
+                var top5 = res.data.sales_by_salesman || [];
+                var tbody = $(".sales-top5-table tbody");
+                tbody.empty();
+                top5.forEach(function (item, idx) {
+                    tbody.append('<tr><td>' + (idx + 1) + '</td><td>' + item.salesman + '</td><td>' + item.order_count + '</td><td>' + getVar("CCY") + item.total_amount + '</td></tr>');
+                });
             }
         });
     }

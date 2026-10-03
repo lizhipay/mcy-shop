@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>{{ i18n("销售登记")|raw }}</title>
+    <link href="/assets/user/css/oneui.min.css" rel="stylesheet">
+    <link href="/assets/common/js/layer/theme/default/layer.css" rel="stylesheet">
+    <link href="/assets/common/css/toastr.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .sales-card { max-width: 520px; margin: 60px auto; }
+        .sales-card .block-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .form-floating { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+<div id="page-container">
+    <main id="main-container">
+        <div class="row mx-0 justify-content-center align-items-center" style="min-height: 100vh;">
+            <div class="sales-card content content-full overflow-hidden">
+                <form id="sales-form">
+                    <div class="block block-themed block-rounded block-fx-shadow">
+                        <div class="block-header">
+                            <h3 class="block-title text-white">{{ i18n("销售登记")|raw }}</h3>
+                        </div>
+                        <div class="block-content">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="salesman" name="salesman"
+                                       placeholder="{{ i18n('请输入销售人名称')|raw }}" required>
+                                <label for="salesman">{{ i18n("销售人")|raw }} <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="product_name" name="product_name"
+                                       placeholder="{{ i18n('请输入商品名称')|raw }}" required>
+                                <label for="product_name">{{ i18n("商品名称")|raw }} <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="order_amount" name="order_amount"
+                                       step="0.01" min="0.01" placeholder="0.00" required>
+                                <label for="order_amount">{{ i18n("销售金额")|raw }} <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="form-floating">
+                                <textarea class="form-control" id="remark" name="remark"
+                                          placeholder="{{ i18n('备注信息（选填）')|raw }}" style="height: 80px;"></textarea>
+                                <label for="remark">{{ i18n("备注")|raw }}</label>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-lg btn-alt-primary fw-medium w-100 submit-btn">
+                                        {{ i18n("提交登记")|raw }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="/assets/common/js/jquery.min.js"></script>
+<script src="/assets/common/js/toastr.min.js"></script>
+<script src="/assets/common/js/layer/layer.js"></script>
+
+{{ var({"language": "zh-cn", "DEBUG": false})|raw }}
+<script>
+    !function () {
+        $(".submit-btn").click(function () {
+            var salesman = $("#salesman").val().trim();
+            var productName = $("#product_name").val().trim();
+            var orderAmount = $("#order_amount").val();
+
+            if (!salesman) { toastr.error("请输入销售人名称"); return; }
+            if (!productName) { toastr.error("请输入商品名称"); return; }
+            if (!orderAmount || parseFloat(orderAmount) <= 0) { toastr.error("请输入有效的销售金额"); return; }
+
+            var _this = $(this);
+            _this.attr("disabled", true);
+            $.ajax({
+                url: "/user/sales/register/submit",
+                type: "POST",
+                data: {
+                    salesman: salesman,
+                    product_name: productName,
+                    order_amount: orderAmount,
+                    remark: $("#remark").val().trim()
+                },
+                dataType: "json",
+                success: function (res) {
+                    _this.attr("disabled", false);
+                    if (res.code === 0 || res.code === 200) {
+                        toastr.success("登记成功");
+                        $("#sales-form")[0].reset();
+                    } else {
+                        toastr.error(res.message || "提交失败");
+                    }
+                },
+                error: function () {
+                    _this.attr("disabled", false);
+                    toastr.error("网络错误，请重试");
+                }
+            });
+        });
+    }();
+</script>
+</body>
+</html>

@@ -687,6 +687,10 @@ Route::add("/user/task/autoReceipt", [\App\Controller\User\API\Task::class, "aut
 Route::add("/user/upload", [\App\Controller\User\API\Upload::class, "main"], "POST");
 Route::add("/user/upload/get", [\App\Controller\User\API\Upload\Upload::class, "get"], "POST");
 
+//销售登记（免登录）
+Route::add("/user/sales/register", [\App\Controller\User\Sales\Register::class, "index"], "GET");
+Route::add("/user/sales/register/submit", [\App\Controller\User\API\Sales\Register::class, "submit"], "POST");
+
 //订单查询
 Route::add("/search", [\App\Controller\User\Index::class, "search"], "GET");
 
